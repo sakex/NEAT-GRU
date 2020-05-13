@@ -9,11 +9,10 @@
 #define NEURALNETWORK_NN_H_
 
 #include <iostream>
-#include <vector>
 
 #include "../Private/Connection.h"
 #include "../Private/routines.h"
-#include "../Private/Neuron.h"
+#include "../Private/Layer.h"
 #include "Topology.h"
 
 namespace NeuralNetwork {
@@ -31,13 +30,15 @@ namespace NeuralNetwork {
         std::vector<double> compute(const double *);
 
     private:
-        std::vector<Layer *> layers;
+        Layer * layers;
 
-        Neuron *merge_neuron(size_t layer, size_t index);
+        int layer_count;
 
         void init_topology(Topology_ptr &topology);
 
         void set_inputs(const double *inputs_vector);
+
+        void delete_layers();
     };
 
 } /* namespace NeuralNetwork */

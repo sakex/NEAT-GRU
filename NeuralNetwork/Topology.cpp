@@ -216,6 +216,10 @@ namespace NeuralNetwork {
         return best_historical_result > result_before_mutation;
     }
 
+    std::vector<int> const & Topology::get_layers_size() const {
+        return layers_size;
+    }
+
     void Topology::set_optimized() {
         std::queue<Mutation> empty;
         std::swap(mutations, empty);

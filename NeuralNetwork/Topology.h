@@ -71,6 +71,8 @@ namespace NeuralNetwork {
 
         bool mutation_positive() const;
 
+        std::vector<int> const & get_layers_size() const;
+
     public:
         // Species evolution methods
         bool optimize();

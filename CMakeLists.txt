@@ -8,11 +8,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(NEAT_GRU_SOURCES
         Train/Train.cpp
-        Train/Train.h
         Game/Game.cpp
-        Game/Game.h
         Game/Player.cpp
-        Game/Player.h
         Private/Generation.cpp
         Private/Generation.h
         Private/Mutation.cpp
@@ -22,24 +19,28 @@ set(NEAT_GRU_SOURCES
         Private/Species.cpp
         Private/Species.h
         Private/MutationField.cpp
-        Private/MutationField.h
         Private/Random.cpp
         Private/Random.h
+        Private/MutationField.h
         NeuralNetwork/Topology.cpp
-        NeuralNetwork/Topology.h
         Timer.cpp
-        Timer.h
         TopologyParser/TopologyParser.cpp
-        TopologyParser/TopologyParser.h
-        Threading/multithreaded_methods.h
         Threading/ThreadPool.cpp
-        Threading/ThreadPool.h
         Serializer/Serializable.cpp
-        Serializer/Serializable.h
-        Serializer/Serializer.hpp
         )
 
-add_library(NEAT_GRU)
+set(PUB_HEADERS Game/Player.h
+        Serializer/Serializable.h
+        Serializer/Serializer.hpp
+        Threading/ThreadPool.h
+        TopologyParser/TopologyParser.h
+        Threading/multithreaded_methods.h
+        Timer.h
+        NeuralNetwork/Topology.h
+        Game/Game.h
+        Train/Train.h)
+
+add_library(NEAT_GRU Private/Layer.cpp Private/Layer.h)
 target_include_directories(NEAT_GRU PRIVATE Private)
 target_include_directories(NEAT_GRU PUBLIC Serializer)
 target_include_directories(NEAT_GRU PUBLIC NeuralNetwork)
@@ -48,6 +49,8 @@ target_include_directories(NEAT_GRU PUBLIC Train)
 target_include_directories(NEAT_GRU PUBLIC TopologyParser)
 target_include_directories(NEAT_GRU PUBLIC Threading)
 target_sources(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
+target_sources(NEAT_GRU PRIVATE ${PUB_HEADERS})
+
 
 if (CUDA_ENABLED)
     include_directories(Private/CUDA/NeuralNetwork)
@@ -76,3 +79,10 @@ else ()
             Private/routines.cpp
             Private/routines.h)
 endif ()
+
+
+INSTALL(TARGETS NEAT_GRU
+        LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+
+INSTALL(FILES ${PUB_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/neat_gru)

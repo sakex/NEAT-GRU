@@ -58,8 +58,6 @@ namespace NeuralNetwork {
         void reset_value();
     };
 
-    typedef std::vector<Neuron *> Layer;
-
 } /* namespace NeuralNetwork */
 
 #endif /* NEURALNETWORK_NEURON_H_ */
