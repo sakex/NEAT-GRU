@@ -5,7 +5,6 @@
  *      Author: sakex
  */
 
-#include <neat/Timer.h>
 #include "Train.h"
 
 namespace Train {

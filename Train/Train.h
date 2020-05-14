@@ -15,6 +15,7 @@
 #include <functional>
 #include <mutex>
 
+#include "../Timer.h"
 #include "../Threading/multithreaded_methods.h"
 #include "../NeuralNetwork/Topology.h"
 #include "../Private/Species.h"
