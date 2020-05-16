@@ -30,5 +30,10 @@ namespace NeuralNetwork {
         output->increment_update(value * update_memory_weight + memory * update_memory_weight);
     }
 
+    void Connection::reset_state() {
+        memory = 0.;
+        prev_input = 0.;
+    }
+
 
 } /* namespace NeuralNetwork */

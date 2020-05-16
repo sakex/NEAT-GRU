@@ -11,7 +11,7 @@ namespace Train {
 
     Train::Train(Game::Game *_game, int const _iterations, int const _max_individuals, int const inputs,
                  int const outputs) :
-            best_historical_topology{Topology_ptr{nullptr}} {
+            best_historical_topology{Topology_ptr{nullptr}}, brains{nullptr} {
         game = _game;
         iterations = _iterations;
         inputs_count = inputs;
@@ -22,8 +22,7 @@ namespace Train {
 
     Train::Train(Game::Game *_game, int const _iterations, int const _max_individuals, int const inputs,
                  int const outputs, Topology_ptr top) :
-            best_historical_topology{std::move(top)} {
-        game = _game;
+            game(_game), best_historical_topology{std::move(top)}, brains{nullptr} {
         iterations = _iterations;
         inputs_count = inputs;
         outputs_count = outputs;
@@ -31,6 +30,10 @@ namespace Train {
         Species_ptr new_species = std::make_unique<Species>();
         *new_species >> best_historical_topology;
         species.emplace_back(std::move(new_species));
+    }
+
+    Train::~Train() {
+        delete[] brains;
     }
 
     void Train::random_new_species() {
@@ -79,15 +82,26 @@ namespace Train {
         species.emplace_back(std::move(new_species));
     }
 
+    inline void Train::assign_results(std::vector<double> const &results) {
+        size_t const size = results.size();
+#if DEBUG
+        assert(size == last_topologies.size());
+#endif
+        for (size_t it = 0; it < size; ++it) {
+            last_topologies[it]->set_last_result(results[it]);
+        }
+    }
+
     void Train::start() {
         reset_players();
         int no_progress = 0;
         for (int it = 0; it != iterations; ++it) { // iterations < 0 -> run forever = other end conditions
             std::cout << it << std::endl;
             utils::Timer run_timer("RUN GENERATION");
-            run_dataset();
+            std::vector<double> results = run_dataset();
+            delete[] brains;
             run_timer.stop();
-            assign_results();
+            assign_results(results);
             update_best();
             if (new_best) {
                 no_progress = 0;
@@ -151,10 +165,15 @@ namespace Train {
     }
 
     void Train::reset_players() {
-        std::vector<Topology_ptr> topologies = topologies_vector();
-        game->reset_players(topologies);
+        last_topologies = topologies_vector();
+        size_t const size = last_topologies.size();
+        brains = new NN[size];
+        for (size_t it = 0; it < size; ++it) {
+            brains[it].init_topology(last_topologies[it]);
+        }
+        game->reset_players(brains, size);
         std::cout << "SPECIES: " << species.size() <<
-                  " TOPOLOGIES: " << topologies.size() << std::endl;
+                  " TOPOLOGIES: " << last_topologies.size() << std::endl;
     }
 
     void Train::reassign_species(std::vector<Topology_ptr> &topologies) {
@@ -199,13 +218,8 @@ namespace Train {
         }
     }
 
-    void Train::run_dataset() {
-        game->run_generation();
-    }
-
-
-    void Train::assign_results() {
-        game->set_last_results();
+    inline std::vector<double> Train::run_dataset() {
+        return game->run_generation();
     }
 
     void Train::natural_selection() {
@@ -253,6 +267,7 @@ namespace Train {
 
     void Train::plot_best() const {
         Game::Player *best = game->post_training(best_historical_topology);
+        if (!best) return;
         std::cout << "RESULT: " << (best->get_result() - 3000) / 3000 << std::endl;
         Serializer::to_file(&*(best->get_topology()), "topology.json");
     }

@@ -45,6 +45,8 @@ namespace NeuralNetwork {
 
         void feed_forward();
 
+        void reset_state();
+
     private:
         bool activated = false;
         double input = 0.;

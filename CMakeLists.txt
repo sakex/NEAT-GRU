@@ -1,3 +1,5 @@
+project(neat_gru)
+cmake_minimum_required(VERSION 3.0)
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
@@ -27,6 +29,7 @@ set(NEAT_GRU_SOURCES
         TopologyParser/TopologyParser.cpp
         Threading/ThreadPool.cpp
         Serializer/Serializable.cpp
+        bindings/bindings.cpp
         )
 
 set(PUB_HEADERS Game/Player.h
@@ -38,7 +41,8 @@ set(PUB_HEADERS Game/Player.h
         Timer.h
         NeuralNetwork/Topology.h
         Game/Game.h
-        Train/Train.h)
+        Train/Train.h
+        bindings/bindings.h)
 
 add_library(NEAT_GRU Private/Layer.cpp Private/Layer.h)
 target_include_directories(NEAT_GRU PRIVATE Private)

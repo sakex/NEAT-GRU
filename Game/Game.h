@@ -20,20 +20,16 @@ namespace Game {
     public:
         virtual ~Game() = default;
 
-        void run_generation();
+        std::vector<double> run_generation();
 
-        void set_last_results();
-
-        void reset_players(std::vector<Topology_ptr> &);
+        void reset_players(NN *, size_t);
 
         Player *post_training(Topology_ptr);
 
     private:
-        virtual void do_run_generation() = 0;
+        virtual std::vector<double> do_run_generation() = 0;
 
-        virtual void do_set_last_results() = 0;
-
-        virtual void do_reset_players(std::vector<Topology_ptr> &) = 0;
+        virtual void do_reset_players(NN *, size_t) = 0;
 
         virtual Player *do_post_training(Topology_ptr) = 0;
 

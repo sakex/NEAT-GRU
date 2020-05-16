@@ -9,6 +9,9 @@
 
 namespace NeuralNetwork {
 
+    NN::NN(): layers(nullptr), layer_count(0) {
+    }
+
     NN::NN(Topology_ptr &topology): layers(nullptr), layer_count(0) {
         init_topology(topology);
     }
@@ -69,6 +72,13 @@ namespace NeuralNetwork {
         return softmax(values);
     }
 
+    void NN::reset_state() {
+        for (size_t it = 0; it < layer_count; ++it) {
+            for (size_t j = 0; j < layers[it].size(); ++j) {
+                layers[it][j]->reset_state();
+            }
+        }
+    }
 
     void NN::set_inputs(const double *inputs_array) {
         Layer &first_layer = layers[0];

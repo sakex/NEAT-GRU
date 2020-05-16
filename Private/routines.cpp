@@ -5,11 +5,11 @@
 #include "routines.h"
 
 namespace NeuralNetwork {
-    double sigmoid(double const value) {
+    inline double sigmoid(double const value) {
         return 1 / (1 + std::exp(-value));
     }
 
-    std::vector<double> softmax(std::vector<double> &values) {
+    inline std::vector<double> softmax(std::vector<double> &values) {
         double total = 0;
         for (double &val: values) {
             if (val < 0) val = 0;

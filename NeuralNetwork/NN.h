@@ -23,18 +23,22 @@ namespace NeuralNetwork {
 
     class NN {
     public:
+        NN();
+
         explicit NN(Topology_ptr &topology);
 
         virtual ~NN();
 
         std::vector<double> compute(const double *);
 
+        void init_topology(Topology_ptr &topology);
+
+        void reset_state();
+
     private:
         Layer * layers;
 
         int layer_count;
-
-        void init_topology(Topology_ptr &topology);
 
         void set_inputs(const double *inputs_vector);
 

@@ -42,7 +42,7 @@ namespace Train {
 
         Train(Game::Game *, int, int, int, int, Topology_ptr);
 
-        ~Train() = default;
+        ~Train();
 
         void start();
 
@@ -58,6 +58,9 @@ namespace Train {
         int outputs_count;
         int max_individuals;
         bool new_best = false;
+        std::vector<Topology_ptr> last_topologies;
+
+        NN * brains;
 
     private:
         void random_new_species();
@@ -67,9 +70,9 @@ namespace Train {
         void reset_players();
 
     private:
-        void run_dataset();
+        void assign_results(std::vector<double> const &);
 
-        void assign_results();
+        std::vector<double> run_dataset();
 
         void natural_selection();
 

@@ -24,9 +24,11 @@ namespace NeuralNetwork {
 
         void activate(double);
 
+        void reset_state();
+
     private:
-        double memory = 0;
-        double prev_input = 0;
+        double memory = 0.;
+        double prev_input = 0.;
         double const input_weight;
         double const memory_weight;
         double const reset_input_weight;
