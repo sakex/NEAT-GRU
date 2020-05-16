@@ -23,9 +23,9 @@ namespace NeuralNetwork {
     public:
         Neuron();
 
-        virtual ~Neuron();
+        virtual ~Neuron() = default;
 
-        Connection *add_connection(Neuron *, double, double, double, double, double, double);
+        void add_connection(Neuron *, double, double, double, double, double, double);
 
         void increment_input(double);
 
@@ -47,12 +47,12 @@ namespace NeuralNetwork {
 
     private:
         bool activated = false;
-        double input = 0;
-        double memory = 0;
-        double update = 0;
-        double reset = 0;
-        double prev_reset = 0;
-        std::vector<Connection *> connections;
+        double input = 0.;
+        double memory = 0.;
+        double update = 0.;
+        double reset = 0.;
+        double prev_reset = 0.;
+        std::vector<Connection> connections;
 
     private:
         void reset_value();
