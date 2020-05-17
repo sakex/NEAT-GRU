@@ -15,15 +15,22 @@ std::vector<double> GameBinding::do_run_generation() {
 
 void GameBinding::do_reset_players(NN *brains, size_t size) {
     _size = size;
-    (*sim.reset_players)(brains, static_cast<unsigned >(size));
+    auto * wrappers = new NetWrapper[size];
+    for(int i = 0; i < size; ++i) {
+        void * ptr = &brains[i];
+        wrappers[i].net = ptr;
+    }
+    (*sim.reset_players)(wrappers, static_cast<unsigned>(size));
+    delete[] wrappers;
 }
 
 ::Game::Player *GameBinding::do_post_training(Topology_ptr) {
     return nullptr;
 }
 
-double * compute_network(NN* net, const double * inputs) {
-    std::vector<double> outputs = net->compute(inputs);
+double * compute_network(NetWrapper net, const double * inputs) {
+    NN * actual_net = static_cast<NN*>(net.net);
+    std::vector<double> outputs = actual_net->compute(inputs);
     return outputs.data();
 }
 

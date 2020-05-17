@@ -22,36 +22,25 @@ namespace Game {
 
     class Player {
     public:
-        explicit Player(NeuralNetwork::Topology_ptr &);
+        explicit Player(NeuralNetwork::NN &);
 
-        Player(Player &base);
-
-        virtual ~Player();
+        virtual ~Player() = default;
 
         void decide();
 
-        void set_last_result();
-
-        void reset(NeuralNetwork::Topology_ptr &);
-
-        NeuralNetwork::Topology_ptr get_topology() const;
+        void reset(NeuralNetwork::NN &);
 
         long double get_result();
 
-        Player &operator=(Player const &base);
-
     protected:
-        NeuralNetwork::NN *brain;
-        NeuralNetwork::Topology_ptr topology;
+        NeuralNetwork::NN & brain;
 
     private:
         virtual void do_decide() = 0;
 
-        virtual void do_reset(NeuralNetwork::Topology_ptr &) = 0;
+        virtual void do_reset(NeuralNetwork::NN &) = 0;
 
         virtual long double do_get_result() = 0;
-
-        virtual void do_set_last_result() = 0;
     };
 }
 

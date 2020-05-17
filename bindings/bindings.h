@@ -9,10 +9,15 @@
 #include "../Game/Game.h"
 
 extern "C"
+struct NetWrapper {
+    void* net;
+};
+
+extern "C"
 struct Simulation {
     double * (*run_generation)();
 
-    void (*reset_players)(NN *, unsigned);
+    void (*reset_players)(NetWrapper *, unsigned);
 };
 
 class GameBinding : public Game::Game {
@@ -32,7 +37,7 @@ private:
 };
 
 extern "C"
-double * compute_network(NN*, const double *);
+double * compute_network(NetWrapper, const double *);
 
 extern "C" void train(Simulation, int, int, int, int);
 
