@@ -5,7 +5,7 @@
 #ifndef NEAT_BINDINGS_H
 #define NEAT_BINDINGS_H
 
-#include "Train.h"
+#include "../Train/Train.h"
 #include "../Game/Game.h"
 
 extern "C"

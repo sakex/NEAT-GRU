@@ -8,11 +8,11 @@
 #ifndef GAME_PLAYER_H_
 #define GAME_PLAYER_H_
 
-#include "neat/NeuralNetwork/Topology.h"
+#include "../NeuralNetwork/Topology.h"
 
 #ifndef CUDA_ENABLED
 
-#include "neat/NeuralNetwork/NN.h"
+#include "../NeuralNetwork/NN.h"
 
 #else
 #include "../NeuralNetwork/CUDA/NN.cuh"

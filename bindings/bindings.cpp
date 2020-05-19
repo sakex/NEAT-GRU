@@ -16,7 +16,7 @@ std::vector<double> GameBinding::do_run_generation() {
 void GameBinding::do_reset_players(NN *brains, size_t size) {
     _size = size;
     auto * wrappers = new NetWrapper[size];
-    for(int i = 0; i < size; ++i) {
+    for(std::size_t i = 0; i < size; ++i) {
         void * ptr = &brains[i];
         wrappers[i].net = ptr;
     }

@@ -22,7 +22,7 @@
 #include "../Private/Generation.h" // Global evolution number
 
 #include "../Serializer/Serializer.hpp"
-#include "Random.h"
+#include "../Private/Random.h"
 
 namespace NeuralNetwork {
 

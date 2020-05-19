@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <memory>
-#include "neat/NeuralNetwork/Topology.h"
+#include "../NeuralNetwork/Topology.h"
 #include "Player.h"
 
 using namespace NeuralNetwork;

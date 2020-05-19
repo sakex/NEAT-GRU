@@ -12,7 +12,7 @@
 #include <memory>
 #include <algorithm>
 
-#include "neat/NeuralNetwork/Topology.h"
+#include "../NeuralNetwork/Topology.h"
 
 namespace NeuralNetwork {
 

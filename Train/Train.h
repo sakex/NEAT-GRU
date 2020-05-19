@@ -23,11 +23,11 @@
 #include "../Game/Game.h"
 #include "../Game/Player.h"
 #include "../Serializer/Serializer.hpp"
-#include "Random.h"
+#include "../Private/Random.h"
 
 #ifndef CUDA_ENABLED
 
-#include "neat/NeuralNetwork/NN.h"
+#include "../NeuralNetwork/NN.h"
 
 #else
 #include "../NeuralNetwork/CUDA/NN.cuh"
