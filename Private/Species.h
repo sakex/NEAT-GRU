@@ -21,7 +21,7 @@ namespace NeuralNetwork {
     public:
         Species();
 
-        Species(Topology_ptr const &, int);
+        Species(Topology_ptr const &, size_t);
 
         virtual ~Species() = default;
 
@@ -42,7 +42,7 @@ namespace NeuralNetwork {
         void natural_selection();
 
     private:
-        int max_individuals;
+        size_t max_individuals;
         std::vector<Topology_ptr> topologies;
         Topology_ptr best_topology;
 

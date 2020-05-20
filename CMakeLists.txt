@@ -5,7 +5,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -fopenmp -flto")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
 set(CMAKE_CXX_STANDARD 14)
 
 set(NEAT_GRU_SOURCES
@@ -30,6 +30,7 @@ set(NEAT_GRU_SOURCES
         Threading/ThreadPool.cpp
         Serializer/Serializable.cpp
         bindings/bindings.cpp
+        bindings/GameBinding.cpp
         )
 
 set(PUB_HEADERS Game/Player.h
@@ -42,7 +43,9 @@ set(PUB_HEADERS Game/Player.h
         NeuralNetwork/Topology.h
         Game/Game.h
         Train/Train.h
-        bindings/bindings.h)
+        bindings/bindings.h
+        bindings/GameBinding.h
+        bindings/structs.h)
 
 add_library(NEAT_GRU Private/Layer.cpp Private/Layer.h)
 target_include_directories(NEAT_GRU PRIVATE Private)
@@ -84,6 +87,7 @@ else ()
             Private/routines.h)
 endif ()
 
+target_link_libraries(NEAT_GRU -lstdc++)
 
 INSTALL(TARGETS NEAT_GRU
         LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

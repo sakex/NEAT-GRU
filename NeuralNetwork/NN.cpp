@@ -56,7 +56,7 @@ namespace NeuralNetwork {
 
     std::vector<double> NN::compute(const double *inputs_vector) {
         set_inputs(inputs_vector);
-        for (size_t it = 0; it < layer_count - 1; ++it) {
+        for (int it = 0; it < layer_count - 1; ++it) {
             for (size_t j = 0; j < layers[it].size(); ++j) {
                 layers[it][j]->feed_forward();
             }
@@ -73,7 +73,7 @@ namespace NeuralNetwork {
     }
 
     void NN::reset_state() {
-        for (size_t it = 0; it < layer_count; ++it) {
+        for (int it = 0; it < layer_count; ++it) {
             for (size_t j = 0; j < layers[it].size(); ++j) {
                 layers[it][j]->reset_state();
             }

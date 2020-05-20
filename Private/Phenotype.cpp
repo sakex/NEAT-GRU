@@ -24,8 +24,8 @@ namespace NeuralNetwork {
             reset_memory_weight(rmw),
             update_input_weight(uiw),
             update_memory_weight(umw),
-            disabled(false),
-            evolution_number(ev_number) {
+            evolution_number(ev_number),
+            disabled(false) {
     }
 
     Phenotype::Phenotype(point const &_input, point const &_output,
@@ -40,8 +40,8 @@ namespace NeuralNetwork {
             reset_memory_weight(rmw),
             update_input_weight(uiw),
             update_memory_weight(umw),
-            disabled(_disabled),
-            evolution_number(ev_number) {
+            evolution_number(ev_number),
+            disabled(_disabled) {
     }
 
     Phenotype::Phenotype(point const &input, point const &output,

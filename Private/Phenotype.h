@@ -95,7 +95,7 @@ namespace NeuralNetwork {
         double update_input_weight;
         double update_memory_weight;
         long int evolution_number;
-        bool disabled = false;
+        bool disabled;
 
         std::string parse_to_string() const override;
     };

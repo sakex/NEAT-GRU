@@ -9,13 +9,12 @@
 
 namespace NeuralNetwork {
 
-    Species::Species() : best_topology{new Topology}, max_individuals(1) {
+    Species::Species() : max_individuals(1), topologies(), best_topology{new Topology} {
     }
 
-    Species::Species(Topology_ptr const &topology, const int max) :
-            best_topology{new Topology(*topology)} {
+    Species::Species(Topology_ptr const &topology, const size_t max) :
+            max_individuals(max), topologies(), best_topology{new Topology(*topology)} {
         topologies.push_back(topology);
-        max_individuals = max;
     }
 
     bool Species::operator<(Species const &other) {
@@ -51,7 +50,7 @@ namespace NeuralNetwork {
         std::vector<Topology_ptr> surviving_topologies;
         std::vector<Topology_ptr> contenders;
         surviving_topologies.reserve(max_individuals);
-        int quarter = max_individuals * 3 / 4;
+        int quarter = static_cast<int>(max_individuals) * 3 / 4;
         for (int it = topologies_size / 2; it < topologies_size; ++it) {
             Topology_ptr &topology = topologies[it];
             if (it >= quarter) {
@@ -85,9 +84,9 @@ namespace NeuralNetwork {
     void Species::evolve(std::vector<Topology_ptr> &surviving_topologies,
                          std::vector<Topology_ptr> &contenders) {
         size_t positive_size = contenders.size();
-        if (positive_size == 0 || max_individuals <= surviving_topologies.size())
+        if (positive_size == 0 || (size_t) max_individuals <= surviving_topologies.size())
             return;
-        for (size_t it = positive_size - 1; it >= 0; --it) {
+        for (long it = (long) positive_size - 1; it >= 0; --it) {
             Topology_ptr &topology = contenders[it];
             size_t new_individuals;
             if (max_individuals > surviving_topologies.size()) {
@@ -107,8 +106,8 @@ namespace NeuralNetwork {
     }
 
     void Species::duplicate_best() {
-        int topologies_size = topologies.size();
-        int best_quantity = max_individuals - topologies_size;
+        int topologies_size = static_cast<int>(topologies.size());
+        int best_quantity = static_cast<int>(max_individuals) - topologies_size;
         if (best_quantity > 0)
             best_topology->new_generation(best_quantity, topologies);
     }

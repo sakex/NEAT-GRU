@@ -76,7 +76,7 @@ namespace NeuralNetwork {
     }
 
     Topology::Topology(Topology const &base) :
-            relationships(), mutations(), ev_number_index() {
+            relationships(), ev_number_index(), mutations() {
         layers = base.layers;
         layers_size = base.layers_size;
         last_result = base.last_result;
