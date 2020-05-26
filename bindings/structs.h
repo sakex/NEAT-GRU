@@ -12,9 +12,9 @@ typedef struct NetWrapper{
 
 
 typedef struct Simulation{
-    double *(*run_generation)();
-
-    void (*reset_players)(NetWrapper *, unsigned);
+    double *(*run_generation)(void *);
+    void (*reset_players)(void *, NetWrapper *, unsigned);
+    void * context;
 } Simulation;
 }
 

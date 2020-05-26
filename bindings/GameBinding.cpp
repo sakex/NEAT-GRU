@@ -14,12 +14,12 @@ void GameBinding::do_reset_players(NN *brains, size_t size) {
         void *ptr = &brains[i];
         wrappers[i].net = ptr;
     }
-    (*sim.reset_players)(wrappers, static_cast<unsigned>(size));
+    (*sim.reset_players)(sim.context, wrappers, static_cast<unsigned>(size));
     delete[] wrappers;
 }
 
 std::vector<double> GameBinding::do_run_generation() {
-    double *results = (*sim.run_generation)();
+    double *results = (*sim.run_generation)(sim.context);
     std::vector<double> ret(results, results + _size);
     return ret;
 }
