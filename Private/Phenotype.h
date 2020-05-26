@@ -9,7 +9,7 @@
 #define NEURALNETWORK_PHENOTYPE_H_
 
 #include <array>
-#include <boost/functional/hash.hpp>
+#include <functional>
 #include "../Serializer/Serializer.hpp"
 
 namespace NeuralNetwork {
@@ -105,21 +105,19 @@ namespace NeuralNetwork {
 namespace std {
     template<>
     struct hash<NeuralNetwork::Phenotype::point> {
-        size_t operator()(const NeuralNetwork::Phenotype::point &p) const {
-            std::size_t seed = 0;
-            boost::hash_combine(seed, p[0]);
-            boost::hash_combine(seed, p[1]);
-            return seed;
+        size_t operator()(const NeuralNetwork::Phenotype::point &p) const noexcept{
+            std::size_t h1 = std::hash<int>{}(p[0]);
+            std::size_t h2 = std::hash<int>{}(p[1]);
+            return h1 ^ (h2 << 1);
         }
     };
 
     template<>
     struct hash<NeuralNetwork::Phenotype::coordinate> {
-        size_t operator()(const NeuralNetwork::Phenotype::coordinate &arr) const {
-            std::size_t seed = 0;
-            boost::hash_combine(seed, arr[0]);
-            boost::hash_combine(seed, arr[1]);
-            return seed;
+        size_t operator()(const NeuralNetwork::Phenotype::coordinate &arr) const noexcept{
+            std::size_t h1 = std::hash<NeuralNetwork::Phenotype::point>{}(arr[0]);
+            std::size_t h2 = std::hash<NeuralNetwork::Phenotype::point>{}(arr[1]);
+            return h1 ^ (h2 << 1);
         }
     };
 }
