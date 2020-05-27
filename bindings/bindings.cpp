@@ -10,8 +10,9 @@ double * compute_network(NetWrapper net, const double * inputs) {
     return outputs.data();
 }
 
-void fit(Simulation const * sim, int const iterations, int const max_individuals, int const inputs, int const outputs) {
-    auto *binding = new GameBinding(*sim);
+void fit(void * s, int const iterations, int const max_individuals, int const inputs, int const outputs) {
+    auto * sim = reinterpret_cast<Simulation*>(s);
+    auto *binding = new GameBinding(sim);
     Train::Train t(binding, iterations, max_individuals, inputs, outputs);
     t.start();
 }

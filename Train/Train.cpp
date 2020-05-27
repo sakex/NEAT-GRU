@@ -93,7 +93,9 @@ namespace Train {
     }
 
     void Train::start() {
+        std::cout << "before reset" << std::endl;
         reset_players();
+        std::cout << "after reset" << std::endl;
         int no_progress = 0;
         for (int it = 0; it != iterations; ++it) { // iterations < 0 -> run forever = other end conditions
             std::cout << it << std::endl;

@@ -13,7 +13,7 @@
 
 class GameBinding : public Game::Game {
 public:
-    explicit GameBinding(Simulation _sim);
+    explicit GameBinding(Simulation * _sim);
 
     ~GameBinding() override = default;
 
@@ -25,7 +25,7 @@ private:
     ::Game::Player *do_post_training(Topology_ptr) override;
 
 private:
-    Simulation const sim;
+    Simulation * sim;
     size_t _size;
 };
 
