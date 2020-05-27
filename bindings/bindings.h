@@ -5,6 +5,7 @@
 #ifndef NEAT_BINDINGS_H
 #define NEAT_BINDINGS_H
 
+#include <Python.h>
 #include "../Train/Train.h"
 #include "GameBinding.h"
 #include "structs.h"

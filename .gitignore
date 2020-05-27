@@ -8,3 +8,4 @@ CMakeFiles/
 CmakeCache.txt
 cmake_install.cmake
 cmake-build-debug
+build/

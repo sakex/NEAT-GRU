@@ -26,18 +26,17 @@ set(NEAT_GRU_SOURCES
         Private/MutationField.h
         NeuralNetwork/Topology.cpp
         Timer.cpp
-        TopologyParser/TopologyParser.cpp
         Threading/ThreadPool.cpp
         Serializer/Serializable.cpp
         bindings/bindings.cpp
         bindings/GameBinding.cpp
+        bindings/python.cpp
         )
 
 set(PUB_HEADERS Game/Player.h
         Serializer/Serializable.h
         Serializer/Serializer.hpp
         Threading/ThreadPool.h
-        TopologyParser/TopologyParser.h
         Threading/multithreaded_methods.h
         Timer.h
         NeuralNetwork/Topology.h
@@ -45,7 +44,7 @@ set(PUB_HEADERS Game/Player.h
         Train/Train.h
         bindings/bindings.h
         bindings/GameBinding.h
-        bindings/structs.h)
+        )
 
 add_library(NEAT_GRU Private/Layer.cpp Private/Layer.h)
 target_include_directories(NEAT_GRU PRIVATE Private)
