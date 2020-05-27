@@ -12,7 +12,7 @@
 extern "C" {
 double * compute_network(NetWrapper net, const double * inputs);
 
-void fit(Simulation sim, int iterations, int max_individuals, int inputs, int outputs);
+void fit(Simulation const * sim, int iterations, int max_individuals, int inputs, int outputs);
 }
 
 #endif //NEAT_BINDINGS_H
