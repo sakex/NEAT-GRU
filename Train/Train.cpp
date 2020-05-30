@@ -93,15 +93,12 @@ namespace Train {
     }
 
     void Train::start() {
-        std::cout << "before reset" << std::endl;
         reset_players();
-        std::cout << "after reset" << std::endl;
         int no_progress = 0;
         for (int it = 0; it != iterations; ++it) { // iterations < 0 -> run forever = other end conditions
             std::cout << it << std::endl;
             utils::Timer run_timer("RUN GENERATION");
             std::vector<double> results = run_dataset();
-            delete[] brains;
             run_timer.stop();
             assign_results(results);
             update_best();
@@ -135,7 +132,6 @@ namespace Train {
         }
 #endif
         plot_best();
-        std::cout << "OUT" << std::endl;
     }
 
     std::vector<Topology_ptr> Train::topologies_vector() {
@@ -169,6 +165,7 @@ namespace Train {
     void Train::reset_players() {
         last_topologies = topologies_vector();
         size_t const size = last_topologies.size();
+        delete[] brains;
         brains = new NN[size];
         for (size_t it = 0; it < size; ++it) {
             brains[it].init_topology(last_topologies[it]);

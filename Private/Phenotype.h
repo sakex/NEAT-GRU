@@ -106,20 +106,27 @@ namespace std {
     template<>
     struct hash<NeuralNetwork::Phenotype::point> {
         size_t operator()(const NeuralNetwork::Phenotype::point &p) const noexcept{
-            std::size_t h1 = std::hash<int>{}(p[0]);
-            std::size_t h2 = std::hash<int>{}(p[1]);
-            return h1 ^ (h2 << 1);
+            std::hash<int> hasher;
+            std::size_t result = 111;
+            result = (result << 1) ^ hasher(p[0]);
+            result = (result << 1) ^ hasher(p[1]);
+            return result;
         }
     };
 
     template<>
     struct hash<NeuralNetwork::Phenotype::coordinate> {
         size_t operator()(const NeuralNetwork::Phenotype::coordinate &arr) const noexcept{
-            std::size_t h1 = std::hash<NeuralNetwork::Phenotype::point>{}(arr[0]);
-            std::size_t h2 = std::hash<NeuralNetwork::Phenotype::point>{}(arr[1]);
-            return h1 ^ (h2 << 1);
+            std::hash<NeuralNetwork::Phenotype::point> hasher;
+            std::size_t result = 144451;
+            result = (result << 1) ^ hasher(arr[0]);
+            result = (result << 1) ^ hasher(arr[1]);
+            return result;
         }
     };
+
+
+
 }
 
 #endif /* NEURALNETWORK_PHENOTYPE_H_ */

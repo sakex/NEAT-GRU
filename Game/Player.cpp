@@ -8,15 +8,14 @@
 #include "Player.h"
 
 namespace Game {
-
-    Player::Player(NeuralNetwork::NN &_brain): brain(_brain) {
+    Player::Player(NeuralNetwork::NN *_brain): brain(_brain) {
     }
 
     void Player::decide() {
         do_decide();
     }
 
-    void Player::reset(NeuralNetwork::NN &new_brain) {
+    void Player::reset(NeuralNetwork::NN *new_brain) {
         do_reset(new_brain);
     }
 

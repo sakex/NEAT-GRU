@@ -22,23 +22,23 @@ namespace Game {
 
     class Player {
     public:
-        explicit Player(NeuralNetwork::NN &);
+        explicit Player(NeuralNetwork::NN *);
 
         virtual ~Player() = default;
 
         void decide();
 
-        void reset(NeuralNetwork::NN &);
+        void reset(NeuralNetwork::NN *);
 
         long double get_result();
 
     protected:
-        NeuralNetwork::NN & brain;
+        NeuralNetwork::NN * brain;
 
     private:
         virtual void do_decide() = 0;
 
-        virtual void do_reset(NeuralNetwork::NN &) = 0;
+        virtual void do_reset(NeuralNetwork::NN *) = 0;
 
         virtual long double do_get_result() = 0;
     };
