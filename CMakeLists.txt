@@ -30,7 +30,6 @@ set(NEAT_GRU_SOURCES
         Serializer/Serializable.cpp
         bindings/bindings.cpp
         bindings/GameBinding.cpp
-        bindings/python.cpp
         )
 
 set(PUB_HEADERS Game/Player.h
