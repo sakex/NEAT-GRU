@@ -30,6 +30,7 @@ set(NEAT_GRU_SOURCES
         Serializer/Serializable.cpp
         bindings/bindings.cpp
         bindings/GameBinding.cpp
+        TopologyParser/TopologyParser.cpp
         )
 
 set(PUB_HEADERS Game/Player.h
@@ -38,6 +39,7 @@ set(PUB_HEADERS Game/Player.h
         Threading/ThreadPool.h
         Threading/multithreaded_methods.h
         Timer.h
+	TopologyParser/TopologyParser.cpp
         NeuralNetwork/Topology.h
         Game/Game.h
         Train/Train.h
