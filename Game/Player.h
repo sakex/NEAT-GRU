@@ -9,14 +9,7 @@
 #define GAME_PLAYER_H_
 
 #include "../NeuralNetwork/Topology.h"
-
-#ifndef CUDA_ENABLED
-
 #include "../NeuralNetwork/NN.h"
-
-#else
-#include "../NeuralNetwork/CUDA/NN.cuh"
-#endif
 
 namespace Game {
 

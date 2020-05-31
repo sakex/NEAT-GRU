@@ -12,8 +12,12 @@
 
 #include "../Private/Connection.h"
 #include "../Private/routines.h"
-#include "../Private/Layer.h"
 #include "Topology.h"
+
+#include "../Private/Layer.h"
+#if CUDA_ENABLED
+#include <cuda_runtime.h>
+#endif
 
 namespace NeuralNetwork {
 
@@ -36,10 +40,15 @@ namespace NeuralNetwork {
         void reset_state();
 
     private:
-        Layer * layers;
-
+        Layer *layers;
         int layer_count;
 
+#if CUDA_ENABLED
+        Layer *gpu_layers;
+        cudaError_t err;
+#endif
+
+    private:
         void set_inputs(const double *inputs_vector);
 
         void delete_layers();
