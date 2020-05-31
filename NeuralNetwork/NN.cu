@@ -1,5 +1,5 @@
 /*
- * NN.cpp
+ * NN.cu
  *
  *  Created on: May 30, 2019
  *      Author: sakex
@@ -9,25 +9,42 @@
 
 namespace NeuralNetwork {
 
+    NN::NN() : layers(nullptr), layer_count(0),
+               gpu_layers(nullptr), err(cudaSuccess) {
+    }
 
-    NN::NN(Topology_ptr &topology): layers() {
+    NN::NN(Topology_ptr &topology) : layers(nullptr),
+                                     layer_count(0),
+                                     gpu_layers(nullptr),
+                                     err(cudaSuccess) {
         init_topology(topology);
     }
 
     NN::~NN() {
-        for (Layer *layer : layers) {
-            for (Neuron *neuron : *layer)
-                delete neuron;
-            delete layer;
-        }
+        delete_layers();
+    }
+
+    void NN::delete_layers() {
+        cudaFree(gpu_layers);
+        delete[] layers;
     }
 
     void NN::init_topology(Topology_ptr &topology) {
-        size_t layers_count = topology->get_layers();
-        for (size_t it = 0; it < layers_count; ++it) {
-            auto *layer = new Layer();
-            layers.push_back(layer);
+        layer_count = topology->get_layers();
+        delete_layers();
+        layers = new Layer[layer_count];
+        size_t const size = layer_count * sizeof(Layer);
+        err = cudaMalloc((void **) &gpu_layers, size);
+        if (err != cudaSuccess) {
+            std::cout << "Failed to allocate device Layers (error code %s)!\n" << cudaGetErrorString(err)
+                      << std::endl;
+            exit(EXIT_FAILURE);
         }
+        std::vector<int> const &sizes = topology->get_layers_size();
+        for (int i = 0; i < layer_count; ++i) {
+            layers[i].set_size(sizes[i]);
+        }
+        err = cudaMemcpy(gpu_layers, layers, size, cudaMemcpyHostToDevice);
         Topology::relationships_map &relationships = topology->get_relationships();
         for (auto &it : relationships) {
             for (Phenotype *phenotype : it.second) {
@@ -42,72 +59,47 @@ namespace NeuralNetwork {
                 double const reset_memory_weight = phenotype->get_reset_memory_weight();
                 double const update_input_weight = phenotype->get_update_input_weight();
                 double const update_memory_weight = phenotype->get_update_memory_weight();
-                Neuron *input_neuron_ptr = merge_neuron(input[0], input[1]);
-                Neuron *output_neuron_ptr = merge_neuron(output[0], output[1]);
+                Neuron *input_neuron_ptr = layers[input[0]][input[1]];
+                Neuron *output_neuron_ptr = layers[output[0]][output[1]];
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
                                                  reset_memory_weight, update_input_weight, update_memory_weight);
             }
         }
     }
 
-    Neuron *NN::merge_neuron(size_t const layer, size_t const index) {
-        Layer &_layer = *layers[layer];
-        if (index < _layer.size()) {
-            if (!_layer[index])
-                _layer[index] = new Neuron;
-            return _layer[index];
-        } else {
-            auto *neuron = new Neuron;
-            _layer.resize(index + 1);
-            _layer[index] = neuron;
-            return neuron;
-        }
-    }
-
-    __global__ void CUDA_feed_forward(NeuralNetwork::Neuron *layer, size_t n) {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx < n) {
-            layer[idx].feed_forward();
-        }
-    }
-
-    inline void CUDA_feed_forward_wrapper(Layer *layer) {
-        cudaDeviceSynchronize();
-        NeuralNetwork::Neuron **ptr = layer->data();
-        size_t n = layer->size();
-        CUDA_feed_forward <<<n, 32>>> (*ptr, n);
-    }
-
     std::vector<double> NN::compute(const double *inputs_vector) {
         set_inputs(inputs_vector);
-        for (auto layer = layers.begin(); layer < layers.end() - 1; ++layer) {
-            CUDA_feed_forward_wrapper(*layer);
+        for (int it = 0; it < layer_count - 1; ++it) {
+            for (size_t j = 0; j < layers[it].size(); ++j) {
+                layers[it][j]->feed_forward();
+            }
         }
-        cudaDeviceSynchronize();
-        Layer *last_layer = layers.back();
+        Layer &last_layer = layers[layer_count - 1];
         std::vector<double> values;
-        values.reserve(last_layer->size());
-        for (Neuron *neuron : *last_layer) {
+        values.reserve(last_layer.size());
+        for (size_t it = 0; it < last_layer.size(); ++it) {
+            Neuron *neuron = last_layer[it];
             values.push_back(neuron->get_value());
             neuron->set_value(0);
         }
-        cudaDeviceSynchronize();
-        std::vector<double> const output = softmax(values);
-        return output;
-        //return softmax(values);
-        //return values;
+        return softmax(values);
     }
 
+    void NN::reset_state() {
+        for (int it = 0; it < layer_count; ++it) {
+            for (size_t j = 0; j < layers[it].size(); ++j) {
+                layers[it][j]->reset_state();
+            }
+        }
+    }
 
     void NN::set_inputs(const double *inputs_array) {
-        Layer *first_layer = layers[0];
-        size_t length = first_layer->size();
+        Layer &first_layer = layers[0];
+        size_t length = first_layer.size();
         for (size_t i = 0; i < length; ++i) {
-            cudaDeviceSynchronize();
-            Neuron *neuron = first_layer->at(i);
+            Neuron *neuron = first_layer[i];
             neuron->set_input_value(inputs_array[i]);
         }
-        cudaDeviceSynchronize();
     }
 
 } /* namespace NeuralNetwork */

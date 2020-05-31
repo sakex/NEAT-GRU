@@ -8,7 +8,6 @@
 
 #ifndef NEURALNETWORK_NEURON_CUH_
 #define NEURALNETWORK_NEURON_CUH_
-#define NEURALNETWORK_NEURON_H_
 
 #include <vector>
 #include <iostream>
@@ -60,8 +59,6 @@ namespace NeuralNetwork {
     private:
         __device__ void reset_value();
     };
-
-    typedef std::vector<Neuron *> Layer;
 
 } /* namespace NeuralNetwork */
 

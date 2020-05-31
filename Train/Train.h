@@ -25,13 +25,7 @@
 #include "../Serializer/Serializer.hpp"
 #include "../Private/Random.h"
 
-#ifndef CUDA_ENABLED
-
 #include "../NeuralNetwork/NN.h"
-
-#else
-#include "../NeuralNetwork/CUDA/NN.cuh"
-#endif
 
 namespace Train {
     using namespace NeuralNetwork;

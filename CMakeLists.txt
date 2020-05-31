@@ -31,6 +31,7 @@ set(NEAT_GRU_SOURCES
         bindings/bindings.cpp
         bindings/GameBinding.cpp
         TopologyParser/TopologyParser.cpp
+        Private/Layer.cpp
         )
 
 set(PUB_HEADERS Game/Player.h
@@ -47,7 +48,7 @@ set(PUB_HEADERS Game/Player.h
         bindings/GameBinding.h
         )
 
-add_library(NEAT_GRU Private/Layer.cpp Private/Layer.h)
+add_library(NEAT_GRU)
 target_include_directories(NEAT_GRU PRIVATE Private)
 target_include_directories(NEAT_GRU PUBLIC Serializer)
 target_include_directories(NEAT_GRU PUBLIC NeuralNetwork)
@@ -66,14 +67,14 @@ if (CUDA_ENABLED)
     target_sources(NEAT_GRU PRIVATE
             Private/CUDA/Neuron.cu
             Private/CUDA/Neuron.cuh
-            Private/CUDA/NN.cu
-            Private/CUDA/NN.h
+            NeuralNetwork/NN.cu
             Private/CUDA/Connection.cu
             Private/CUDA/Connection.cuh
             Private/CUDA/routines.cu
             Private/CUDA/routines.cuh)
-    set_target_properties(trading PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    target_compile_options(trading PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_35,code=sm_35>)
+    add_definitions(-DCUDA_ENABLED)
+    set_target_properties(NEAT_GRU PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    target_compile_options(NEAT_GRU PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_35,code=sm_35>)
 
 else ()
     target_sources(NEAT_GRU PRIVATE
