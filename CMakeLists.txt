@@ -32,6 +32,14 @@ set(NEAT_GRU_SOURCES
         bindings/GameBinding.cpp
         TopologyParser/TopologyParser.cpp
         Private/Layer.cpp
+        Private/Neuron.cpp
+        Private/Neuron.h
+        NeuralNetwork/NN.cpp
+        NeuralNetwork/NN.h
+        Private/Connection.cpp
+        Private/Connection.h
+        Private/routines.cpp
+        Private/routines.h
         )
 
 set(PUB_HEADERS Game/Player.h
@@ -58,35 +66,6 @@ target_include_directories(NEAT_GRU PUBLIC TopologyParser)
 target_include_directories(NEAT_GRU PUBLIC Threading)
 target_sources(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
 target_sources(NEAT_GRU PRIVATE ${PUB_HEADERS})
-
-
-if (CUDA_ENABLED)
-    include_directories(Private/CUDA/NeuralNetwork)
-    set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
-    enable_language(CUDA)
-    target_sources(NEAT_GRU PRIVATE
-            Private/CUDA/Neuron.cu
-            Private/CUDA/Neuron.cuh
-            NeuralNetwork/NN.cu
-            Private/CUDA/Connection.cu
-            Private/CUDA/Connection.cuh
-            Private/CUDA/routines.cu
-            Private/CUDA/routines.cuh)
-    add_definitions(-DCUDA_ENABLED)
-    set_target_properties(NEAT_GRU PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    target_compile_options(NEAT_GRU PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_35,code=sm_35>)
-
-else ()
-    target_sources(NEAT_GRU PRIVATE
-            Private/Neuron.cpp
-            Private/Neuron.h
-            NeuralNetwork/NN.cpp
-            NeuralNetwork/NN.h
-            Private/Connection.cpp
-            Private/Connection.h
-            Private/routines.cpp
-            Private/routines.h)
-endif ()
 
 target_link_libraries(NEAT_GRU -lstdc++)
 
