@@ -268,7 +268,7 @@ namespace Train {
         Game::Player *best = game->post_training(best_historical_topology);
         if (!best) return;
         std::cout << "RESULT: " << (best->get_result() - 3000) / 3000 << std::endl;
-        // Serializer::to_file(&*(best->get_topology()), "topology.json");
+        Serializer::to_file(best_historical_topology->to_string(), "topology.json");
     }
 
 
