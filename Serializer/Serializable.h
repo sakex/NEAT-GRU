@@ -10,18 +10,29 @@
 
 #include <string>
 
+/// Serializer namespace
 namespace Serializer {
 
-class Serializable {
-public:
-	Serializable();
-	virtual ~Serializable();
+    /// Serializable abstract class, implement to use to_file()
+    class Serializable {
+    public:
+        Serializable() = default;
 
-	std::string to_string() const;
+        virtual ~Serializable() = default;
 
-private:
-	virtual std::string parse_to_string() const = 0;
-};
+        /**
+         * Convert Serializable to string
+         * @return string representation of the Serializable
+         */
+        std::string to_string() const;
+
+    private:
+        /**
+         * Pure virtual method to implement to convert Serializable to string
+         * @return string representation of the Serializable
+         */
+        virtual std::string parse_to_string() const = 0;
+    };
 
 } /* namespace Serializer */
 

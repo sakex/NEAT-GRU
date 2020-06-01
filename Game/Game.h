@@ -61,14 +61,14 @@ namespace Game {
          * @param nets, A C array of NeuralNetworks to pass to the players
          * @param count, An unsigned int that tells how many elements are in nets
          */
-        virtual void do_reset_players(NN *, size_t) = 0;
+        virtual void do_reset_players(NN * nets, size_t count) = 0;
 
         /**
          * Function to be implemented for the action to be run after the training
          *
          * @param topology
          */
-        virtual void do_post_training(Topology_ptr) = 0;
+        virtual void do_post_training(Topology_ptr topology) = 0;
 
     };
 }

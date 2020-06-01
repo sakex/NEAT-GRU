@@ -9,13 +9,6 @@
 
 namespace Serializer {
 
-Serializable::Serializable() {
-
-}
-
-Serializable::~Serializable() {
-}
-
 std::string Serializable::to_string() const {
 	return parse_to_string();
 }
