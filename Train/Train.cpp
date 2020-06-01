@@ -98,7 +98,7 @@ namespace Train {
         for (int it = 0; it != iterations; ++it) { // iterations < 0 -> run forever = other end conditions
             std::cout << it << std::endl;
             utils::Timer run_timer("RUN GENERATION");
-            std::vector<double> results = run_dataset();
+            std::vector<double> results = run_generation();
             run_timer.stop();
             assign_results(results);
             update_best();
@@ -131,7 +131,7 @@ namespace Train {
             std::cout << top->get_last_result() << std::endl;
         }
 #endif
-        plot_best();
+        post_training();
     }
 
     std::vector<Topology_ptr> Train::topologies_vector() {
@@ -149,17 +149,9 @@ namespace Train {
     }
 
     void Train::reset_species() {
-        /*if ((new_best && turns_without_reassignments >= next_reassignment) ||
-            turns_without_reassignments >= 5 * next_reassignment) {*/
         new_best = false;
-        /*turns_without_reassignments = 0;
-        if (next_reassignment < 20)
-            ++next_reassignment;*/
         std::vector<Topology_ptr> topologies = topologies_vector();
         reassign_species(topologies);
-        /*} else {
-            turns_without_reassignments++;
-        }*/
     }
 
     void Train::reset_players() {
@@ -217,7 +209,7 @@ namespace Train {
         }
     }
 
-    inline std::vector<double> Train::run_dataset() {
+    inline std::vector<double> Train::run_generation() {
         return game->run_generation();
     }
 
@@ -264,10 +256,8 @@ namespace Train {
                   << best_historical_topology->get_last_result() << std::endl;
     }
 
-    void Train::plot_best() const {
-        Game::Player *best = game->post_training(best_historical_topology);
-        if (!best) return;
-        std::cout << "RESULT: " << (best->get_result() - 3000) / 3000 << std::endl;
+    void Train::post_training() const {
+        game->post_training(best_historical_topology);
         Serializer::to_file(best_historical_topology->to_string(), "topology.json");
     }
 

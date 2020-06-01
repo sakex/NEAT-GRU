@@ -24,6 +24,5 @@ std::vector<double> GameBinding::do_run_generation() {
     return ret;
 }
 
-::Game::Player *GameBinding::do_post_training(Topology_ptr) {
-    return nullptr;
+void GameBinding::do_post_training(Topology_ptr) {
 }

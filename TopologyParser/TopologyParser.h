@@ -8,8 +8,13 @@
 #include <nlohmann/json.hpp>
 #include "../NeuralNetwork/Topology.h"
 
-
+/// Namespace for parsing topologies
 struct TopologyParser {
+    /**
+     * Parse a JSON and returns a topology
+     * @param j Json to be converted to a Topology
+     * @return Topology from the json
+     */
     static NeuralNetwork::Topology parse(nlohmann::json & j);
 };
 

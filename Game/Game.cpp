@@ -18,7 +18,7 @@ namespace Game {
         do_reset_players(brains, size);
     }
 
-    Player *Game::post_training(Topology_ptr top) {
-        return do_post_training(std::move(top));
+    void Game::post_training(Topology_ptr top) {
+        do_post_training(std::move(top));
     }
 }
