@@ -11,28 +11,55 @@
 #include "../NeuralNetwork/Topology.h"
 #include "../NeuralNetwork/NN.h"
 
+/// Namespace for the Game abstract classes
 namespace Game {
 
+    /// Abstract class to implement for the players of the simulation
     class Player {
     public:
-        explicit Player(NeuralNetwork::NN *);
+        /**
+         * Constructor with a NeuralNetwork as parameter
+         * @param network, The network to be passed
+         */
+        explicit Player(NeuralNetwork::NN * network);
 
         virtual ~Player() = default;
 
+        /// Decide action to take
         void decide();
 
-        void reset(NeuralNetwork::NN *);
+        /**
+         * Reset with a new network
+         *
+         * @param network New network to reset
+         */
+        void reset(NeuralNetwork::NN * network);
 
+        /**
+         * Getter to get results
+         * @return Loss function output
+         */
         long double get_result();
 
     protected:
+        /// The NeuralNetwork of the player
         NeuralNetwork::NN * brain;
 
     private:
+        /// Function to override to make decision
         virtual void do_decide() = 0;
 
-        virtual void do_reset(NeuralNetwork::NN *) = 0;
+        /**
+         * Function to override to reset with a new network
+         *
+         * @param network New network to reset
+         */
+        virtual void do_reset(NeuralNetwork::NN * network) = 0;
 
+        /**
+         * Function to implement for the getter to get results
+         * @return Loss function output
+         */
         virtual long double do_get_result() = 0;
     };
 }

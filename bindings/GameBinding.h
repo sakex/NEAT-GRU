@@ -22,7 +22,7 @@ private:
 
     std::vector<double> do_run_generation() override;
 
-    ::Game::Player *do_post_training(Topology_ptr) override;
+    void do_post_training(Topology_ptr) override;
 
 private:
     Simulation * sim;

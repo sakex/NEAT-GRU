@@ -5,7 +5,9 @@
 #include "Timer.h"
 
 namespace utils {
-    Timer::Timer(std::string s) : name(std::move(s)), start(std::chrono::high_resolution_clock::now()) {
+    Timer::Timer(std::string title) :
+            name(std::move(title)),
+            start(std::chrono::high_resolution_clock::now()) {
     }
 
     void Timer::stop() const {

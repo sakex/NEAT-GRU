@@ -9,11 +9,19 @@
 #include <string>
 #include <iostream>
 
+/// Namespace for util functions
 namespace utils {
+
+    /// Class used to time the different functions during training
     class Timer {
     public:
-        explicit Timer(std::string);
+        /**
+         * Constructor, starts timing right away
+         * @param title String that contains the name of the function being timed
+         */
+        explicit Timer(std::string title);
 
+        /// Prints the time elapsed
         void stop() const;
 
     private:

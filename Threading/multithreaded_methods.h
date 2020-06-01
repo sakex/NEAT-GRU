@@ -12,8 +12,19 @@
 #include <mutex>
 #include <vector>
 
+/// Namespace for the multithreaded algorithms
 namespace Threading {
 
+    /**
+     * Multithreaded for_each, like Rust's rayon::par_iter
+     *
+     * @tparam Iterable An iterable type (such as std::vector<T>)
+     * @tparam Callable A callable type (such as a std::function)
+     * @param _begin Pointer or iterator pointing to the first element of the Iterable
+     * @param _end Pointer or iterator pointing to the last element of the Iterable
+     * @param cb Function on which we do the iterations
+     * @param max_threads Maximum number of threads, defaults to std::thread::hardware_concurrency
+     */
     template<typename Iterable, typename Callable>
     inline static void for_each(Iterable _begin, Iterable _end, Callable &cb,
                                 unsigned max_threads = std::thread::hardware_concurrency()) {
