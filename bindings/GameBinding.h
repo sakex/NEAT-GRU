@@ -10,22 +10,40 @@
 #include "../NeuralNetwork/Topology.h"
 #include "structs.h"
 
-
+/// Wrapper around the struct Simulation to enable the training on a simulation
 class GameBinding : public Game::Game {
 public:
+    /**
+     * Constructor that takes a simulation
+     *
+     * @param _sim C struct simulation to be run
+     */
     explicit GameBinding(Simulation * _sim);
 
     ~GameBinding() override = default;
 
 private:
+    /**
+     * Will be called during the reset player phase a call the underlying simulation's reset_players()
+     * @param brains Thet networks
+     * @param size The number of networks
+     */
     void do_reset_players(NN *brains, size_t size) override;
 
+    /**
+     * We be called during the run generation phase of the training
+     * @return A vector of results
+     */
     std::vector<double> do_run_generation() override;
 
+    /// Empty body for now
     void do_post_training(Topology_ptr) override;
 
 private:
+    /// The simulation to be run
     Simulation * sim;
+
+    /// Number of networks in the last generation (bookkeeping)
     size_t _size;
 };
 

@@ -10,8 +10,24 @@
 #include "structs.h"
 
 extern "C" {
+    /**
+     * Binding to allow a computation of a neural network
+     *
+     * @param net The network to be computed
+     * @param inputs The inputs of the computation
+     * @return The output of the computation
+     */
 double * compute_network(NetWrapper net, const double * inputs);
 
+/**
+ * Binding to call Train::fit
+ *
+ * @param sim Simulation to run
+ * @param iterations Number of iterations
+ * @param max_individuals Maximum number of individuals in a given generation
+ * @param inputs Number of neurons on the input layer
+ * @param outputs Number of neurons on the output layer
+ */
 void fit(void * sim, int iterations, int max_individuals, int inputs, int outputs);
 }
 

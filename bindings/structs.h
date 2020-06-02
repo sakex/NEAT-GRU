@@ -6,15 +6,32 @@
 #define NEAT_GRU_STRUCTS_H
 
 extern "C" {
-typedef struct NetWrapper{
+/// C binding for the neural networks
+typedef struct NetWrapper {
     void *net;
 } NetWrapper;
 
+/// C binding for the Simulation
+typedef struct Simulation {
+    /**
+     * Logic for each generation (has to be implemented or it will be undefined behaviour)
+     *
+     * @param cont Context to call the method on
+     * @return A C array of scores
+     */
+    double *(*run_generation)(void * cont);
 
-typedef struct Simulation{
-    double *(*run_generation)(void *);
-    void (*reset_players)(void *, NetWrapper *, unsigned);
-    void * context;
+    /**
+     * Reset players implementation (has to be implemented or it will be undefined behaviour)
+     *
+     * @param cont Context to call the method on
+     * @param networks New neural networks for the next generation
+     * @param size Number of networks passed
+     */
+    void (*reset_players)(void * cont, NetWrapper * networks, unsigned size);
+
+    /// Optional field, if a context has to be kept
+    void *context;
 } Simulation;
 }
 
