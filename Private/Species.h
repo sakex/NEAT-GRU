@@ -50,7 +50,7 @@ namespace NeuralNetwork {
         void do_selection();
 
         void evolve(std::vector<Topology_ptr> &,
-                    std::vector<Topology_ptr> &);
+                    std::vector<Topology_ptr> &) const;
 
         void mate(std::vector<Topology_ptr> &,
                   std::vector<Topology_ptr> &);

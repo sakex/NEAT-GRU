@@ -8,6 +8,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
 set(CMAKE_CXX_STANDARD 14)
 
+if (CMAKE_BUILD_TYPE EQUAL Release)
+    add_compile_definitions(__MULTITHREADED__=1)
+endif ()
+
 set(NEAT_GRU_SOURCES
         Train/Train.cpp
         Game/Game.cpp
@@ -48,7 +52,7 @@ set(PUB_HEADERS Game/Player.h
         Threading/ThreadPool.h
         Threading/multithreaded_methods.h
         Timer.h
-	TopologyParser/TopologyParser.cpp
+        TopologyParser/TopologyParser.cpp
         NeuralNetwork/Topology.h
         Game/Game.h
         Train/Train.h

@@ -82,7 +82,7 @@ namespace NeuralNetwork {
     }
 
     void Species::evolve(std::vector<Topology_ptr> &surviving_topologies,
-                         std::vector<Topology_ptr> &contenders) {
+                         std::vector<Topology_ptr> &contenders) const {
         size_t positive_size = contenders.size();
         if (positive_size == 0 || (size_t) max_individuals <= surviving_topologies.size())
             return;
