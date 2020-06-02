@@ -3,6 +3,9 @@
 ## Install Nlohmann/json
     sudo apt-get install -y nlohmann-json-dev
     
+## Generate doc with Doxygen
+    doxygen doc.conf
+    
 ## Build
 ### Using a CMake subdirectory
  Add to your projects CMakeLists.txt:
