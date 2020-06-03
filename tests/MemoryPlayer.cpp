@@ -40,7 +40,7 @@ void MemoryPlayer::play_rounds(std::size_t rounds, bool showing) {
     std::sort(scores.begin(), scores.end());
     int median = scores[rounds / 2];
     _score = std::accumulate(scores.begin(), scores.end(), 0, [median](long acc, int score) {
-        return score < median ? (acc - score) : acc - median;
+        return score > median ? (acc - score) : acc - median;
     });
 }
 
