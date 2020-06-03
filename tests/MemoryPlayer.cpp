@@ -28,13 +28,20 @@ std::array<int, 2> max_two_values(std::vector<double> const &input) {
 }
 
 void MemoryPlayer::play_rounds(std::size_t rounds, bool showing) {
+    std::vector<int> scores;
+    scores.reserve(rounds);
     for (std::size_t i = 0; i < rounds; ++i) {
-        _score -= play(showing);
+        scores.push_back(play(showing));
         grid.reset();
         network->reset_state();
-        if(showing)
+        if (showing)
             std::cout << "====================================" << std::endl;
     }
+    std::sort(scores.begin(), scores.end());
+    int median = scores[rounds / 2];
+    _score = std::accumulate(scores.begin(), scores.end(), 0, [median](long acc, int score) {
+        return score < median ? (acc - score) : acc - median;
+    });
 }
 
 long MemoryPlayer::score() const {
@@ -59,7 +66,7 @@ long MemoryPlayer::play(bool showing) {
         plays = max_two_values(computed);
         tries++;
     }
-    if(grid.has_won())
+    if (grid.has_won())
         return tries;
     return tries - grid.get_found();
 }

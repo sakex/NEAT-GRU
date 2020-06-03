@@ -34,4 +34,5 @@ void Memory::do_post_training(Topology_ptr top) {
     auto * net = new NeuralNetwork::NN(top);
     MemoryPlayer player(net);
     player.play_rounds(50, true);
+    std::cout << "Final score: " << player.score() << std::endl;
 }

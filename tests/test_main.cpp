@@ -8,7 +8,7 @@
 
 int main() {
     auto *mem = new Memory;
-    Train::Train train(mem, 1000, 1000, 5, 10, NUMBERS, NUMBERS);
+    Train::Train train(mem, 1000, 1000, 4, 40, NUMBERS, NUMBERS);
     train.start();
     return 0;
 }
