@@ -1,18 +1,19 @@
 project(neat_gru)
 cmake_minimum_required(VERSION 3.0)
 if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+    SET(CMAKE_BUILD_TYPE Release)
 endif ()
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
-set(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+SET(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
+SET(CMAKE_CXX_STANDARD 14)
 
-if (CMAKE_BUILD_TYPE EQUAL Release)
+if (CMAKE_BUILD_TYPE STREQUAL Release)
     add_compile_definitions(__MULTITHREADED__=1)
 endif ()
 
-set(NEAT_GRU_SOURCES
+
+SET(NEAT_GRU_SOURCES
         Train/Train.cpp
         Game/Game.cpp
         Game/Player.cpp
@@ -46,7 +47,7 @@ set(NEAT_GRU_SOURCES
         Private/routines.h
         )
 
-set(PUB_HEADERS Game/Player.h
+SET(PUB_HEADERS Game/Player.h
         Serializer/Serializable.h
         Serializer/Serializer.hpp
         Threading/ThreadPool.h
@@ -60,18 +61,28 @@ set(PUB_HEADERS Game/Player.h
         bindings/GameBinding.h
         )
 
-add_library(NEAT_GRU)
-target_include_directories(NEAT_GRU PRIVATE Private)
-target_include_directories(NEAT_GRU PUBLIC Serializer)
-target_include_directories(NEAT_GRU PUBLIC NeuralNetwork)
-target_include_directories(NEAT_GRU PUBLIC Game)
-target_include_directories(NEAT_GRU PUBLIC Train)
-target_include_directories(NEAT_GRU PUBLIC TopologyParser)
-target_include_directories(NEAT_GRU PUBLIC Threading)
-target_sources(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
-target_sources(NEAT_GRU PRIVATE ${PUB_HEADERS})
+ADD_LIBRARY(NEAT_GRU Train/static.h)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PRIVATE Private)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Serializer)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC NeuralNetwork)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Game)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Train)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC TopologyParser)
+TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Threading)
+TARGET_SOURCES(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
+TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 
-target_link_libraries(NEAT_GRU -lstdc++)
+
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    include(CTest)
+endif ()
+
+ENABLE_TESTING()
+ADD_SUBDIRECTORY(tests)
+ADD_TEST(neat_gru neat_gru_testing)
+
+TARGET_LINK_LIBRARIES(NEAT_GRU -lstdc++)
+
 
 INSTALL(TARGETS NEAT_GRU
         LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

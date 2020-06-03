@@ -7,26 +7,32 @@
 
 #include "Train.h"
 
-namespace Train {
+int Train::Constants::MAX_LAYERS = 0;
+int Train::Constants::MAX_PER_LAYER = 0;
 
-    Train::Train(Game::Game *_game, int const _iterations, int const _max_individuals, int const inputs,
-                 int const outputs) :
+namespace Train {
+    Train::Train(Game::Game *_game, int _iterations, int _max_individuals,
+                 int _max_layers, int _max_per_layer, int inputs, int outputs) :
             best_historical_topology{Topology_ptr{nullptr}}, brains{nullptr} {
         game = _game;
         iterations = _iterations;
         inputs_count = inputs;
         outputs_count = outputs;
         max_individuals = _max_individuals;
+        Constants::MAX_LAYERS = _max_layers;
+        Constants::MAX_PER_LAYER = _max_per_layer;
         random_new_species();
     }
 
-    Train::Train(Game::Game *_game, int const _iterations, int const _max_individuals, int const inputs,
-                 int const outputs, Topology_ptr top) :
+    Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_layers, int _max_per_layer,
+                 int inputs, int outputs, Topology_ptr top) :
             game(_game), best_historical_topology{std::move(top)}, brains{nullptr} {
         iterations = _iterations;
         inputs_count = inputs;
         outputs_count = outputs;
         max_individuals = _max_individuals;
+        Constants::MAX_LAYERS = _max_layers;
+        Constants::MAX_PER_LAYER = _max_per_layer;
         Species_ptr new_species = std::make_unique<Species>();
         *new_species >> best_historical_topology;
         species.emplace_back(std::move(new_species));

@@ -23,6 +23,8 @@
 
 #include "../Serializer/Serializer.hpp"
 #include "../Private/Random.h"
+#include "../Train/static.h"
+
 
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {

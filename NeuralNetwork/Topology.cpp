@@ -216,7 +216,7 @@ namespace NeuralNetwork {
         return best_historical_result > result_before_mutation;
     }
 
-    std::vector<int> const & Topology::get_layers_size() const {
+    std::vector<int> const &Topology::get_layers_size() const {
         return layers_size;
     }
 
@@ -306,21 +306,14 @@ namespace NeuralNetwork {
     std::vector<Phenotype *> Topology::mutate() {
         // Input must already exist and output may or may not exist
         using utils::Random;
-        constexpr int MAX_LAYERS = 10;
-        constexpr int MAX_POS = 50;
         bool new_output = false;
-        int max_layer = std::min(layers, MAX_LAYERS);
+        int max_layer = std::min(layers, Train::Constants::MAX_LAYERS);
         int input_index = layers >= 2 ? Random::random_number(max_layer - 2) : 0;
         int input_position = Random::random_number(layers_size[input_index] - 1);
-        /*int new_layer = 0;
-        if (input_index == layers - 2 && layers <= MAX_LAYERS) {
-            new_layer = Random::random_number(1);
-        }*/
         int output_index = Random::random_between(input_index + 1, max_layer);
-        //int output_index = input_index + 1 + new_layer;
         int output_position = 0;
         if (output_index < layers - 1) {
-            output_position = Random::random_number(std::min(layers_size[output_index], MAX_POS));
+            output_position = Random::random_number(std::min(layers_size[output_index], Train::Constants::MAX_PER_LAYER));
             if (output_position >= layers_size[output_index]) {
                 new_output = true;
             }

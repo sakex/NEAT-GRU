@@ -24,6 +24,7 @@
 #include "../Game/Player.h"
 #include "../Serializer/Serializer.hpp"
 #include "../Private/Random.h"
+#include "static.h"
 
 #include "../NeuralNetwork/NN.h"
 
@@ -34,16 +35,20 @@ namespace Train {
     /// Class to train topologies on a game
     class Train {
     public:
+
         /**
          * Constructor without a base Topology
          *
          * @param _game The game on which we train our networks
          * @param _iterations Number of iterations until we end, set to less than 0 for infinite training
          * @param _max_individuals Maximum number of players for a given generation
+         * @param _max_layers Maximum number of layers in a given network
+         * @param _max_per_layer Maximum number of neurons per layer in a given network
          * @param inputs Number of input Neurons on the first layer of the Neural Networks
          * @param outputs Number of output Neurons on the last layer of the Neural Networks
          */
-        Train(Game::Game *_game, int _iterations, int _max_individuals, int inputs, int outputs);
+        Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_layers, int _max_per_layer, int inputs,
+              int outputs);
 
         /**
          * Constructor with a base Topology to continue training it
@@ -51,11 +56,13 @@ namespace Train {
          * @param _game The game on which we train our networks
          * @param _iterations Number of iterations until we end, set to less than 0 for infinite training
          * @param _max_individuals Maximum number of players for a given generation
+         * @param _max_layers Maximum number of layers in a given network
+         * @param _max_per_layer Maximum number of neurons per layer in a given network
          * @param inputs Number of input Neurons on the first layer of the Neural Networks
          * @param outputs Number of output Neurons on the last layer of the Neural Networks
          * @param top The pretrained topology to continue training
          */
-        Train(Game::Game *_game, int _iterations, int _max_individuals, int inputs,
+        Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_layers, int _max_per_layer, int inputs,
               int outputs, Topology_ptr top);
 
         ~Train();
@@ -98,7 +105,7 @@ namespace Train {
          * Pairs topologies and their results returned by the Simulation
          * @param results the results from the simulation's run_generation()
          */
-        void assign_results(std::vector<double> const & results);
+        void assign_results(std::vector<double> const &results);
 
         /**
          * Calls run_generation on the Game
