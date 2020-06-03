@@ -30,4 +30,8 @@ void Memory::do_reset_players(NN *nets, size_t count) {
     }
 }
 
-void Memory::do_post_training(Topology_ptr) {}
+void Memory::do_post_training(Topology_ptr top) {
+    auto * net = new NeuralNetwork::NN(top);
+    MemoryPlayer player(net);
+    player.play_rounds(50, true);
+}

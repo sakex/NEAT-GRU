@@ -12,7 +12,7 @@ class MemoryPlayer {
 public:
     explicit MemoryPlayer(NeuralNetwork::NN * net);
 
-    void play_rounds(std::size_t rounds);
+    void play_rounds(std::size_t rounds, bool showing = false);
 
     long score() const;
 
@@ -21,7 +21,7 @@ private:
     MemoryGrid grid;
     long _score = 0;
 
-    long play();
+    long play(bool showing);
 };
 
 

@@ -5,16 +5,19 @@
 #include "MemoryGrid.h"
 
 #include <random>
+#include <iostream>
 
 MemoryGrid::MemoryGrid() : numbers(), found(), won(false) {
     for(bool & v: found) v = false;
 
     for (int i = 0; i < NUMBERS / 2; ++i) {
-        constexpr int NUMBERS_BY_2 = NUMBERS / 2;
-        double const value = static_cast<double>(i  - NUMBERS_BY_2) / static_cast<double>(NUMBERS_BY_2);
+        constexpr int NUMBERS_BY_2 = (NUMBERS - 2) / 2;
+        double const value = static_cast<double>(i * 2  - NUMBERS_BY_2) / static_cast<double>(NUMBERS_BY_2);
         numbers[i*2] = value;
         numbers[i*2 + 1] = value;
     }
+    /*for(auto value: numbers) std::cout << value << " ";
+    std::cout << std::endl;*/
     std::shuffle(std::begin(numbers), std::end(numbers), std::mt19937(std::random_device()()));
 }
 
