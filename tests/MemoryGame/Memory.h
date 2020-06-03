@@ -5,9 +5,9 @@
 #ifndef NEAT_GRU_MEMORY_H
 #define NEAT_GRU_MEMORY_H
 
-#include "../Game/Game.h"
+#include "Game.h"
 #include "MemoryPlayer.h"
-#include "../Threading/multithreaded_methods.h"
+#include "multithreaded_methods.h"
 
 class Memory : public Game::Game {
 public:

@@ -55,7 +55,7 @@ long MemoryPlayer::play(bool showing) {
     std::copy(first_arr.begin(), first_arr.end(), game_info);
     std::vector<double> first_computed = network->compute(game_info);
     std::array<int, 2> plays = max_two_values(first_computed);
-    while (!grid.has_won() && tries < 300) {
+    while (!grid.has_won() && tries < 100) {
         numbers_list current_game = grid.pick_two(plays[0], plays[1]);
         std::copy(current_game.begin(), current_game.end(), game_info);
         if (showing) {

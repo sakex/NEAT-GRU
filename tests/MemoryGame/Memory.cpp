@@ -11,7 +11,7 @@ Memory::Memory() : players() {
 
 std::vector<double> Memory::do_run_generation() {
     auto &&cb = [](MemoryPlayer &player) {
-        player.play_rounds(150);
+        player.play_rounds(100);
     };
     Threading::for_each(players.begin(), players.end(), cb);
     std::vector<double> outputs;
@@ -33,6 +33,6 @@ void Memory::do_reset_players(NN *nets, size_t count) {
 void Memory::do_post_training(Topology_ptr top) {
     auto * net = new NeuralNetwork::NN(top);
     MemoryPlayer player(net);
-    player.play_rounds(150, true);
+    player.play_rounds(100, true);
     std::cout << "Final score: " << player.score() << std::endl;
 }

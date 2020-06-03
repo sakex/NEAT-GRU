@@ -92,6 +92,7 @@ namespace NeuralNetwork {
     }
 
     Mutation &Mutation::operator=(Mutation const &base) {
+        if(&base == this) return *this;
         phenotype = base.phenotype;
         interval_found = base.interval_found;
         direction = base.direction;

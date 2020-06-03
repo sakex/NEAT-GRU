@@ -5,7 +5,7 @@
 #ifndef NEAT_GRU_MEMORYPLAYER_H
 #define NEAT_GRU_MEMORYPLAYER_H
 
-#include "../NeuralNetwork/NN.h"
+#include "NN.h"
 #include "MemoryGrid.h"
 
 class MemoryPlayer {
