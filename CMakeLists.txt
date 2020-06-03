@@ -5,6 +5,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
 SET(CMAKE_CXX_STANDARD 14)
 

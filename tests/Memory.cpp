@@ -30,4 +30,4 @@ void Memory::do_reset_players(NN *nets, size_t count) {
     }
 }
 
-void Memory::do_post_training(Topology_ptr topology) {}
+void Memory::do_post_training(Topology_ptr) {}

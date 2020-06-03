@@ -32,7 +32,7 @@ numbers_list MemoryGrid::pick_two(int const pos1, int const pos2) {
     numbers_list arr_cp = numbers;
     for(int i = 0; i < NUMBERS; ++i) {
         if(i != pos1 && i != pos2 && !found[i]) {
-            arr_cp[i] = -1;
+            arr_cp[i] = -10;
         }
     }
     if(arr_cp[pos1] == arr_cp[pos2]) {

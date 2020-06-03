@@ -4,7 +4,7 @@
 
 #include "MemoryPlayer.h"
 
-MemoryPlayer::MemoryPlayer(NeuralNetwork::NN *net) : grid(), network(net) {
+MemoryPlayer::MemoryPlayer(NeuralNetwork::NN *net) : network(net), grid() {
 }
 
 std::array<int, 2> max_two_values(std::vector<double> const &input) {
@@ -12,7 +12,7 @@ std::array<int, 2> max_two_values(std::vector<double> const &input) {
     double first_max_value = -100000;
     int second_max = -1;
     double second_max_value = -100000;
-    for (int i = 0; i < input.size(); ++i) {
+    for (size_t i = 0; i < input.size(); ++i) {
         double const v = input[i];
         if (v > first_max_value) {
             second_max_value = first_max_value;
