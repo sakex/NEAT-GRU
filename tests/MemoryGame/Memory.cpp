@@ -35,4 +35,5 @@ void Memory::do_post_training(Topology_ptr top) {
     MemoryPlayer player(net);
     player.play_rounds(100, true);
     std::cout << "Final score: " << player.score() << std::endl;
+    delete net;
 }

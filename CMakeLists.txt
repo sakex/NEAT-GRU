@@ -80,7 +80,6 @@ endif ()
 
 ENABLE_TESTING()
 ADD_SUBDIRECTORY(tests)
-ADD_TEST(neat_gru neat_gru_testing)
 
 TARGET_LINK_LIBRARIES(NEAT_GRU -lstdc++)
 

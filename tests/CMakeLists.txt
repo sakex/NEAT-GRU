@@ -9,3 +9,15 @@ ADD_EXECUTABLE(neat_gru_testing
         MemoryGame/constants.h)
 
 TARGET_LINK_LIBRARIES(neat_gru_testing NEAT_GRU pthread)
+
+ADD_TEST(neat_gru neat_gru_testing)
+
+ADD_EXECUTABLE(neat_trend_testing
+        TrendGame/test_main.cpp
+        TrendGame/TrendGame.cpp
+        TrendGame/TrendGame.h
+        )
+
+ADD_TEST(neat_gru neat_trend_testing)
+TARGET_LINK_LIBRARIES(neat_trend_testing NEAT_GRU pthread)
+
