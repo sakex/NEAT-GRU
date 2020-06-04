@@ -19,7 +19,7 @@ public:
 
     numbers_list pick_two(int pos1, int pos2);
 
-    void reset();
+    void reset(numbers_list const & list);
 
     long get_found();
 

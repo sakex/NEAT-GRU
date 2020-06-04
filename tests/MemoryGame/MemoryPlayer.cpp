@@ -27,12 +27,13 @@ std::array<int, 2> max_two_values(std::vector<double> const &input) {
     return {first_max, second_max};
 }
 
-void MemoryPlayer::play_rounds(std::size_t rounds, bool showing) {
+void MemoryPlayer::play_rounds(std::vector<numbers_list> const & datasets, bool showing) {
     std::vector<int> scores;
+    size_t const rounds = datasets.size();
     scores.reserve(rounds);
-    for (std::size_t i = 0; i < rounds; ++i) {
+    for (numbers_list const & list: datasets) {
+        grid.reset(list);
         scores.push_back(play(showing));
-        grid.reset();
         network->reset_state();
         if (showing)
             std::cout << "====================================" << std::endl;

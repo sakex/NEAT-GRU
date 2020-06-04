@@ -21,6 +21,9 @@ public:
 
 private:
     std::vector<MemoryPlayer> players;
+    std::vector<numbers_list> datasets;
+
+    void generate_random_grids();
 };
 
 

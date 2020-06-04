@@ -6,7 +6,9 @@
 #include "TrendGame.h"
 
 
-TrendGame::TrendGame() = default;
+TrendGame::TrendGame(): players(), datasets() {
+    generate_dataset();
+}
 
 void get_current_max_index(std::vector<int> const &vec, std::vector<int> & output) {
     int current_count[DIFFERENT_NUMBERS];
@@ -20,27 +22,26 @@ void get_current_max_index(std::vector<int> const &vec, std::vector<int> & outpu
     }
 }
 
-std::vector<Dataset> TrendGame::generate_dataset() {
-    std::vector<Dataset> datasets;
-    datasets.reserve(100);
-    for (size_t it = 0; it < 100; ++it) {
+void TrendGame::generate_dataset() {
+    datasets.clear();
+    datasets.reserve(150);
+    for (size_t it = 0; it < 150; ++it) {
         Dataset ds {std::vector<int>(), std::vector<int>()};
-        ds.data.reserve(100);
-        for (size_t j = 0; j < 100; ++j) {
+        ds.data.reserve(50);
+        for (size_t j = 0; j < 50; ++j) {
             int number = utils::Random::random_number(DIFFERENT_NUMBERS);
             ds.data.push_back(number);
         }
         get_current_max_index(ds.data, ds.most_frequent);
         datasets.push_back(ds);
     }
-    return datasets;
 }
 
 std::vector<double> TrendGame::do_run_generation() {
-    std::vector<Dataset> datasets = generate_dataset();
-    auto &&cb = [&datasets](Player &player) {
+    auto & _datasets = datasets;
+    auto &&cb = [&_datasets](Player &player) {
         double input[DIFFERENT_NUMBERS];
-        for (Dataset &ds: datasets) {
+        for (Dataset &ds: _datasets) {
             for (size_t it = 0; it < ds.data.size(); ++ it) {
                 int const index = ds.data[it];
                 for (double &v: input) v = -1.;
@@ -71,7 +72,7 @@ void TrendGame::do_reset_players(NN *nets, size_t count) {
 void TrendGame::do_post_training(Topology_ptr top) {
     auto * net = new NeuralNetwork::NN(top);
     Player player {net, 0};
-    std::vector<Dataset> datasets = generate_dataset();
+    generate_dataset();
     double input[DIFFERENT_NUMBERS];
     for (Dataset &ds: datasets) {
         std::vector<int> sequence;

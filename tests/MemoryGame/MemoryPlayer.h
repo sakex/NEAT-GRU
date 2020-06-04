@@ -12,7 +12,7 @@ class MemoryPlayer {
 public:
     explicit MemoryPlayer(NeuralNetwork::NN * net);
 
-    void play_rounds(std::size_t rounds, bool showing = false);
+    void play_rounds(std::vector<numbers_list> const & datasets, bool showing = false);
 
     long score() const;
 

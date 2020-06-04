@@ -5,7 +5,7 @@
 #ifndef NEAT_GRU_CONSTANTS_H
 #define NEAT_GRU_CONSTANTS_H
 
-constexpr int NUMBERS = 6;
+constexpr int NUMBERS = 12;
 
 
 #endif //NEAT_GRU_CONSTANTS_H

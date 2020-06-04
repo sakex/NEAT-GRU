@@ -9,7 +9,7 @@
 #include "multithreaded_methods.h"
 #include "../../Private/Random.h"
 
-constexpr int DIFFERENT_NUMBERS = 10;
+constexpr int DIFFERENT_NUMBERS = 5;
 
 struct Player {
     NN* network;
@@ -23,7 +23,7 @@ struct Dataset {
 
 class TrendGame : public Game::Game {
 public:
-    static std::vector<Dataset> generate_dataset();
+    void generate_dataset();
 
 public:
     TrendGame();
@@ -36,6 +36,7 @@ public:
 
 private:
     std::vector<Player> players;
+    std::vector<Dataset> datasets;
 };
 
 
