@@ -27,22 +27,14 @@ std::array<int, 2> max_two_values(std::vector<double> const &input) {
     return {first_max, second_max};
 }
 
-void MemoryPlayer::play_rounds(std::vector<numbers_list> const & datasets, bool showing) {
-    std::vector<int> scores;
-    size_t const rounds = datasets.size();
-    scores.reserve(rounds);
-    for (numbers_list const & list: datasets) {
+void MemoryPlayer::play_rounds(std::vector<numbers_list> const &datasets, bool showing) {
+    for (numbers_list const &list: datasets) {
         grid.reset(list);
-        scores.push_back(play(showing));
+        _score -= play(showing);
         network->reset_state();
         if (showing)
             std::cout << "====================================" << std::endl;
     }
-    std::sort(scores.begin(), scores.end());
-    int median = scores[rounds / 2];
-    _score = std::accumulate(scores.begin(), scores.end(), 0, [median](long acc, int score) {
-        return score > median ? (acc - score) : acc - median;
-    });
 }
 
 long MemoryPlayer::score() const {
