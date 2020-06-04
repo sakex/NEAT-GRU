@@ -51,6 +51,7 @@ void Memory::do_reset_players(NN *nets, size_t count) {
 void Memory::do_post_training(Topology_ptr top) {
     auto * net = new NeuralNetwork::NN(top);
     MemoryPlayer player(net);
+    generate_random_grids();
     player.play_rounds(datasets, true);
     std::cout << "Final score: " << player.score() << std::endl;
     delete net;
