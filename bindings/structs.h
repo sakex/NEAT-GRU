@@ -6,11 +6,6 @@
 #define NEAT_GRU_STRUCTS_H
 
 extern "C" {
-/// C binding for the neural networks
-typedef struct NetWrapper {
-    void *net;
-} NetWrapper;
-
 /// C binding for the Simulation
 typedef struct Simulation {
     /**
@@ -28,7 +23,7 @@ typedef struct Simulation {
      * @param networks New neural networks for the next generation
      * @param size Number of networks passed
      */
-    void (*reset_players)(void * cont, NetWrapper * networks, unsigned size);
+    void (*reset_players)(void * cont, void * networks, unsigned ptr_size, unsigned size);
 
     /// Optional field, if a context has to be kept
     void *context;

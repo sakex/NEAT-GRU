@@ -17,7 +17,7 @@ extern "C" {
      * @param inputs The inputs of the computation
      * @return The output of the computation
      */
-double * compute_network(NetWrapper net, const double * inputs);
+double * compute_network(void * net, const double * inputs);
 
 /**
  * Binding to call Train::fit
