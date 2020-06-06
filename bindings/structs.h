@@ -14,7 +14,7 @@ typedef struct Simulation {
      * @param cont Context to call the method on
      * @return A C array of scores
      */
-    double *(*run_generation)(void * cont);
+    double *(*run_generation)(void *cont);
 
     /**
      * Reset players implementation (has to be implemented or it will be undefined behaviour)
@@ -23,7 +23,7 @@ typedef struct Simulation {
      * @param networks New neural networks for the next generation
      * @param size Number of networks passed
      */
-    void (*reset_players)(void * cont, void * networks, unsigned ptr_size, unsigned size);
+    void (*reset_players)(void *cont, void *networks, unsigned ptr_size, unsigned size);
 
     /// Optional field, if a context has to be kept
     void *context;

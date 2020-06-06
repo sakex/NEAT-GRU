@@ -9,10 +9,10 @@
 
 namespace NeuralNetwork {
 
-    NN::NN(): layers(nullptr), layer_count(0) {
+    NN::NN() : layers(nullptr), layer_count(0) {
     }
 
-    NN::NN(Topology_ptr &topology): layers(nullptr), layer_count(0) {
+    NN::NN(Topology_ptr &topology) : layers(nullptr), layer_count(0) {
         init_topology(topology);
     }
 
@@ -28,8 +28,8 @@ namespace NeuralNetwork {
         layer_count = topology->get_layers();
         delete_layers();
         layers = new Layer[layer_count];
-        std::vector<int> const & sizes = topology->get_layers_size();
-        for(int i = 0; i < layer_count; ++i) {
+        std::vector<int> const &sizes = topology->get_layers_size();
+        for (int i = 0; i < layer_count; ++i) {
             layers[i].set_size(sizes[i]);
         }
         Topology::relationships_map &relationships = topology->get_relationships();
@@ -61,11 +61,11 @@ namespace NeuralNetwork {
                 layers[it][j]->feed_forward();
             }
         }
-        Layer & last_layer = layers[layer_count - 1];
+        Layer &last_layer = layers[layer_count - 1];
         std::vector<double> values;
         values.reserve(last_layer.size());
         for (size_t it = 0; it < last_layer.size(); ++it) {
-            Neuron * neuron = last_layer[it];
+            Neuron *neuron = last_layer[it];
             values.push_back(neuron->get_value());
             neuron->set_value(0);
         }

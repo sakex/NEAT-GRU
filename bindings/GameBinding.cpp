@@ -4,12 +4,12 @@
 
 #include "GameBinding.h"
 
-GameBinding::GameBinding(Simulation * _sim) : sim(_sim), _size(0) {
+GameBinding::GameBinding(Simulation *_sim) : sim(_sim), _size(0) {
 }
 
 void GameBinding::do_reset_players(NN *brains, size_t size) {
     _size = size;
-    void * void_brains = brains;
+    void *void_brains = brains;
     (*sim->reset_players)(sim->context, void_brains, sizeof(NN), static_cast<unsigned>(size));
 }
 
