@@ -21,3 +21,8 @@ ADD_EXECUTABLE(neat_trend_testing
 ADD_TEST(neat_gru neat_trend_testing)
 TARGET_LINK_LIBRARIES(neat_trend_testing NEAT_GRU pthread)
 
+
+ADD_EXECUTABLE(test_routines test_routines.cpp)
+
+ADD_TEST(neat_gru test_routines)
+TARGET_LINK_LIBRARIES(test_routines NEAT_GRU)

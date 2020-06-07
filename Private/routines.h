@@ -18,7 +18,12 @@
 namespace NeuralNetwork {
     double sigmoid(double);
 
-    std::vector<double> softmax(std::vector<double> &);
+    /**
+     * Transforms a double c array into its softmax
+     * @param input The input array
+     * @param size The number of doubles in the array
+     */
+    void softmax(double * input, unsigned size);
 
     struct NoLayer : public std::exception {
         const char *what() const noexcept override {

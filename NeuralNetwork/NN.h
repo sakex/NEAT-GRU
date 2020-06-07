@@ -42,7 +42,7 @@ namespace NeuralNetwork {
          * @param inputs_vector C double array of inputs
          * @return a vector of weights
          */
-        std::vector<double> compute(const double *inputs_vector);
+        double * compute(const double *inputs_vector);
 
         /**
          * Inits the Network from a topology

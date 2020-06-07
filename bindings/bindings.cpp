@@ -6,10 +6,8 @@
 
 double *compute_network(void *net, const double *inputs) {
     NN *actual_net = reinterpret_cast<NN *>(net);
-    std::vector<double> outputs = actual_net->compute(inputs);
-    auto *heap_array = (double *) malloc(outputs.size() * sizeof(double));
-    std::copy(outputs.begin(), outputs.end(), heap_array);
-    return heap_array;
+    double* outputs = actual_net->compute(inputs);
+    return outputs;
 }
 
 void fit(void *s, int const iterations, int const max_individuals, int const max_layers, int const max_per_layer,

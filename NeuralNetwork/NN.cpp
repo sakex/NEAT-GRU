@@ -54,7 +54,7 @@ namespace NeuralNetwork {
         }
     }
 
-    std::vector<double> NN::compute(const double *inputs_vector) {
+    double * NN::compute(const double *inputs_vector) {
         set_inputs(inputs_vector);
         for (int it = 0; it < layer_count - 1; ++it) {
             for (size_t j = 0; j < layers[it].size(); ++j) {
@@ -62,14 +62,16 @@ namespace NeuralNetwork {
             }
         }
         Layer &last_layer = layers[layer_count - 1];
-        std::vector<double> values;
-        values.reserve(last_layer.size());
-        for (size_t it = 0; it < last_layer.size(); ++it) {
+        unsigned const size = last_layer.size();
+        double * out = nullptr;
+        out = new double[size];
+        for (unsigned it = 0; it < size; ++it) {
             Neuron *neuron = last_layer[it];
-            values.push_back(neuron->get_value());
+            out[it] = neuron->get_value();
             neuron->set_value(0);
         }
-        return softmax(values);
+        softmax(out, size);
+        return out;
     }
 
     void NN::reset_state() {

@@ -7,12 +7,12 @@
 MemoryPlayer::MemoryPlayer(NeuralNetwork::NN *net) : network(net), grid() {
 }
 
-std::array<int, 2> max_two_values(std::vector<double> const &input) {
+std::array<int, 2> max_two_values(const double * input) {
     int first_max = -1;
     double first_max_value = -100000;
     int second_max = -1;
     double second_max_value = -100000;
-    for (size_t i = 0; i < input.size(); ++i) {
+    for (size_t i = 0; i < NUMBERS * 2; ++i) {
         double const v = input[i];
         if (v > first_max_value) {
             second_max_value = first_max_value;
@@ -46,8 +46,9 @@ long MemoryPlayer::play(bool showing) {
     double game_info[NUMBERS];
     numbers_list first_arr = grid.pick_two(0, 1);
     std::copy(first_arr.begin(), first_arr.end(), game_info);
-    std::vector<double> first_computed = network->compute(game_info);
+    double * first_computed = network->compute(game_info);
     std::array<int, 2> plays = max_two_values(first_computed);
+    delete[] first_computed;
     while (!grid.has_won() && tries < 100) {
         numbers_list current_game = grid.pick_two(plays[0], plays[1]);
         std::copy(current_game.begin(), current_game.end(), game_info);
@@ -55,9 +56,10 @@ long MemoryPlayer::play(bool showing) {
             for (double it : game_info) std::cout << it << " ";
             std::cout << std::endl;
         }
-        std::vector<double> computed = network->compute(game_info);
+        double * computed = network->compute(game_info);
         plays = max_two_values(computed);
         tries++;
+        delete[] computed;
     }
     if (grid.has_won())
         return tries;

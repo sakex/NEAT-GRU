@@ -9,19 +9,17 @@ namespace NeuralNetwork {
         return 1 / (1 + std::exp(-value));
     }
 
-    std::vector<double> softmax(std::vector<double> &values) {
+    void softmax(double *input, unsigned size) {
         double total = 0;
-        for (double &val: values) {
-            if (val < 0) val = 0;
-            else {
-                total += val;
-            }
+        for (unsigned i = 0; i < size; ++i) {
+            if (input[i] < 0.) input[i] = 0.;
+            else total += input[i];
         }
         if (total > 1) {
-            for (double &val: values) {
-                val /= total;
+            for (unsigned i = 0; i < size; ++i) {
+                input[i] /= total;
             }
         }
-        return values;
     }
+
 }
