@@ -10,14 +10,21 @@
 #include "structs.h"
 
 extern "C" {
-    /**
-     * Binding to allow a computation of a neural network
-     *
-     * @param net The network to be computed
-     * @param inputs The inputs of the computation
-     * @return The output of the computation
-     */
-double * compute_network(void * net, const double * inputs);
+/**
+ * Binding to allow a computation of a neural network
+ *
+ * @param net The network to be computed
+ * @param inputs The inputs of the computation
+ * @return The output of the computation
+ */
+double *compute_network(NN *net, const double *inputs);
+
+/**
+ * Binding to reset the hidden state of a neural network
+ *
+ * @param net The network to be reset
+ */
+void reset_network_state(NN * net);
 
 /**
  * Binding to call Train::fit
@@ -30,7 +37,7 @@ double * compute_network(void * net, const double * inputs);
  * @param inputs Number of neurons on the input layer
  * @param outputs Number of neurons on the output layer
  */
-void fit(void * sim, int iterations, int max_individuals, int max_layers, int max_per_layers, int inputs, int outputs);
+void fit(void *sim, int iterations, int max_individuals, int max_layers, int max_per_layers, int inputs, int outputs);
 }
 
 #endif //NEAT_BINDINGS_H
