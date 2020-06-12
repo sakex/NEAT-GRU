@@ -263,8 +263,10 @@ namespace Train {
     }
 
     void Train::post_training() const {
-        game->post_training(best_historical_topology);
         Serializer::to_file(best_historical_topology->to_string(), "topology.json");
+        auto * net = new NN(best_historical_topology);
+        game->post_training(net);
+        delete net;
     }
 
 

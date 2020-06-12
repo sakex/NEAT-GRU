@@ -37,7 +37,7 @@ private:
     std::vector<double> do_run_generation() override;
 
     /// Empty body for now
-    void do_post_training(Topology_ptr) override;
+    void do_post_training(NN* network) override;
 
 private:
     /// The simulation to be run

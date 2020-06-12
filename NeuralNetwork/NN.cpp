@@ -12,7 +12,7 @@ namespace NeuralNetwork {
     NN::NN() : layers(nullptr), layer_count(0) {
     }
 
-    NN::NN(Topology_ptr &topology) : layers(nullptr), layer_count(0) {
+    NN::NN(Topology_ptr const &topology) : layers(nullptr), layer_count(0) {
         init_topology(topology);
     }
 
@@ -24,7 +24,7 @@ namespace NeuralNetwork {
         delete[] layers;
     }
 
-    void NN::init_topology(Topology_ptr &topology) {
+    void NN::init_topology(Topology_ptr const &topology) {
         layer_count = topology->get_layers();
         delete_layers();
         layers = new Layer[layer_count];

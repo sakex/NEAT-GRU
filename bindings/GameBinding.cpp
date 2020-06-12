@@ -20,5 +20,6 @@ std::vector<double> GameBinding::do_run_generation() {
     return ret;
 }
 
-void GameBinding::do_post_training(Topology_ptr) {
+void GameBinding::do_post_training(NN * network) {
+    (*sim->post_training)(sim->context, network);
 }

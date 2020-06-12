@@ -25,6 +25,13 @@ typedef struct Simulation {
      */
     void (*reset_players)(void *cont, void *networks, unsigned ptr_size, unsigned size);
 
+    /**
+     *
+     * @param cont Context to call the method on
+     * @param network The best historical network to run the post training on
+     */
+    void (*post_training)(void *cont, NN * network);
+
     /// Optional field, if a context has to be kept
     void *context;
 } Simulation;

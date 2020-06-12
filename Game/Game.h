@@ -42,9 +42,9 @@ namespace Game {
         /**
          * Action to run after the training is done
          *
-         * @param topology
+         * @param network The network of the best historical topology
          */
-        void post_training(Topology_ptr topology);
+        void post_training(NN* network);
 
     private:
 
@@ -66,9 +66,9 @@ namespace Game {
         /**
          * Function to be implemented for the action to be run after the training
          *
-         * @param topology
+         * @param network The network of the best historical topology
          */
-        virtual void do_post_training(Topology_ptr topology) = 0;
+        virtual void do_post_training(NN* network) = 0;
 
     };
 }
