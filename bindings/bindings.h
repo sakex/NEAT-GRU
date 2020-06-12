@@ -8,6 +8,8 @@
 #include "../Train/Train.h"
 #include "GameBinding.h"
 #include "structs.h"
+#include <nlohmann/json.hpp>
+#include <TopologyParser.h>
 
 extern "C" {
 /**
@@ -24,7 +26,15 @@ double *compute_network(NN *net, const double *inputs);
  *
  * @param net The network to be reset
  */
-void reset_network_state(NN * net);
+void reset_network_state(NN *net);
+
+/**
+ * Generate a neural network from a json serialized string
+ *
+ * @param serialized - The string to convert
+ * @return - Pointer to a neural network on the heap
+ */
+NN *network_from_string(char const *serialized);
 
 /**
  * Binding to call Train::fit
