@@ -25,6 +25,8 @@ namespace NeuralNetwork {
 
         __host__ double * get_result();
 
+        __host__ Neuron* raw();
+
     private:
         unsigned _size;
         Neuron *neurons;

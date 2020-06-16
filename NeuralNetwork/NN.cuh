@@ -6,16 +6,17 @@
 #define NEAT_GRU_NN_CUH
 #include <iostream>
 
-#include "../Private/Connection.h"
+#include "../Private/Connection.cuh"
 #include "../Private/routines.h"
 #include "Topology.h"
 
+#include "../Private/Neuron.cuh"
 #include "../Private/Layer.cuh"
+#include "../Private/CudaPhenotype.cuh"
+
 
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
-
-    class Neuron;
 
     class Topology;
 
@@ -65,8 +66,6 @@ namespace NeuralNetwork {
     };
 
 } /* namespace NeuralNetwork */
-
-#endif /* NEURALNETWORK_NN_H_ */
 
 
 #endif //NEAT_GRU_NN_CUH

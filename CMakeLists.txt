@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 3.0)
 IF (CUDA_ENABLED)
     project(neat_gru CUDA)
     set(CMAKE_CUDA_STANDARD 14)
-    ADD_COMPILE_OPTIONS(--compiler-options -Wall)
+    ADD_COMPILE_OPTIONS(-dc --compiler-options -Wall)
+    ADD_COMPILE_DEFINITIONS(CUDA_ENABLED=1)
+    SET(CUDA_SEPARABLE_COMPILATION ON)
 ELSE ()
     project(neat_gru)
     SET(CMAKE_CXX_STANDARD 14)
@@ -18,7 +20,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "-g")
 SET(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
 
 if (CMAKE_BUILD_TYPE STREQUAL Release)
-    add_compile_definitions(__MULTITHREADED__=1)
+    ADD_COMPILE_DEFINITIONS(__MULTITHREADED__=1)
 endif ()
 
 
@@ -65,14 +67,14 @@ TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Train)
 TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC TopologyParser)
 TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Threading)
 TARGET_SOURCES(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
-TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
+# TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 
 IF (CUDA_ENABLED)
     TARGET_SOURCES(NEAT_GRU PRIVATE
             NeuralNetwork/NN.cu
             Private/Connection.cu
-            Private/Neuron.cu
             Private/Layer.cu
+            Private/Neuron.cu
             )
 ELSE ()
     TARGET_SOURCES(NEAT_GRU PRIVATE

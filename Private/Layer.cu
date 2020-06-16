@@ -6,17 +6,17 @@
 
 namespace NeuralNetwork {
     __global__ void set_input_kernel(Neuron *layer, double const *inputs) {
-        int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         layer[tid].set_input_value(inputs[tid]);
     }
 
     __global__ void feed_forward_kernel(Neuron *layer) {
-        int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         layer[tid].feed_forward();
     }
 
     __global__ void get_result_kernel(Neuron *layer, double * arr) {
-        int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         arr[tid] = layer[tid].get_value();
         layer[tid].set_value(0);
     }
@@ -54,5 +54,9 @@ namespace NeuralNetwork {
         cudaMemcpy(output, dev_output, _size*sizeof(double), cudaMemcpyDeviceToHost);
         cudaFree(dev_output);
         return output;
+    }
+
+    __host__ Neuron* Layer::raw() {
+        return neurons;
     }
 }

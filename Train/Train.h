@@ -26,7 +26,11 @@
 #include "../Private/Random.h"
 #include "static.h"
 
+#ifdef CUDA_ENABLED
+#include "../NeuralNetwork/NN.cuh"
+#else
 #include "../NeuralNetwork/NN.h"
+#endif
 
 /// Namespace that solely countains the Train class
 namespace Train {
