@@ -1,13 +1,21 @@
-project(neat_gru)
 cmake_minimum_required(VERSION 3.0)
+
+IF (CUDA_ENABLED)
+    project(neat_gru CUDA)
+    set(CMAKE_CUDA_STANDARD 14)
+    ADD_COMPILE_OPTIONS(--compiler-options -Wall)
+ELSE ()
+    project(neat_gru)
+    SET(CMAKE_CXX_STANDARD 14)
+    ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
+ENDIF ()
+
 if (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
 endif ()
 
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
-ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
-SET(CMAKE_CXX_STANDARD 14)
 
 if (CMAKE_BUILD_TYPE STREQUAL Release)
     add_compile_definitions(__MULTITHREADED__=1)
@@ -19,17 +27,11 @@ SET(NEAT_GRU_SOURCES
         Game/Game.cpp
         Game/Player.cpp
         Private/Generation.cpp
-        Private/Generation.h
         Private/Mutation.cpp
-        Private/Mutation.h
         Private/Phenotype.cpp
-        Private/Phenotype.h
         Private/Species.cpp
-        Private/Species.h
         Private/MutationField.cpp
         Private/Random.cpp
-        Private/Random.h
-        Private/MutationField.h
         NeuralNetwork/Topology.cpp
         Timer.cpp
         Threading/ThreadPool.cpp
@@ -37,15 +39,7 @@ SET(NEAT_GRU_SOURCES
         bindings/bindings.cpp
         bindings/GameBinding.cpp
         TopologyParser/TopologyParser.cpp
-        Private/Layer.cpp
-        Private/Neuron.cpp
-        Private/Neuron.h
-        NeuralNetwork/NN.cpp
-        NeuralNetwork/NN.h
-        Private/Connection.cpp
-        Private/Connection.h
         Private/routines.cpp
-        Private/routines.h
         )
 
 SET(PUB_HEADERS Game/Player.h
@@ -73,6 +67,21 @@ TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Threading)
 TARGET_SOURCES(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
 TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 
+IF (CUDA_ENABLED)
+    TARGET_SOURCES(NEAT_GRU PRIVATE
+            NeuralNetwork/NN.cu
+            Private/Connection.cu
+            Private/Neuron.cu
+            Private/Layer.cu
+            )
+ELSE ()
+    TARGET_SOURCES(NEAT_GRU PRIVATE
+            NeuralNetwork/NN.cpp
+            Private/Connection.cpp
+            Private/Layer.cpp
+            Private/Neuron.cpp
+            )
+ENDIF ()
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
