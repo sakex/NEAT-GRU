@@ -1,31 +1,29 @@
-/*
- * NN.h
- *
- *  Created on: May 30, 2019
- *      Author: sakex
- */
+//
+// Created by alexandre on 16.06.20.
+//
 
-#ifndef NEURALNETWORK_NN_H_
-#define NEURALNETWORK_NN_H_
-
+#ifndef NEAT_GRU_NN_CUH
+#define NEAT_GRU_NN_CUH
 #include <iostream>
 
-#include "../Private/Connection.h"
+#include "../Private/Connection.cuh"
+#include "../Private/routines.h"
 #include "Topology.h"
 
-#include "../Private/Layer.h"
+#include "../Private/Neuron.cuh"
+#include "../Private/Layer.cuh"
+#include "../Private/CudaPhenotype.cuh"
+
 
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
-
-    class Neuron;
 
     class Topology;
 
     /// Class Neural Network with GRU gates
     class NN {
     public:
-        NN();
+        __host__ NN();
 
         /**
          * Constructor with a topology as input
@@ -41,13 +39,13 @@ namespace NeuralNetwork {
          * @param inputs_vector C double array of inputs
          * @return a vector of weights
          */
-        double * compute(const double *inputs_vector);
+        __host__ double * compute(const double *inputs_vector);
 
         /**
          * Inits the Network from a topology
          * @param topology The input topology
          */
-        void init_topology(Topology_ptr const &topology);
+        __host__ void init_topology(Topology_ptr const &topology);
 
         /// Resets the hidden state to 0
         void reset_state();
@@ -69,4 +67,5 @@ namespace NeuralNetwork {
 
 } /* namespace NeuralNetwork */
 
-#endif /* NEURALNETWORK_NN_H_ */
+
+#endif //NEAT_GRU_NN_CUH
