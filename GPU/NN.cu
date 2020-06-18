@@ -92,7 +92,7 @@ namespace NeuralNetwork {
         layer_addresses[i] = neurons_count;
         err = cudaMalloc(&layers, sizeof(Neuron) * (unsigned long)neurons_count);
         if(err) {
-            std::cerr << "Failed at cudaMalloc Neurons with error:\n" << cudaGetErrorString(err) << std::endl;
+            std::cerr << "Failed at cudaMalloc Neurons with error:\n" << err << ": " << cudaGetErrorString(err) << std::endl;
             throw;
         }
         Topology::relationships_map &relationships = topology->get_relationships();
@@ -124,16 +124,28 @@ namespace NeuralNetwork {
             }
         }
         CUDAConnectionCount *device_counts;
-        cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
-        cudaMemcpy(device_counts, connection_counts.data(), sizeof(CUDAConnectionCount) * connection_counts.size(),
+        err = cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
+        if(err) {
+            std::cerr << "Failed at cudaMalloc CUDAConnectionCount with error:\n" << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
+        err = cudaMemcpy(device_counts, connection_counts.data(), sizeof(CUDAConnectionCount) * connection_counts.size(),
                    cudaMemcpyHostToDevice);
+        if(err) {
+            std::cerr << "Failed at cudaMemcpy CUDAConnectionCount with error:\n" << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
         set_connections_kernel<<<1, 1>>>(layers, device_counts, connection_counts.size());
         err = cudaDeviceSynchronize();
         if(err) {
             std::cerr << "Failed at set_connections_kernel " << std::endl;
             throw;
         }
-        cudaFree(device_counts);
+        err = cudaFree(device_counts);
+        if(err) {
+            std::cerr << "Failed at cudaFree(device_counts) " << std::endl;
+            throw;
+        }
 
 
         CUDAPhenotype *device_phenotypes;
@@ -141,7 +153,11 @@ namespace NeuralNetwork {
         cudaMemcpy(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
                    cudaMemcpyHostToDevice);
         connect_neurons_kernel<<<1, 1>>>(layers, device_phenotypes, phenotype_vec.size());
-        cudaDeviceSynchronize();
+        err = cudaDeviceSynchronize();
+        if(err) {
+            std::cerr << "Failed at connect_neurons_kernel " << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
         cudaFree(device_phenotypes);
     }
 
