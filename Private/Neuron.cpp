@@ -9,6 +9,10 @@
 
 namespace NeuralNetwork {
 
+    inline float sigmoid(float const value) {
+        return value / (1 + std::abs(value));
+    }
+
     Neuron::Neuron() : input(0.0) {
     }
 

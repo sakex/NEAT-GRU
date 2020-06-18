@@ -9,6 +9,8 @@
 #include <iostream>
 #include "CudaPhenotype.cuh"
 #include "../NeuralNetwork/Topology.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 
 /// Namespace containing the different classes relevant for the neural network
@@ -21,6 +23,7 @@ namespace NeuralNetwork {
     /// Class Neural Network with GRU gates
     class NN {
     public:
+        static size_t current_id;
         NN();
 
         /**
@@ -53,6 +56,8 @@ namespace NeuralNetwork {
         Neuron *layers;
         int layer_count;
         int * layer_addresses;
+        cudaStream_t stream;
+        size_t id;
 
     private:
         /**

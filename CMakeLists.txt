@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(neat_gru)
 SET(CMAKE_CXX_STANDARD 14)
-# ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
 
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -65,16 +64,15 @@ IF (CUDA_ENABLED)
     ADD_SUBDIRECTORY(GPU)
     TARGET_LINK_LIBRARIES(NEAT_GRU NEAT_CUDA)
 ELSE ()
+    ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
     TARGET_SOURCES(NEAT_GRU PRIVATE
             NeuralNetwork/NN.cpp
             Private/Connection.cpp
-            Private/Layer.cpp
             Private/Neuron.cpp
             )
     SET(PUB_HEADERS ${PUB_HEADERS}
             NeuralNetwork/NN.h
             Private/Connection.h
-            Private/Layer.h
             Private/Neuron.h
             )
 

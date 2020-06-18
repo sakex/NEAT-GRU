@@ -24,8 +24,6 @@ namespace NeuralNetwork {
 
         __device__ void activate(float value);
 
-        __device__ float get_memory() const;
-
     private:
         float memory = 0.;
         float prev_input = 0.;

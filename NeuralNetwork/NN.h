@@ -13,12 +13,10 @@
 #include "../Private/Connection.h"
 #include "Topology.h"
 
-#include "../Private/Layer.h"
+#include "../Private/Neuron.h"
 
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
-
-    class Neuron;
 
     class Topology;
 
@@ -53,8 +51,11 @@ namespace NeuralNetwork {
         void reset_state();
 
     private:
-        Layer *layers;
+        int neurons_count;
         int layer_count;
+        int input_size;
+        int output_size;
+        Neuron *layers;
 
     private:
         /**
