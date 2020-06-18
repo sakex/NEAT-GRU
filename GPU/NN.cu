@@ -202,11 +202,11 @@ namespace NeuralNetwork {
     float *NN::compute(const float *inputs_array) {
         cudaError err;
         set_inputs(inputs_array);
-        int from, to, distance;
-        for (size_t pos = 0; pos < layer_count - 1; ++pos) {
-            from = layer_addresses[pos];
-            to = layer_addresses[pos + 1];
-            distance = to - from;
+        size_t pos = 0;
+        for (; pos < layer_count - 1; ++pos) {
+            int from = layer_addresses[pos];
+            int to = layer_addresses[pos + 1];
+            int distance = to - from;
             feed_forward_kernel<<<1, distance>>>(layers, from);
             err = cudaDeviceSynchronize();
             if(err) {
@@ -214,6 +214,10 @@ namespace NeuralNetwork {
                 throw;
             }
         }
+
+        int from = layer_addresses[pos];
+        int to = layer_addresses[pos + 1];
+        int distance = to - from;
 
         auto *output = new float[distance];
         float *dev_output;
@@ -247,7 +251,7 @@ namespace NeuralNetwork {
     void NN::set_inputs(const float *inputs_array) {
         int const from = layer_addresses[0];
         int const to = layer_addresses[1];
-        int const distance = from - to;
+        int const distance = to - from;
 
         float *dev_inputs;
         cudaMalloc(&dev_inputs, distance * sizeof(float));

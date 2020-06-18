@@ -62,7 +62,6 @@ namespace NeuralNetwork {
     }
 
     __device__ void Neuron::feed_forward() {
-        if (!activated) return;
         const float update_gate = sigmoid(update);
         const float reset_gate = sigmoid(reset);
         const float current_memory = std::tanh(input + memory * reset_gate);
@@ -88,7 +87,6 @@ namespace NeuralNetwork {
     }
 
     __device__ float Neuron::get_value() {
-        if (!activated) return 0;
         const float update_gate = sigmoid(update);
         const float reset_gate = sigmoid(reset);
         const float current_memory = std::tanh(input + memory * reset_gate);
