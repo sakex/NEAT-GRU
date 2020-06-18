@@ -6,7 +6,7 @@
 #define NEAT_GRU_MEMORYPLAYER_H
 
 #ifdef CUDA_ENABLED
-#include "NN.cuh"
+#include "../../GPU/NN.cuh"
 #else
 #include "NN.h"
 #endif

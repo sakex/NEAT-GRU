@@ -161,10 +161,12 @@ namespace Train {
     }
 
     void Train::reset_players() {
+        last_topologies.clear();
         last_topologies = topologies_vector();
+
         size_t const size = last_topologies.size();
         delete[] brains;
-        brains = new NN[size];
+        brains = new NN[size]();
         for (size_t it = 0; it < size; ++it) {
             brains[it].init_topology(last_topologies[it]);
         }

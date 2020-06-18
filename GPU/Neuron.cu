@@ -13,19 +13,9 @@ namespace NeuralNetwork {
     Neuron::add_connection(Neuron *neuron, float const input_weight, float const memory_weight, float const riw,
                            float const rmw,
                            float const uiw, float const umw) {
-        auto *address_as_ull = (unsigned long long int *) last_connection_added;
-        unsigned long long int old = *address_as_ull, assumed;
-        Connection * co = &connections[assumed - 1];
-        printf("HERE: %f, %f\n", input_weight, memory_weight);
+        Connection *co = &connections[last_connection_added++];
         co->init(input_weight, memory_weight, riw, rmw, uiw, umw, neuron);
-
-/*
-        do {
-            printf("HERE\n");
-            assumed = old;
-            old = atomicCAS(address_as_ull, assumed, assumed + 1);
-        } while (assumed != old);
-        */ __syncthreads();
+        __syncthreads();
     }
 
     __device__ void Neuron::set_connections_count(size_t const value) {
@@ -95,5 +85,9 @@ namespace NeuralNetwork {
         prev_reset = reset_gate;
         reset_value();
         return std::tanh(value);
+    }
+
+    __device__ void Neuron::free_connections() {
+        free(connections);
     }
 }

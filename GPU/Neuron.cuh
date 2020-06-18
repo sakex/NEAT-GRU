@@ -39,6 +39,8 @@ namespace NeuralNetwork {
 
         __device__ float get_value();
 
+        __device__ void free_connections();
+
     private:
         bool activated = false;
         float input = 0.;

@@ -26,6 +26,8 @@ namespace NeuralNetwork {
 
         Neuron* raw();
 
+        void free_neurons();
+
     private:
         unsigned _size;
         Neuron *neurons;

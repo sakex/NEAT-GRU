@@ -13,9 +13,13 @@ struct CUDAPhenotype {
     float const reset_memory_weight;
     float const update_input_weight;
     float const update_memory_weight;
-    int input_pos[2];
-    int output_pos[2];
+    int input_pos;
+    int output_pos;
 };
 
+struct CUDAConnectionCount {
+    int pos;
+    size_t count;
+};
 
 #endif //NEAT_GRU_CUDAPHENOTYPE_CUH

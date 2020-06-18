@@ -5,14 +5,12 @@ SET(CMAKE_CUDA_STANDARD 14)
 ADD_LIBRARY(NEAT_CUDA
         NN.cu
         Connection.cu
-        Layer.cu
         Neuron.cu
         )
 
-SET(PUB_HEADERS ${PUB_HEADERS}
+SET(PUB_HEADERS
         NN.cuh
         Connection.cuh
-        Layer.cuh
         Neuron.cuh
         )
 
@@ -26,4 +24,4 @@ SET_TARGET_PROPERTIES(
         PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
 
-TARGET_LINK_LIBRARIES(NEAT_CUDA ${CUDA_LIBRARIES} NEAT_GRU)
+TARGET_LINK_LIBRARIES(NEAT_CUDA ${CUDA_LIBRARIES})

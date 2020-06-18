@@ -9,7 +9,7 @@ if (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
 endif ()
 
-SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+SET(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 SET(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -ffast-math -frename-registers -flto")
 
 if (CMAKE_BUILD_TYPE STREQUAL Release)
@@ -29,7 +29,6 @@ SET(NEAT_GRU_SOURCES
         Private/Random.cpp
         NeuralNetwork/Topology.cpp
         Timer.cpp
-        Threading/ThreadPool.cpp
         Serializer/Serializable.cpp
         bindings/bindings.cpp
         bindings/GameBinding.cpp
@@ -37,10 +36,10 @@ SET(NEAT_GRU_SOURCES
         Private/routines.cpp
         )
 
-SET(PUB_HEADERS Game/Player.h
+SET(PUB_HEADERS
+        Game/Player.h
         Serializer/Serializable.h
         Serializer/Serializer.hpp
-        Threading/ThreadPool.h
         Threading/multithreaded_methods.h
         Timer.h
         TopologyParser/TopologyParser.cpp
@@ -62,6 +61,7 @@ TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Threading)
 TARGET_SOURCES(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
 
 IF (CUDA_ENABLED)
+    ADD_COMPILE_DEFINITIONS(CUDA_ENABLED=1)
     ADD_SUBDIRECTORY(GPU)
     TARGET_LINK_LIBRARIES(NEAT_GRU NEAT_CUDA)
 ELSE ()

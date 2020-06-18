@@ -27,7 +27,7 @@
 #include "static.h"
 
 #ifdef CUDA_ENABLED
-#include "../GPU/NN.h"
+#include "../GPU/NN.cuh"
 #else
 #include "../NeuralNetwork/NN.h"
 #endif

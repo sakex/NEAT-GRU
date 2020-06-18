@@ -5,12 +5,15 @@
 #ifndef NEAT_GRU_NN_CUH
 #define NEAT_GRU_NN_CUH
 
+#include <vector>
 #include "CudaPhenotype.cuh"
 #include "../NeuralNetwork/Topology.h"
 
 
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
+
+    class Neuron;
 
     class Topology;
 
@@ -45,8 +48,10 @@ namespace NeuralNetwork {
         void reset_state();
 
     private:
-        Layer *layers;
+        int neurons_count;
+        Neuron *layers;
         int layer_count;
+        int * layer_addresses;
 
     private:
         /**

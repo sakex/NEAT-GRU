@@ -16,7 +16,7 @@ void Memory::generate_random_grids() {
         numbers_list numbers;
         for (int i = 0; i < NUMBERS / 2; ++i) {
             constexpr int NUMBERS_BY_2 = (NUMBERS - 2) / 2;
-            double const value = static_cast<double>(i * 2  - NUMBERS_BY_2) / static_cast<double>(NUMBERS_BY_2);
+            float const value = static_cast<float>(i * 2  - NUMBERS_BY_2) / static_cast<float>(NUMBERS_BY_2);
             numbers[i*2] = value;
             numbers[i*2 + 1] = value;
         }
@@ -26,13 +26,13 @@ void Memory::generate_random_grids() {
 
 }
 
-std::vector<double> Memory::do_run_generation() {
+std::vector<float> Memory::do_run_generation() {
     auto & _datasets = datasets;
     auto &&cb = [_datasets](MemoryPlayer &player) {
         player.play_rounds(_datasets);
     };
     Threading::for_each(players.begin(), players.end(), cb);
-    std::vector<double> outputs;
+    std::vector<float> outputs;
     outputs.reserve(players.size());
     std::transform(players.begin(), players.end(),
                    std::back_inserter(outputs),
@@ -48,8 +48,7 @@ void Memory::do_reset_players(NN *nets, size_t count) {
     }
 }
 
-void Memory::do_post_training(Topology_ptr top) {
-    auto * net = new NeuralNetwork::NN(top);
+void Memory::do_post_training(NN * net) {
     MemoryPlayer player(net);
     generate_random_grids();
     player.play_rounds(datasets, true);
