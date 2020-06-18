@@ -12,8 +12,6 @@ namespace NeuralNetwork {
 
     class Neuron {
     public:
-        __device__ __host__ Neuron() = default;
-
         __device__ void add_connection(Neuron *, float, float, float, float, float, float);
 
 
@@ -31,7 +29,7 @@ namespace NeuralNetwork {
 
         __device__ void feed_forward();
 
-        __device__ __host__ void reset_value();
+        __device__ void reset_value();
 
         __device__ void set_connections_count(size_t);
 
@@ -41,14 +39,16 @@ namespace NeuralNetwork {
 
         __device__ void free_connections();
 
+        __device__ void init();
+
     private:
-        bool activated = false;
-        float input = 0.;
-        float memory = 0.;
-        float update = 0.;
-        float reset = 0.;
-        float prev_reset = 0.;
-        size_t last_connection_added = 0;
+        bool activated;
+        float input;
+        float memory;
+        float update;
+        float reset;
+        float prev_reset;
+        size_t last_connection_added;
         Connection *connections;
     };
 }

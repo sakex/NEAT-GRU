@@ -40,15 +40,26 @@ namespace NeuralNetwork {
         delete_layers();
     }
 
-    __global__ void free_connections_kernel(Neuron *neurons) {
-        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
-        neurons[tid].free_connections();
+    __global__ void free_connections_kernel(Neuron *neurons, int count) {
+        for(int it = 0; it < count; ++it){
+            neurons[it].free_connections();
+        }
     }
 
     void NN::delete_layers() {
-        free_connections_kernel<<<1, neurons_count>>>(layers);
-        cudaDeviceSynchronize();
+        free_connections_kernel<<<1, 1>>>(layers, neurons_count);
+        cudaError err = cudaDeviceSynchronize();
+        if(err) {
+            std::cerr << "Failed at delete layers " << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
         cudaFree(layers);
+    }
+
+    __global__ void init_kernel(Neuron * neurons) {
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        neurons[tid].init();
+        __syncthreads();
     }
 
     __global__ void set_connections_kernel(Neuron *layers, CUDAConnectionCount *connection_count, size_t N) {
@@ -56,6 +67,7 @@ namespace NeuralNetwork {
             CUDAConnectionCount *count = &connection_count[it];
             Neuron *input_neuron_ptr = &layers[count->pos];
             input_neuron_ptr->set_connections_count(count->count);
+            __syncthreads();
         }
     }
 
@@ -64,8 +76,6 @@ namespace NeuralNetwork {
             CUDAPhenotype *phen = &phenotypes[it];
             Neuron *input_neuron_ptr = &layers[phen->input_pos];
             Neuron *output_neuron_ptr = &layers[phen->output_pos];
-
-            printf("Input: %i, Output: %i\n", phen->input_pos, phen->output_pos);
 
             input_neuron_ptr->add_connection(
                     output_neuron_ptr,
@@ -90,9 +100,15 @@ namespace NeuralNetwork {
             neurons_count += sizes[i];
         }
         layer_addresses[i] = neurons_count;
-        err = cudaMalloc(&layers, sizeof(Neuron) * (unsigned long)neurons_count);
+        err = cudaMalloc(&layers, sizeof(Neuron) * neurons_count);
         if(err) {
             std::cerr << "Failed at cudaMalloc Neurons with error:\n" << err << ": " << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
+        init_kernel<<<1, neurons_count>>>(layers);
+        err = cudaDeviceSynchronize();
+        if(err) {
+            std::cerr << "Failed at init kernel:\n" << err << ": " << cudaGetErrorString(err) << std::endl;
             throw;
         }
         Topology::relationships_map &relationships = topology->get_relationships();
@@ -150,15 +166,23 @@ namespace NeuralNetwork {
 
         CUDAPhenotype *device_phenotypes;
         cudaMalloc(&device_phenotypes, sizeof(CUDAPhenotype) * phenotype_vec.size());
-        cudaMemcpy(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
+        err = cudaMemcpy(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
                    cudaMemcpyHostToDevice);
+        if(err) {
+            std::cerr << "Failed at cudaMemcpy(device_phenotypes) " << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
         connect_neurons_kernel<<<1, 1>>>(layers, device_phenotypes, phenotype_vec.size());
         err = cudaDeviceSynchronize();
         if(err) {
             std::cerr << "Failed at connect_neurons_kernel " << cudaGetErrorString(err) << std::endl;
             throw;
         }
-        cudaFree(device_phenotypes);
+        err = cudaFree(device_phenotypes);
+        if(err) {
+            std::cerr << "Failed at cudafree(device_phenotypes) " << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
     }
 
     __global__ void feed_forward_kernel(Neuron *layer, int from) {
@@ -231,7 +255,11 @@ namespace NeuralNetwork {
 
         set_input_kernel<<<1, distance>>>(layers, dev_inputs);
         cudaFree(dev_inputs);
-        cudaDeviceSynchronize();
+        cudaError err = cudaDeviceSynchronize();
+        if(err) {
+            std::cerr << "Failed at set_input " << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
     }
 
 } /* namespace NeuralNetwork */

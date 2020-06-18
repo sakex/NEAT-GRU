@@ -18,8 +18,19 @@ namespace NeuralNetwork {
         __syncthreads();
     }
 
+    __device__ void Neuron::init() {
+        connections = nullptr;
+        activated = false;
+        input = 0.;
+        memory = 0.;
+        update = 0.;
+        reset = 0.;
+        prev_reset = 0.;
+        last_connection_added = 0;
+    }
+
     __device__ void Neuron::set_connections_count(size_t const value) {
-        connections = (Connection *) malloc(sizeof(Connection) * value);
+        connections = new Connection[value];
         __syncthreads();
     }
 
@@ -63,7 +74,7 @@ namespace NeuralNetwork {
         reset_value();
     }
 
-    __device__ __host__ void Neuron::reset_value() {
+    __device__ void Neuron::reset_value() {
         input = 0.;
         update = 0.;
         memory = 0.;
@@ -88,6 +99,8 @@ namespace NeuralNetwork {
     }
 
     __device__ void Neuron::free_connections() {
-        free(connections);
+        delete []connections;
+        connections = nullptr;
+        __syncthreads();
     }
 }

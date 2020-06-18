@@ -56,7 +56,7 @@ std::vector<float> TrendGame::do_run_generation() {
             player.network->reset_state();
         }
     };
-    std::for_each(players.begin(), players.end(), cb);
+    Threading::for_each(players.begin(), players.end(), cb);
     std::vector<float> outputs;
     outputs.reserve(players.size());
     std::transform(players.begin(), players.end(),
