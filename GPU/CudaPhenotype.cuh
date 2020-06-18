@@ -7,12 +7,12 @@
 
 
 struct CUDAPhenotype {
-    double const input_weight;
-    double const memory_weight;
-    double const reset_input_weight;
-    double const reset_memory_weight;
-    double const update_input_weight;
-    double const update_memory_weight;
+    float const input_weight;
+    float const memory_weight;
+    float const reset_input_weight;
+    float const reset_memory_weight;
+    float const update_input_weight;
+    float const update_memory_weight;
     int input_pos[2];
     int output_pos[2];
 };

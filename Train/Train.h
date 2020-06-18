@@ -27,7 +27,7 @@
 #include "static.h"
 
 #ifdef CUDA_ENABLED
-#include "../NeuralNetwork/NN.cuh"
+#include "../GPU/NN.h"
 #else
 #include "../NeuralNetwork/NN.h"
 #endif
@@ -109,13 +109,13 @@ namespace Train {
          * Pairs topologies and their results returned by the Simulation
          * @param results the results from the simulation's run_generation()
          */
-        void assign_results(std::vector<double> const &results);
+        void assign_results(std::vector<float> const &results);
 
         /**
          * Calls run_generation on the Game
          * @return a vector of results
          */
-        std::vector<double> run_generation();
+        std::vector<float> run_generation();
 
         /// Do the natural selection
         void natural_selection();

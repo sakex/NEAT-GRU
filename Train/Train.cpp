@@ -45,7 +45,7 @@ namespace Train {
     void Train::random_new_species() {
         using utils::Random;
         Species_ptr new_species = std::make_unique<Species>();
-        int const connections_per_input = std::ceil((double) outputs_count / (double) inputs_count);
+        int const connections_per_input = std::ceil((float) outputs_count / (float) inputs_count);
         std::vector<int> not_added;
         int output_index = 0;
         for (int i = 0; i < inputs_count; ++i) {
@@ -64,12 +64,12 @@ namespace Train {
             initial_topology->set_layers(2);
             for (int i = 0; i < inputs_count; ++i) {
                 Phenotype::point input = {0, i};
-                double input_weight = Random::random_between(-100, 100) / 100.0;
-                double const memory_weight = Random::random_between(-100, 100) / 100.0;
-                double const reset_input_weight = Random::random_between(-100, 100) / 100.0;
-                double const reset_memory_weight = Random::random_between(-100, 100) / 100.0;
-                double const update_input_weight = Random::random_between(-100, 100) / 100.0;
-                double const update_memory_weight = Random::random_between(-100, 100) / 100.0;
+                float input_weight = Random::random_between(-100, 100) / 100.0;
+                float const memory_weight = Random::random_between(-100, 100) / 100.0;
+                float const reset_input_weight = Random::random_between(-100, 100) / 100.0;
+                float const reset_memory_weight = Random::random_between(-100, 100) / 100.0;
+                float const update_input_weight = Random::random_between(-100, 100) / 100.0;
+                float const update_memory_weight = Random::random_between(-100, 100) / 100.0;
 
                 for (int j = 0; j < connections_per_input; ++j) {
                     int index = not_added[not_added_it];
@@ -88,7 +88,7 @@ namespace Train {
         species.emplace_back(std::move(new_species));
     }
 
-    inline void Train::assign_results(std::vector<double> const &results) {
+    inline void Train::assign_results(std::vector<float> const &results) {
         size_t const size = results.size();
 #if DEBUG
         assert(size == last_topologies.size());
@@ -104,7 +104,7 @@ namespace Train {
         for (int it = 0; it != iterations; ++it) { // iterations < 0 -> run forever = other end conditions
             std::cout << it << std::endl;
             utils::Timer run_timer("RUN GENERATION");
-            std::vector<double> results = run_generation();
+            std::vector<float> results = run_generation();
             run_timer.stop();
             assign_results(results);
             update_best();
@@ -183,7 +183,7 @@ namespace Train {
             if (!topology->is_assigned()) {
                 Species_ptr new_species = std::make_unique<Species>(topology, 1);
                 auto lambda = [&topology, &new_species, &mutex](Topology_ptr &other) {
-                    double const delta = Topology::delta_compatibility(*topology, *other);
+                    float const delta = Topology::delta_compatibility(*topology, *other);
                     if (!other->is_assigned() && delta <= 1) {
                         other->set_assigned(true);
                         mutex.lock();
@@ -215,7 +215,7 @@ namespace Train {
         }
     }
 
-    inline std::vector<double> Train::run_generation() {
+    inline std::vector<float> Train::run_generation() {
         return game->run_generation();
     }
 
@@ -235,11 +235,11 @@ namespace Train {
     void Train::update_best() {
         Topology_ptr best = nullptr;
         Topology_ptr worst = nullptr;
-        long double max = -10000000;
-        long double min = 100000000;
+        float max = -10000000.f;
+        float min = 100000000.f;
         std::vector<Topology_ptr> topologies = topologies_vector();
         for (Topology_ptr &topology : topologies) {
-            long double result = topology->get_last_result();
+            float result = topology->get_last_result();
             if (result > max) {
                 max = result;
                 best = topology;

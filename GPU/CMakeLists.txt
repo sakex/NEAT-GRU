@@ -1,0 +1,29 @@
+project(neat_gpu LANGUAGES CUDA)
+FIND_PACKAGE(CUDA REQUIRED)
+SET(CMAKE_CUDA_STANDARD 14)
+
+ADD_LIBRARY(NEAT_CUDA
+        NN.cu
+        Connection.cu
+        Layer.cu
+        Neuron.cu
+        )
+
+SET(PUB_HEADERS ${PUB_HEADERS}
+        NN.cuh
+        Connection.cuh
+        Layer.cuh
+        Neuron.cuh
+        )
+
+TARGET_SOURCES(NEAT_CUDA PRIVATE ${PUB_HEADERS})
+
+set_target_properties(NEAT_CUDA PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS ON)
+
+
+SET_TARGET_PROPERTIES(
+        NEAT_CUDA
+        PROPERTIES
+        CUDA_SEPARABLE_COMPILATION ON)
+
+TARGET_LINK_LIBRARIES(NEAT_CUDA ${CUDA_LIBRARIES} NEAT_GRU)

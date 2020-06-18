@@ -2,10 +2,12 @@
 // Created by alexandre on 16.06.20.
 //
 
+
+#include "Neuron.cuh"
 #include "Layer.cuh"
 
 namespace NeuralNetwork {
-    __global__ void set_input_kernel(Neuron *layer, double const *inputs) {
+    __global__ void set_input_kernel(Neuron *layer, float const *inputs) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         layer[tid].set_input_value(inputs[tid]);
     }
@@ -15,14 +17,14 @@ namespace NeuralNetwork {
         layer[tid].feed_forward();
     }
 
-    __global__ void get_result_kernel(Neuron *layer, double * arr) {
+    __global__ void get_result_kernel(Neuron *layer, float * arr) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         arr[tid] = layer[tid].get_value();
         layer[tid].set_value(0);
     }
 
 
-    __device__ __host__ Layer::Layer(): _size(0), neurons(nullptr) {
+    Layer::Layer(): _size(0), neurons(nullptr) {
 
     }
 
@@ -39,20 +41,25 @@ namespace NeuralNetwork {
         return _size;
     }
 
-    __host__ void Layer::set_input(double const *inputs) {
+    __host__ void Layer::set_input(float const *inputs) {
         set_input_kernel<<<1, _size>>>(neurons, inputs);
     }
 
     __host__ void Layer::feed_forward() {
         feed_forward_kernel<<<1, _size>>>(neurons);
     }
-    __host__ double * Layer::get_result() {
-        auto *output = new double[_size];
-        double *dev_output;
-        cudaMalloc(&dev_output, _size*sizeof(double));
+    __host__ float * Layer::get_result() {
+        auto *output = new float[_size];
+        float *dev_output;
+        cudaMalloc(&dev_output, _size*sizeof(float));
         get_result_kernel<<<1, _size>>>(neurons, dev_output);
-        cudaMemcpy(output, dev_output, _size*sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(output, dev_output, _size*sizeof(float), cudaMemcpyDeviceToHost);
         cudaFree(dev_output);
+        /*
+        for(size_t it = 0; it < _size; ++it) {
+            printf("%f, ", output[it]);
+        }
+        printf("\n");*/
         return output;
     }
 

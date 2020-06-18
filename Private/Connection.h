@@ -18,23 +18,23 @@ namespace NeuralNetwork {
     class Connection {
 
     public:
-        Connection(double, double, double, double, double, double, Neuron *);
+        Connection(float, float, float, float, float, float, Neuron *);
 
         ~Connection() = default;
 
-        void activate(double);
+        void activate(float);
 
         void reset_state();
 
     private:
-        double memory = 0.;
-        double prev_input = 0.;
-        double const input_weight;
-        double const memory_weight;
-        double const reset_input_weight;
-        double const reset_memory_weight;
-        double const update_input_weight;
-        double const update_memory_weight;
+        float memory = 0.;
+        float prev_input = 0.;
+        float const input_weight;
+        float const memory_weight;
+        float const reset_input_weight;
+        float const reset_memory_weight;
+        float const update_input_weight;
+        float const update_memory_weight;
         Neuron *output;
     };
 

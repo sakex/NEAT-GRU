@@ -4,8 +4,8 @@
 
 #include "bindings.h"
 
-double *compute_network(NN *net, const double *inputs) {
-    double *outputs = net->compute(inputs);
+float *compute_network(NN *net, const float *inputs) {
+    float *outputs = net->compute(inputs);
     return outputs;
 }
 

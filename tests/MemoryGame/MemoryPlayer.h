@@ -5,7 +5,11 @@
 #ifndef NEAT_GRU_MEMORYPLAYER_H
 #define NEAT_GRU_MEMORYPLAYER_H
 
+#ifdef CUDA_ENABLED
+#include "NN.cuh"
+#else
 #include "NN.h"
+#endif
 #include "MemoryGrid.h"
 
 class MemoryPlayer {

@@ -9,12 +9,12 @@
 
 namespace NeuralNetwork {
 
-    double sigmoid(double const value) {
+    float sigmoid(float const value) {
         return 1 / (1 + std::exp(-value));
     }
 
-    void softmax(double *input, unsigned size) {
-        double total = 0;
+    void softmax(float *input, unsigned size) {
+        float total = 0;
         for (unsigned i = 0; i < size; ++i) {
             if (input[i] < 0.) input[i] = 0.;
             else total += input[i];
@@ -57,12 +57,12 @@ namespace NeuralNetwork {
                 }
                 Phenotype::point input = phenotype->get_input();
                 Phenotype::point output = phenotype->get_output();
-                double const input_weight = phenotype->get_input_weight();
-                double const memory_weight = phenotype->get_memory_weight();
-                double const reset_input_weight = phenotype->get_reset_input_weight();
-                double const reset_memory_weight = phenotype->get_reset_memory_weight();
-                double const update_input_weight = phenotype->get_update_input_weight();
-                double const update_memory_weight = phenotype->get_update_memory_weight();
+                float const input_weight = phenotype->get_input_weight();
+                float const memory_weight = phenotype->get_memory_weight();
+                float const reset_input_weight = phenotype->get_reset_input_weight();
+                float const reset_memory_weight = phenotype->get_reset_memory_weight();
+                float const update_input_weight = phenotype->get_update_input_weight();
+                float const update_memory_weight = phenotype->get_update_memory_weight();
                 Neuron *input_neuron_ptr = layers[input[0]][input[1]];
                 Neuron *output_neuron_ptr = layers[output[0]][output[1]];
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
@@ -71,7 +71,7 @@ namespace NeuralNetwork {
         }
     }
 
-    double * NN::compute(const double *inputs_vector) {
+    float * NN::compute(const float *inputs_vector) {
         set_inputs(inputs_vector);
         for (int it = 0; it < layer_count - 1; ++it) {
             for (size_t j = 0; j < layers[it].size(); ++j) {
@@ -80,8 +80,8 @@ namespace NeuralNetwork {
         }
         Layer &last_layer = layers[layer_count - 1];
         unsigned const size = last_layer.size();
-        double * out = nullptr;
-        out = new double[size];
+        float * out = nullptr;
+        out = new float[size];
         for (unsigned it = 0; it < size; ++it) {
             Neuron *neuron = last_layer[it];
             out[it] = neuron->get_value();
@@ -99,7 +99,7 @@ namespace NeuralNetwork {
         }
     }
 
-    void NN::set_inputs(const double *inputs_array) {
+    void NN::set_inputs(const float *inputs_array) {
         Layer &first_layer = layers[0];
         size_t length = first_layer.size();
         for (size_t i = 0; i < length; ++i) {

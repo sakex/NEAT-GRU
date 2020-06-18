@@ -9,7 +9,11 @@
 #define GAME_PLAYER_H_
 
 #include "../NeuralNetwork/Topology.h"
+#ifdef CUDA_ENABLED
+#include "../GPU/NN.h"
+#else
 #include "../NeuralNetwork/NN.h"
+#endif
 
 /// Namespace for the Game abstract classes
 namespace Game {
@@ -39,7 +43,7 @@ namespace Game {
          * Getter to get results
          * @return Loss function output
          */
-        long double get_result();
+        float get_result();
 
     protected:
         /// The NeuralNetwork of the player
@@ -60,7 +64,7 @@ namespace Game {
          * Function to implement for the getter to get results
          * @return Loss function output
          */
-        virtual long double do_get_result() = 0;
+        virtual float do_get_result() = 0;
     };
 }
 

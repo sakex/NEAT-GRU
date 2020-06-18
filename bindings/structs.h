@@ -14,7 +14,7 @@ typedef struct Simulation {
      * @param cont Context to call the method on
      * @return A C array of scores
      */
-    double *(*run_generation)(void *cont);
+    float *(*run_generation)(void *cont);
 
     /**
      * Reset players implementation (has to be implemented or it will be undefined behaviour)

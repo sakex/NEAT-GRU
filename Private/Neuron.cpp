@@ -13,50 +13,50 @@ namespace NeuralNetwork {
     }
 
     void
-    Neuron::add_connection(Neuron *neuron, double const input_weight, double const memory_weight, double const riw,
-                           double const rmw,
-                           double const uiw, double const umw) {
+    Neuron::add_connection(Neuron *neuron, float const input_weight, float const memory_weight, float const riw,
+                           float const rmw,
+                           float const uiw, float const umw) {
         connections.emplace_back(input_weight, memory_weight, riw, rmw, uiw, umw, neuron);
     }
 
-    void Neuron::increment_input(const double inc_value) {
+    void Neuron::increment_input(const float inc_value) {
         input += inc_value;
         activated = true;
     }
 
-    void Neuron::increment_update(const double inc_value) {
+    void Neuron::increment_update(const float inc_value) {
         update += inc_value;
     }
 
-    void Neuron::increment_memory(const double inc_value) {
+    void Neuron::increment_memory(const float inc_value) {
         memory += inc_value;
     }
 
-    void Neuron::increment_reset(const double inc_value) {
+    void Neuron::increment_reset(const float inc_value) {
         reset += inc_value;
     }
 
-    void Neuron::set_value(double new_value) {
+    void Neuron::set_value(float new_value) {
         input = new_value;
     }
 
-    void Neuron::set_input_value(double new_value) {
+    void Neuron::set_input_value(float new_value) {
         input = new_value;
         activated = true;
     }
 
-    double Neuron::get_value() {
+    float Neuron::get_value() {
         if (!activated) return 0;
-        const double update_gate = sigmoid(update);
-        const double reset_gate = sigmoid(reset);
-        const double current_memory = std::tanh(input + memory * reset_gate);
-        const double value = update_gate * memory + (1. - update_gate) * current_memory;
+        const float update_gate = sigmoid(update);
+        const float reset_gate = sigmoid(reset);
+        const float current_memory = std::tanh(input + memory * reset_gate);
+        const float value = update_gate * memory + (1. - update_gate) * current_memory;
         prev_reset = reset_gate;
         reset_value();
         return std::tanh(value);
     }
 
-    double Neuron::get_prev_reset() const {
+    float Neuron::get_prev_reset() const {
         return prev_reset;
     }
 
@@ -69,10 +69,10 @@ namespace NeuralNetwork {
 
     void Neuron::feed_forward() {
         if (!activated) return;
-        const double update_gate = sigmoid(update);
-        const double reset_gate = sigmoid(reset);
-        const double current_memory = std::tanh(input + memory * reset_gate);
-        const double value = update_gate * memory + (1. - update_gate) * current_memory;
+        const float update_gate = sigmoid(update);
+        const float reset_gate = sigmoid(reset);
+        const float current_memory = std::tanh(input + memory * reset_gate);
+        const float value = update_gate * memory + (1. - update_gate) * current_memory;
         for (Connection &connection : connections) {
             connection.activate(value);
         }

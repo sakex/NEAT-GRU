@@ -1,16 +1,9 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.16)
 
-IF (CUDA_ENABLED)
-    project(neat_gru CUDA)
-    set(CMAKE_CUDA_STANDARD 14)
-    ADD_COMPILE_OPTIONS(-dc --compiler-options -Wall)
-    ADD_COMPILE_DEFINITIONS(CUDA_ENABLED=1)
-    SET(CUDA_SEPARABLE_COMPILATION ON)
-ELSE ()
-    project(neat_gru)
-    SET(CMAKE_CXX_STANDARD 14)
-    ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
-ENDIF ()
+project(neat_gru)
+SET(CMAKE_CXX_STANDARD 14)
+# ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
+
 
 if (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
@@ -67,15 +60,10 @@ TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Train)
 TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC TopologyParser)
 TARGET_INCLUDE_DIRECTORIES(NEAT_GRU PUBLIC Threading)
 TARGET_SOURCES(NEAT_GRU PRIVATE ${NEAT_GRU_SOURCES})
-# TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 
 IF (CUDA_ENABLED)
-    TARGET_SOURCES(NEAT_GRU PRIVATE
-            NeuralNetwork/NN.cu
-            Private/Connection.cu
-            Private/Layer.cu
-            Private/Neuron.cu
-            )
+    ADD_SUBDIRECTORY(GPU)
+    TARGET_LINK_LIBRARIES(NEAT_GRU NEAT_CUDA)
 ELSE ()
     TARGET_SOURCES(NEAT_GRU PRIVATE
             NeuralNetwork/NN.cpp
@@ -83,16 +71,26 @@ ELSE ()
             Private/Layer.cpp
             Private/Neuron.cpp
             )
+    SET(PUB_HEADERS ${PUB_HEADERS}
+            NeuralNetwork/NN.h
+            Private/Connection.h
+            Private/Layer.h
+            Private/Neuron.h
+            )
+
+    TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 ENDIF ()
+
+
+TARGET_LINK_LIBRARIES(NEAT_GRU -lstdc++)
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
+    ENABLE_TESTING()
+    ADD_SUBDIRECTORY(tests)
 endif ()
 
-ENABLE_TESTING()
-ADD_SUBDIRECTORY(tests)
 
-TARGET_LINK_LIBRARIES(NEAT_GRU -lstdc++)
 
 
 INSTALL(TARGETS NEAT_GRU

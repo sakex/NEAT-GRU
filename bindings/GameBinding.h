@@ -34,7 +34,7 @@ private:
      * We be called during the run generation phase of the training
      * @return A vector of results
      */
-    std::vector<double> do_run_generation() override;
+    std::vector<float> do_run_generation() override;
 
     /// Empty body for now
     void do_post_training(NN* network) override;

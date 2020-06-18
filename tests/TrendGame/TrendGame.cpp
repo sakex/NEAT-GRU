@@ -37,15 +37,15 @@ void TrendGame::generate_dataset() {
     }
 }
 
-std::vector<double> TrendGame::do_run_generation() {
+std::vector<float> TrendGame::do_run_generation() {
     auto const &_datasets = datasets;
     auto cb = [&_datasets](Player &player) {
-        std::array<double, DIFFERENT_NUMBERS> input{};
-        for (Dataset const& ds: _datasets) {
+        std::array<float, DIFFERENT_NUMBERS> input{};
+        for (Dataset const &ds: _datasets) {
             for (size_t it = 0; it < ds.data.size(); ++it) {
-                double *result = nullptr;
+                float *result;
                 int const index = ds.data[it];
-                for(auto & i: input) i = -1.;
+                for (auto &i: input) i = -1.;
                 input[index] = 1.;
                 result = player.network->compute(input.data());
                 auto max_elem = std::max_element(result, result + DIFFERENT_NUMBERS);
@@ -56,8 +56,8 @@ std::vector<double> TrendGame::do_run_generation() {
             player.network->reset_state();
         }
     };
-    Threading::for_each(players.begin(), players.end(), cb);
-    std::vector<double> outputs;
+    std::for_each(players.begin(), players.end(), cb);
+    std::vector<float> outputs;
     outputs.reserve(players.size());
     std::transform(players.begin(), players.end(),
                    std::back_inserter(outputs),
@@ -71,19 +71,18 @@ void TrendGame::do_reset_players(NN *nets, size_t count) {
     for (size_t it = 0; it < count; ++it) players.push_back({&nets[it], 0});
 }
 
-void TrendGame::do_post_training(Topology_ptr top) {
-    auto *net = new NeuralNetwork::NN(top);
+void TrendGame::do_post_training(NN *net) {
     Player player{net, 0};
     generate_dataset();
-    double input[DIFFERENT_NUMBERS];
+    float input[DIFFERENT_NUMBERS];
     for (Dataset &ds: datasets) {
         std::vector<int> sequence;
         sequence.reserve(datasets[0].data.size());
         for (size_t it = 0; it < ds.data.size(); ++it) {
             int const index = ds.data[it];
-            for (double &v: input) v = -1.;
+            for (float &v: input) v = -1.;
             input[index] = 1.;
-            double *result = player.network->compute(input);
+            float *result = player.network->compute(input);
             auto max_elem = std::max_element(result, result + DIFFERENT_NUMBERS);
             int const max_index = std::distance(result, max_elem);
             player.score -= (max_index != ds.most_frequent[it]);

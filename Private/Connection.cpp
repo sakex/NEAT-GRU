@@ -9,8 +9,8 @@
 
 namespace NeuralNetwork {
 
-    Connection::Connection(double const _input_weight, double const _memory_weight, double const riw, double const rmw,
-                           double const uiw, double const umw, Neuron *output) :
+    Connection::Connection(float const _input_weight, float const _memory_weight, float const riw, float const rmw,
+                           float const uiw, float const umw, Neuron *output) :
             input_weight(_input_weight),
             memory_weight(_memory_weight),
             reset_input_weight(riw),
@@ -20,8 +20,8 @@ namespace NeuralNetwork {
             output{output} {
     }
 
-    void Connection::activate(double const value) {
-        double const prev_reset = output->get_prev_reset();
+    void Connection::activate(float const value) {
+        float const prev_reset = output->get_prev_reset();
         memory = prev_input * input_weight + memory_weight * prev_reset * memory;
         prev_input = value;
         output->increment_memory(memory * memory_weight);

@@ -12,7 +12,7 @@
 constexpr int DIFFERENT_NUMBERS = 5;
 
 struct Player {
-    NN* network;
+    NN *network;
     long score;
 };
 
@@ -28,11 +28,11 @@ public:
 public:
     TrendGame();
 
-    std::vector<double> do_run_generation() override;
+    std::vector<float> do_run_generation() override;
 
     void do_reset_players(NN *nets, size_t count) override;
 
-    void do_post_training(Topology_ptr topology) override;
+    void do_post_training(NN *net) override;
 
 private:
     std::vector<Player> players;
