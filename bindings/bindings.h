@@ -19,7 +19,7 @@ extern "C" {
  * @param inputs The inputs of the computation
  * @return The output of the computation
  */
-double *compute_network(NN *net, const double *inputs);
+float *compute_network(NN *net, const float *inputs);
 
 /**
  * Binding to reset the hidden state of a neural network
