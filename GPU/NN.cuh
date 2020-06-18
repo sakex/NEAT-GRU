@@ -6,6 +6,7 @@
 #define NEAT_GRU_NN_CUH
 
 #include <vector>
+#include <iostream>
 #include "CudaPhenotype.cuh"
 #include "../NeuralNetwork/Topology.h"
 

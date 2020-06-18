@@ -79,6 +79,7 @@ namespace NeuralNetwork {
     }
 
     void NN::init_topology(Topology_ptr const &topology) {
+        cudaError err;
         layer_count = topology->get_layers();
         std::vector<int> const &sizes = topology->get_layers_size();
         layer_addresses = new int[layer_count + 1];
@@ -89,7 +90,11 @@ namespace NeuralNetwork {
             neurons_count += sizes[i];
         }
         layer_addresses[i] = neurons_count;
-        cudaMalloc(&layers, sizeof(Neuron) * (unsigned long)neurons_count);
+        err = cudaMalloc(&layers, sizeof(Neuron) * (unsigned long)neurons_count);
+        if(err) {
+            std::cerr << "Failed at cudaMalloc Neurons with error:\n" << cudaGetErrorString(err) << std::endl;
+            throw;
+        }
         Topology::relationships_map &relationships = topology->get_relationships();
         std::vector<CUDAPhenotype> phenotype_vec;
         std::vector<CUDAConnectionCount> connection_counts;
@@ -123,7 +128,11 @@ namespace NeuralNetwork {
         cudaMemcpy(device_counts, connection_counts.data(), sizeof(CUDAConnectionCount) * connection_counts.size(),
                    cudaMemcpyHostToDevice);
         set_connections_kernel<<<1, 1>>>(layers, device_counts, connection_counts.size());
-        cudaDeviceSynchronize();
+        err = cudaDeviceSynchronize();
+        if(err) {
+            std::cerr << "Failed at set_connections_kernel " << std::endl;
+            throw;
+        }
         cudaFree(device_counts);
 
 
@@ -151,6 +160,7 @@ namespace NeuralNetwork {
 
 
     float *NN::compute(const float *inputs_array) {
+        cudaError err;
         set_inputs(inputs_array);
         int from, to, distance;
         for (size_t pos = 0; pos < layer_count - 1; ++pos) {
@@ -158,7 +168,11 @@ namespace NeuralNetwork {
             to = layer_addresses[pos + 1];
             distance = to - from;
             feed_forward_kernel<<<1, distance>>>(layers, from);
-            cudaDeviceSynchronize();
+            err = cudaDeviceSynchronize();
+            if(err) {
+                std::cerr << "Failed at feedforward index: " << pos << std::endl;
+                throw;
+            }
         }
 
         auto *output = new float[distance];
@@ -167,7 +181,11 @@ namespace NeuralNetwork {
         get_result_kernel<<<1, distance>>>(layers, dev_output, from);
         cudaMemcpy(output, dev_output, distance * sizeof(float), cudaMemcpyDeviceToHost);
         cudaFree(dev_output);
-        cudaDeviceSynchronize();
+        err = cudaDeviceSynchronize();
+        if(err) {
+            std::cerr << "Failed at copy output " << std::endl;
+            throw;
+        }
 
         softmax(output, distance);
         return output;
