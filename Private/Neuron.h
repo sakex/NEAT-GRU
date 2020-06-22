@@ -15,6 +15,7 @@
 
 #include "Connection.h"
 
+
 namespace NeuralNetwork {
 
     class Connection;
@@ -27,13 +28,7 @@ namespace NeuralNetwork {
 
         void add_connection(Neuron *, float, float, float, float, float, float);
 
-        void increment_input(float);
-
-        void increment_update(float);
-
-        void increment_memory(float);
-
-        void increment_reset(float);
+        void increment_state(float mem, float inp, float res, float upd);
 
         void set_value(float new_value);
 
@@ -48,12 +43,11 @@ namespace NeuralNetwork {
         void reset_state();
 
     private:
-        bool activated = false;
-        float input = 0.;
-        float memory = 0.;
-        float update = 0.;
-        float reset = 0.;
-        float prev_reset = 0.;
+        float input = 0.f;
+        float memory = 0.f;
+        float update = 0.f;
+        float reset = 0.f;
+        float prev_reset = 0.f;
         std::vector<Connection> connections;
 
     private:

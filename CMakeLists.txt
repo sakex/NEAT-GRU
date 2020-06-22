@@ -32,7 +32,6 @@ SET(NEAT_GRU_SOURCES
         bindings/bindings.cpp
         bindings/GameBinding.cpp
         TopologyParser/TopologyParser.cpp
-        Private/routines.cpp
         )
 
 SET(PUB_HEADERS
@@ -67,8 +66,6 @@ ELSE ()
     ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
     TARGET_SOURCES(NEAT_GRU PRIVATE
             NeuralNetwork/NN.cpp
-            Private/Connection.cpp
-            Private/Neuron.cpp
             )
     SET(PUB_HEADERS ${PUB_HEADERS}
             NeuralNetwork/NN.h

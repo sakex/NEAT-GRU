@@ -9,11 +9,10 @@
 #define NEURALNETWORK_NN_H_
 
 #include <iostream>
-
 #include "../Private/Connection.h"
 #include "Topology.h"
+#include "../Private/xmm_union.h"
 
-#include "../Private/Neuron.h"
 
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
