@@ -9,11 +9,11 @@
 
 namespace NeuralNetwork {
 
-    float sigmoid(float const value) {
-        return 1 / (1 + std::exp(-value));
+    inline float sigmoid(float const value) {
+        return value / (1 + std::abs(value));
     }
 
-    void softmax(float *input, unsigned size) {
+    inline void softmax(float *input, unsigned size) {
         float total = 0;
         for (unsigned i = 0; i < size; ++i) {
             if (input[i] < 0.) input[i] = 0.;
@@ -26,10 +26,18 @@ namespace NeuralNetwork {
         }
     }
 
-    NN::NN() : layers(nullptr), layer_count(0) {
+    NN::NN() : neurons_count(0),
+               layers{nullptr},
+               input_size(0),
+               output_size(0),
+               layer_count(0) {
     }
 
-    NN::NN(Topology_ptr const &topology) : layers(nullptr), layer_count(0) {
+    NN::NN(Topology_ptr const &topology) : neurons_count(0),
+                                           layers{nullptr},
+                                           input_size(0),
+                                           output_size(0),
+                                           layer_count(0)  {
         init_topology(topology);
     }
 
@@ -43,12 +51,17 @@ namespace NeuralNetwork {
 
     void NN::init_topology(Topology_ptr const &topology) {
         layer_count = topology->get_layers();
-        delete_layers();
-        layers = new Layer[layer_count];
         std::vector<int> const &sizes = topology->get_layers_size();
-        for (int i = 0; i < layer_count; ++i) {
-            layers[i].set_size(sizes[i]);
+        int *layer_addresses = new int[layer_count];
+        neurons_count = 0;
+        int i = 0;
+        for (; i < layer_count; ++i) {
+            layer_addresses[i] = neurons_count;
+            neurons_count += sizes[i];
         }
+        input_size = sizes[0];
+        output_size = sizes.back();
+        layers = new Neuron[neurons_count];
         Topology::relationships_map &relationships = topology->get_relationships();
         for (auto &it : relationships) {
             for (Phenotype *phenotype : it.second) {
@@ -63,48 +76,40 @@ namespace NeuralNetwork {
                 float const reset_memory_weight = phenotype->get_reset_memory_weight();
                 float const update_input_weight = phenotype->get_update_input_weight();
                 float const update_memory_weight = phenotype->get_update_memory_weight();
-                Neuron *input_neuron_ptr = layers[input[0]][input[1]];
-                Neuron *output_neuron_ptr = layers[output[0]][output[1]];
+                Neuron *input_neuron_ptr = &layers[layer_addresses[input[0]] + input[1]];
+                Neuron *output_neuron_ptr = &layers[layer_addresses[output[0]] + output[1]];
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
                                                  reset_memory_weight, update_input_weight, update_memory_weight);
             }
         }
+        delete[] layer_addresses;
     }
 
-    float * NN::compute(const float *inputs_vector) {
+    float *NN::compute(const float *inputs_vector) {
         set_inputs(inputs_vector);
-        for (int it = 0; it < layer_count - 1; ++it) {
-            for (size_t j = 0; j < layers[it].size(); ++j) {
-                layers[it][j]->feed_forward();
-            }
+        for (int it = 0; it < neurons_count - output_size; ++it) {
+            layers[it].feed_forward();
         }
-        Layer &last_layer = layers[layer_count - 1];
-        unsigned const size = last_layer.size();
-        float * out = nullptr;
-        out = new float[size];
-        for (unsigned it = 0; it < size; ++it) {
-            Neuron *neuron = last_layer[it];
+        float *out;
+        out = new float[output_size];
+        for (int it = 0; it < output_size; ++it) {
+            Neuron *neuron = &layers[neurons_count - output_size + it];
             out[it] = neuron->get_value();
             neuron->set_value(0);
         }
-        softmax(out, size);
+        softmax(out, output_size);
         return out;
     }
 
     void NN::reset_state() {
-        for (int it = 0; it < layer_count; ++it) {
-            for (size_t j = 0; j < layers[it].size(); ++j) {
-                layers[it][j]->reset_state();
-            }
+        for (int it = 0; it < neurons_count; ++it) {
+            layers[it].reset_state();
         }
     }
 
     void NN::set_inputs(const float *inputs_array) {
-        Layer &first_layer = layers[0];
-        size_t length = first_layer.size();
-        for (size_t i = 0; i < length; ++i) {
-            Neuron *neuron = first_layer[i];
-            neuron->set_input_value(inputs_array[i]);
+        for (int i = 0; i < input_size; ++i) {
+            layers[i].set_input_value(inputs_array[i]);
         }
     }
 

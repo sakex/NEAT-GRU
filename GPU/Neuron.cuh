@@ -27,7 +27,7 @@ namespace NeuralNetwork {
 
         __device__ float get_prev_reset() const;
 
-        __device__ void feed_forward();
+        __device__ float compute_value();
 
         __device__ void reset_value();
 
@@ -41,15 +41,16 @@ namespace NeuralNetwork {
 
         __device__ void init();
 
+    public:
+        Connection *connections;
+        size_t last_connection_added;
+
     private:
-        bool activated;
         float input;
         float memory;
         float update;
         float reset;
         float prev_reset;
-        size_t last_connection_added;
-        Connection *connections;
     };
 }
 

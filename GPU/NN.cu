@@ -7,6 +7,8 @@
 
 namespace NeuralNetwork {
 
+    size_t NN::current_id = 0;
+
     float sigmoid(float const value) {
         return 1 / (1 + std::exp(-value));
     }
@@ -25,50 +27,44 @@ namespace NeuralNetwork {
     }
 
     NN::NN() :
-    neurons_count(0),
-    layers{nullptr},
-    layer_count(0),
-    layer_addresses{nullptr} {
+            neurons_count(0),
+            layers{nullptr},
+            layer_count(0),
+            layer_addresses{nullptr} {
+        id = current_id++;
     }
 
     NN::NN(Topology_ptr const &topology) : neurons_count(0), layers(nullptr), layer_count(0), layer_addresses{nullptr} {
+        cudaStreamCreate(&stream);
         init_topology(topology);
     }
 
     NN::~NN() {
         delete[] layer_addresses;
         delete_layers();
+        cudaStreamDestroy(stream);
     }
 
-    __global__ void free_connections_kernel(Neuron *neurons, int count) {
-        for(int it = 0; it < count; ++it){
-            neurons[it].free_connections();
-        }
+    __global__ void free_connections_kernel(Neuron *neurons) {
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        neurons[tid].free_connections();
     }
 
     void NN::delete_layers() {
-        free_connections_kernel<<<1, 1>>>(layers, neurons_count);
-        cudaError err = cudaDeviceSynchronize();
-        if(err) {
-            std::cerr << "Failed at delete layers " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
+        free_connections_kernel<<<1, neurons_count, id, stream>>>(layers);
         cudaFree(layers);
     }
 
-    __global__ void init_kernel(Neuron * neurons) {
+    __global__ void init_kernel(Neuron *neurons) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         neurons[tid].init();
-        __syncthreads();
     }
 
-    __global__ void set_connections_kernel(Neuron *layers, CUDAConnectionCount *connection_count, size_t N) {
-        for (size_t it = 0; it < N; ++it) {
-            CUDAConnectionCount *count = &connection_count[it];
-            Neuron *input_neuron_ptr = &layers[count->pos];
-            input_neuron_ptr->set_connections_count(count->count);
-            __syncthreads();
-        }
+    __global__ void set_connections_kernel(Neuron *layers, CUDAConnectionCount *connection_count) {
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        CUDAConnectionCount *count = &connection_count[tid];
+        Neuron *input_neuron_ptr = &layers[count->pos];
+        input_neuron_ptr->set_connections_count(count->count);
     }
 
     __global__ void connect_neurons_kernel(Neuron *layers, CUDAPhenotype *phenotypes, size_t N) {
@@ -89,7 +85,6 @@ namespace NeuralNetwork {
     }
 
     void NN::init_topology(Topology_ptr const &topology) {
-        cudaError err;
         layer_count = topology->get_layers();
         std::vector<int> const &sizes = topology->get_layers_size();
         layer_addresses = new int[layer_count + 1];
@@ -100,17 +95,8 @@ namespace NeuralNetwork {
             neurons_count += sizes[i];
         }
         layer_addresses[i] = neurons_count;
-        err = cudaMalloc(&layers, sizeof(Neuron) * neurons_count);
-        if(err) {
-            std::cerr << "Failed at cudaMalloc Neurons with error:\n" << err << ": " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
-        init_kernel<<<1, neurons_count>>>(layers);
-        err = cudaDeviceSynchronize();
-        if(err) {
-            std::cerr << "Failed at init kernel:\n" << err << ": " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
+        cudaMalloc(&layers, sizeof(Neuron) * neurons_count);
+        init_kernel<<<1, neurons_count, id, stream>>>(layers);
         Topology::relationships_map &relationships = topology->get_relationships();
         std::vector<CUDAPhenotype> phenotype_vec;
         std::vector<CUDAConnectionCount> connection_counts;
@@ -140,79 +126,53 @@ namespace NeuralNetwork {
             }
         }
         CUDAConnectionCount *device_counts;
-        err = cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
-        if(err) {
-            std::cerr << "Failed at cudaMalloc CUDAConnectionCount with error:\n" << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
-        err = cudaMemcpy(device_counts, connection_counts.data(), sizeof(CUDAConnectionCount) * connection_counts.size(),
-                   cudaMemcpyHostToDevice);
-        if(err) {
-            std::cerr << "Failed at cudaMemcpy CUDAConnectionCount with error:\n" << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
-        set_connections_kernel<<<1, 1>>>(layers, device_counts, connection_counts.size());
-        err = cudaDeviceSynchronize();
-        if(err) {
-            std::cerr << "Failed at set_connections_kernel " << std::endl;
-            throw;
-        }
-        err = cudaFree(device_counts);
-        if(err) {
-            std::cerr << "Failed at cudaFree(device_counts) " << std::endl;
-            throw;
-        }
+        cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
+
+        cudaMemcpyAsync(device_counts, connection_counts.data(),
+                   sizeof(CUDAConnectionCount) * connection_counts.size(),
+                   cudaMemcpyHostToDevice, stream);
+
+        set_connections_kernel<<<1, connection_counts.size(), id, stream>>>(layers, device_counts);
+
+        cudaFree(device_counts);
 
 
         CUDAPhenotype *device_phenotypes;
         cudaMalloc(&device_phenotypes, sizeof(CUDAPhenotype) * phenotype_vec.size());
-        err = cudaMemcpy(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
-                   cudaMemcpyHostToDevice);
-        if(err) {
-            std::cerr << "Failed at cudaMemcpy(device_phenotypes) " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
-        connect_neurons_kernel<<<1, 1>>>(layers, device_phenotypes, phenotype_vec.size());
-        err = cudaDeviceSynchronize();
-        if(err) {
-            std::cerr << "Failed at connect_neurons_kernel " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
-        err = cudaFree(device_phenotypes);
-        if(err) {
-            std::cerr << "Failed at cudafree(device_phenotypes) " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
+        cudaMemcpyAsync(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
+                   cudaMemcpyHostToDevice, stream);
+        connect_neurons_kernel<<<1, 1, id, stream>>>(layers, device_phenotypes, phenotype_vec.size());
+        cudaFree(device_phenotypes);
+    }
+
+    __global__ void ff_connections(Connection *connections, float const value) {
+        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
+        connections[tid].activate(value);
     }
 
     __global__ void feed_forward_kernel(Neuron *layer, int from) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
-        layer[from + tid].feed_forward();
-        __syncthreads();
+        Neuron *n = &layer[from + tid];
+        float const value = n->compute_value();
+        ff_connections<<<1, n->last_connection_added>>>(n->connections, value);
     }
 
     __global__ void get_result_kernel(Neuron *layer, float *arr, int from) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         arr[tid] = layer[from + tid].get_value();
         layer[from + tid].set_value(0);
-        __syncthreads();
     }
 
 
     float *NN::compute(const float *inputs_array) {
-        cudaError err;
         set_inputs(inputs_array);
         size_t pos = 0;
+
         for (; pos < layer_count - 1; ++pos) {
             int from = layer_addresses[pos];
             int to = layer_addresses[pos + 1];
             int distance = to - from;
-            feed_forward_kernel<<<1, distance>>>(layers, from);
-            err = cudaDeviceSynchronize();
-            if(err) {
-                std::cerr << "Failed at feedforward index: " << pos << std::endl;
-                throw;
-            }
+            feed_forward_kernel<<<1, distance, id, stream>>>(layers, from);
         }
 
         int from = layer_addresses[pos];
@@ -222,15 +182,10 @@ namespace NeuralNetwork {
         auto *output = new float[distance];
         float *dev_output;
         cudaMalloc(&dev_output, distance * sizeof(float));
-        get_result_kernel<<<1, distance>>>(layers, dev_output, from);
-        cudaMemcpy(output, dev_output, distance * sizeof(float), cudaMemcpyDeviceToHost);
+        get_result_kernel<<<1, distance, id, stream>>>(layers, dev_output, from);
+        cudaStreamSynchronize(stream);
+        cudaMemcpyAsync(output, dev_output, distance * sizeof(float), cudaMemcpyDeviceToHost, stream);
         cudaFree(dev_output);
-        err = cudaDeviceSynchronize();
-        if(err) {
-            std::cerr << "Failed at copy output " << std::endl;
-            throw;
-        }
-
         softmax(output, distance);
         return output;
     }
@@ -255,15 +210,10 @@ namespace NeuralNetwork {
 
         float *dev_inputs;
         cudaMalloc(&dev_inputs, distance * sizeof(float));
-        cudaMemcpy(dev_inputs, inputs_array, distance * sizeof(float), cudaMemcpyHostToDevice);
+        cudaMemcpyAsync(dev_inputs, inputs_array, distance * sizeof(float), cudaMemcpyHostToDevice, stream);
 
-        set_input_kernel<<<1, distance>>>(layers, dev_inputs);
+        set_input_kernel<<<1, distance, id, stream>>>(layers, dev_inputs);
         cudaFree(dev_inputs);
-        cudaError err = cudaDeviceSynchronize();
-        if(err) {
-            std::cerr << "Failed at set_input " << cudaGetErrorString(err) << std::endl;
-            throw;
-        }
     }
 
 } /* namespace NeuralNetwork */

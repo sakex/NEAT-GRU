@@ -41,8 +41,4 @@ namespace NeuralNetwork {
         output->increment_reset(value * reset_input_weight + memory * reset_memory_weight);
         output->increment_update(value * update_memory_weight + memory * update_memory_weight);
     }
-
-    __device__ float Connection::get_memory() const {
-        return reset_input_weight;
-    }
 }

@@ -15,12 +15,10 @@ namespace NeuralNetwork {
                            float const uiw, float const umw) {
         Connection *co = &connections[last_connection_added++];
         co->init(input_weight, memory_weight, riw, rmw, uiw, umw, neuron);
-        __syncthreads();
     }
 
     __device__ void Neuron::init() {
         connections = nullptr;
-        activated = false;
         input = 0.;
         memory = 0.;
         update = 0.;
@@ -31,18 +29,14 @@ namespace NeuralNetwork {
 
     __device__ void Neuron::set_connections_count(size_t const value) {
         connections = new Connection[value];
-        __syncthreads();
     }
 
     __device__ void Neuron::increment_input(const float inc_value) {
         atomicAdd(&input, inc_value);
-        activated = true;
-        __syncthreads();
     }
 
     __device__ void Neuron::increment_update(const float inc_value) {
         atomicAdd(&update, inc_value);
-        __syncthreads();
     }
 
     __device__ void Neuron::increment_memory(const float inc_value) {
@@ -61,29 +55,24 @@ namespace NeuralNetwork {
         return prev_reset;
     }
 
-    __device__ void Neuron::feed_forward() {
+    __device__ float Neuron::compute_value() {
         const float update_gate = sigmoid(update);
         const float reset_gate = sigmoid(reset);
         const float current_memory = std::tanh(input + memory * reset_gate);
         const float value = update_gate * memory + (1. - update_gate) * current_memory;
-        for (size_t it = 0; it < last_connection_added; ++it) {
-            connections[it].activate(value);
-        }
         prev_reset = reset_gate;
         reset_value();
+        return value;
     }
 
     __device__ void Neuron::reset_value() {
         input = 0.;
         update = 0.;
         memory = 0.;
-        activated = false;
     }
 
     __device__ void Neuron::set_input_value(float new_value) {
         input = new_value;
-        activated = true;
-        __syncthreads();
     }
 
     __device__ float Neuron::get_value() {
@@ -97,8 +86,7 @@ namespace NeuralNetwork {
     }
 
     __device__ void Neuron::free_connections() {
-        delete []connections;
+        delete[]connections;
         connections = nullptr;
-        __syncthreads();
     }
 }
