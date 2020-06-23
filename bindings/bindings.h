@@ -15,6 +15,8 @@ extern "C" {
 /**
  * Binding to allow a computation of a neural network
  *
+ * Definined in NeuralNetwork/NN.cpp for optimisation reasons
+ *
  * @param net The network to be computed
  * @param inputs The inputs of the computation
  * @return The output of the computation
@@ -23,6 +25,8 @@ float *compute_network(NN *net, const float *inputs);
 
 /**
  * Binding to reset the hidden state of a neural network
+ *
+ * Definined in NeuralNetwork/NN.cpp for optimisation reasons
  *
  * @param net The network to be reset
  */

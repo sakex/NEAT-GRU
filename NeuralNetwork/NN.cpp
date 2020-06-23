@@ -7,6 +7,7 @@
 
 
 #include "../Private/Neuron.h"
+#include "../bindings/bindings.h"
 #include "NN.h"
 
 namespace NeuralNetwork {
@@ -201,7 +202,7 @@ namespace NeuralNetwork {
         delete[] layer_addresses;
     }
 
-    float *NN::compute(const float *inputs_vector) {
+    inline float *NN::compute(const float *inputs_vector) {
         set_inputs(inputs_vector);
         for (int it = 0; it < neurons_count - output_size; ++it) {
             layers[it].feed_forward();
@@ -229,4 +230,14 @@ namespace NeuralNetwork {
         }
     }
 
+
 } /* namespace NeuralNetwork */
+
+float *compute_network(NN *net, const float *inputs) {
+    float *outputs = net->compute(inputs);
+    return outputs;
+}
+
+void reset_network_state(NN *net) {
+    net->reset_state();
+}

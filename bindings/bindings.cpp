@@ -4,15 +4,6 @@
 
 #include "bindings.h"
 
-float *compute_network(NN *net, const float *inputs) {
-    float *outputs = net->compute(inputs);
-    return outputs;
-}
-
-void reset_network_state(NN *net) {
-    net->reset_state();
-}
-
 NN *network_from_string(char const *serialized) {
     using json = nlohmann::json;
     json j = json::parse(serialized);
