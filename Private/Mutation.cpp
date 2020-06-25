@@ -40,13 +40,10 @@ namespace NeuralNetwork {
 
     void Mutation::set_field(int value) {
         field = value;
-        interval[0] = static_cast<float>(-INFINITY);
-        interval[1] = static_cast<float>(INFINITY);
-        interval_found = false;
         direction = 0;
         iterations = 0;
         unfruitful = 0;
-        gradient = 10;
+        step = 10;
         best_historical_weight = 0;
         best_historical_wealth = 0;
     }
@@ -57,34 +54,24 @@ namespace NeuralNetwork {
             best_historical_wealth = wealth;
             best_historical_weight = weight;
         }
-        const float delta = wealth - last_result;
-        const int prev_direction = direction;
+        const float delta = (wealth - last_result);
         if (direction == 0 || direction == 1)
             direction = delta > 0 ? 1 : -1;
         else if (direction == -1)
             direction = delta > 0 ? -1 : 1;
         else
             throw InvalidDirectionException();
-        const int index = direction == -1 ? 1 : 0;
-        // If direction is -1, then we update the max value of the inverval, else we update the min value
-        interval[index] = weight;
-        if (prev_direction != direction && prev_direction != 0) {
-            interval_found = true;
-        }
-        if (!interval_found) {
-            ++unfruitful;
-            MutationField::set(field, phenotype, weight + static_cast<float>(gradient * direction));
-            gradient--;
-            if (!gradient)
-                unfruitful = 1000;
-        } else {
-            iterations++;
-            const float new_weight = (interval[1] + interval[0]) / 2.f;
-            MutationField::set(field, phenotype, new_weight);
-        }
-        if (std::abs(interval[0] - interval[1]) < .5)
-            iterations = 1000;
+        if (prev_weight != weight)
+            MutationField::set(field, phenotype,
+                               weight +
+                               static_cast<float>(step * direction) * std::abs(delta / (prev_weight - weight)));
+        else
+            MutationField::set(field, phenotype,
+                               weight + static_cast<float>(step * direction));
+        iterations++;
+        step--;
         last_result = wealth;
+        prev_weight = weight;
     }
 
     bool Mutation::operator!() const {
@@ -94,11 +81,10 @@ namespace NeuralNetwork {
     Mutation &Mutation::operator=(Mutation const &base) {
         if (&base == this) return *this;
         phenotype = base.phenotype;
-        interval_found = base.interval_found;
         direction = base.direction;
         iterations = base.iterations;
         unfruitful = base.unfruitful;
-        gradient = base.gradient;
+        step = base.step;
         last_result = base.last_result;
         return *this;
     }

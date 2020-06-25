@@ -46,6 +46,14 @@ namespace NeuralNetwork {
         phenotype->set_update_memory_weight(value);
     }
 
+    float __MutationField<5>::get(NeuralNetwork::Phenotype *phenotype) {
+        return phenotype->get_update_input_weight();
+    }
+
+    void __MutationField<5>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+        phenotype->set_update_input_weight(value);
+    }
+
     float MutationField::get(int field, NeuralNetwork::Phenotype *phenotype) {
         switch (field) {
             case 0:

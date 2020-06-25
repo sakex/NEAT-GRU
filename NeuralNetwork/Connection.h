@@ -19,7 +19,7 @@ namespace NeuralNetwork {
     public:
         Connection() = default;
 
-        void init(float, float, float, float, float, Neuron *);
+        void init(float, float, float, float, float, float, Neuron *);
 
         ~Connection() = default;
 
@@ -33,6 +33,7 @@ namespace NeuralNetwork {
         float input_weight = 0.f;
         float memory_weight = 0.f;
         float reset_input_weight = 0.f;
+        float update_input_weight = 0.f;
         float reset_memory_weight = 0.f;
         float update_memory_weight = 0.f;
         Neuron *output;

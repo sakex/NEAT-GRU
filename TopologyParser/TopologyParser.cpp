@@ -17,11 +17,12 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
         float const input_weight = it["input_weight"];
         float const memory_weight = it["memory_weight"];
         float const reset_input_weight = it["reset_input_weight"];
+        float const update_input_weight = it["update_input_weight"];
         float const reset_memory_weight = it["reset_memory_weight"];
         float const update_memory_weight = it["update_memory_weight"];
         bool disabled = it["disabled"];
         new_phenotypes.push_back(
-                new Phenotype(input, output, input_weight, memory_weight, reset_input_weight, reset_memory_weight,
+                new Phenotype(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight, reset_memory_weight,
                               update_memory_weight, disabled, 0));
     }
     topology.set_layers(max_layers + 1);

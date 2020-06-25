@@ -67,6 +67,7 @@ namespace Train {
                 float input_weight = Random::random_between(-100, 100) / 100.0f;
                 float const memory_weight = Random::random_between(-100, 100) / 100.0f;
                 float const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
+                float const update_input_weight = Random::random_between(-100, 100) / 100.0f;
                 float const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
                 float const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
 
@@ -76,7 +77,7 @@ namespace Train {
                     Phenotype::point output = {1, index};
                     Phenotype::coordinate coordinate = {input, output};
                     auto *phenotype = new Phenotype(input, input_weight, memory_weight, reset_input_weight,
-                                                    reset_memory_weight, update_memory_weight,
+                                                    update_input_weight, reset_memory_weight, update_memory_weight,
                                                     Generation::number(coordinate));
                     phenotype->set_output(1, index);
                     initial_topology->add_relationship(phenotype, true);

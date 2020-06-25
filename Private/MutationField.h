@@ -54,6 +54,13 @@ namespace NeuralNetwork {
         static void set(Phenotype *, float);
     };
 
+    template<>
+    struct __MutationField<5> {
+        static float get(Phenotype *);
+
+        static void set(Phenotype *, float);
+    };
+
     struct MutationField {
         static float get(int, Phenotype *);
 

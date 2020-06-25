@@ -25,7 +25,7 @@ namespace NeuralNetwork {
 
         virtual ~Neuron();
 
-        void add_connection(Neuron *, float, float, float, float, float);
+        void add_connection(Neuron *, float, float, float, float, float, float);
 
         void increment_state(float mem, float inp, float res, float upd);
 
@@ -40,6 +40,8 @@ namespace NeuralNetwork {
         void reset_state();
 
         void set_connections_count(int count);
+
+        void init();
 
     private:
         float input = 0.f;

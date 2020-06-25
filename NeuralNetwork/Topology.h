@@ -18,7 +18,6 @@
 #include <functional>
 
 #include "../Private/Mutation.h"
-#include "../Private/routines.h" // no layer exception
 #include "../Private/Generation.h" // Global evolution number
 
 #include "../Serializer/Serializer.hpp"
