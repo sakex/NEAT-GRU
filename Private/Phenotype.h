@@ -23,11 +23,11 @@ namespace NeuralNetwork {
         //constructors
         explicit Phenotype(point const &, long);
 
-        explicit Phenotype(point const &, float, float, float, float, float, float, long);
+        explicit Phenotype(point const &, float, float, float, float, float, long);
 
-        explicit Phenotype(point const &, point const &, float, float, float, float, float, float, bool, long);
+        explicit Phenotype(point const &, point const &, float, float, float, float, float, bool, long);
 
-        explicit Phenotype(point const &, point const &, float, float, float, float, float, float, long);
+        explicit Phenotype(point const &, point const &, float, float, float, float, float, long);
 
         Phenotype(Phenotype const &);
 
@@ -40,8 +40,6 @@ namespace NeuralNetwork {
         void set_reset_input_weight(float);
 
         void set_reset_memory_weight(float);
-
-        void set_update_input_weight(float);
 
         void set_update_memory_weight(float);
 
@@ -72,7 +70,6 @@ namespace NeuralNetwork {
 
         float get_reset_memory_weight() const;
 
-        float get_update_input_weight() const;
 
         float get_update_memory_weight() const;
 
@@ -92,7 +89,6 @@ namespace NeuralNetwork {
         float memory_weight;
         float reset_input_weight;
         float reset_memory_weight;
-        float update_input_weight;
         float update_memory_weight;
         long int evolution_number;
         bool disabled;

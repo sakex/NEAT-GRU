@@ -8,7 +8,6 @@
 #ifndef NEURALNETWORK_CONNECTION_H_
 #define NEURALNETWORK_CONNECTION_H_
 
-#include "routines.h"
 #include "Neuron.h"
 
 namespace NeuralNetwork {
@@ -18,7 +17,9 @@ namespace NeuralNetwork {
     class Connection {
 
     public:
-        Connection(float, float, float, float, float, float, Neuron *);
+        Connection() = default;
+
+        void init(float, float, float, float, float, Neuron *);
 
         ~Connection() = default;
 
@@ -27,14 +28,13 @@ namespace NeuralNetwork {
         void reset_state();
 
     private:
-        float memory = 0.;
-        float prev_input = 0.;
-        float const input_weight;
-        float const memory_weight;
-        float const reset_input_weight;
-        float const reset_memory_weight;
-        float const update_input_weight;
-        float const update_memory_weight;
+        float memory = 0.f;
+        float prev_input = 0.f;
+        float input_weight = 0.f;
+        float memory_weight = 0.f;
+        float reset_input_weight = 0.f;
+        float reset_memory_weight = 0.f;
+        float update_memory_weight = 0.f;
         Neuron *output;
     };
 

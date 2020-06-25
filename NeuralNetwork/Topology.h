@@ -45,7 +45,7 @@ namespace NeuralNetwork {
          * @param top2 Second topology to find distance with first one
          * @return Distance between top1 and top2
          */
-        static double delta_compatibility(Topology &top1, Topology &top2);
+        static float delta_compatibility(Topology &top1, Topology &top2);
 
         static std::shared_ptr<Topology> crossover(Topology &top1, Topology &top2);
 
@@ -75,10 +75,10 @@ namespace NeuralNetwork {
         int get_layers() const;
 
         /// Set last score
-        void set_last_result(long double);
+        void set_last_result(float);
 
         /// Get last score
-        long double get_last_result() const;
+        float get_last_result() const;
 
         /// Get all relationships
         relationships_map &get_relationships();
@@ -96,7 +96,7 @@ namespace NeuralNetwork {
         bool mutation_positive() const;
 
         /// Get the layers sizes
-        std::vector<int> const & get_layers_size() const;
+        std::vector<int> const &get_layers_size() const;
 
     public:
         // Species evolution methods
@@ -116,14 +116,14 @@ namespace NeuralNetwork {
          * @param output The vector to which we push the new topologies
          */
         void new_generation(size_t children_count,
-                            std::vector<std::shared_ptr<Topology>> & output);
+                            std::vector<std::shared_ptr<Topology>> &output);
 
     private:
         // Data
         int layers = 0;
-        long double last_result = 0;
-        long double best_historical_result = 0;
-        long double result_before_mutation = 0;
+        float last_result = 0;
+        float best_historical_result = 0;
+        float result_before_mutation = 0;
         bool assigned = false;
         std::vector<int> layers_size;
         relationships_map relationships;
@@ -149,7 +149,7 @@ namespace NeuralNetwork {
          * @param input Input Point
          * @param output Output Point
          */
-        void disable_phenotypes(Phenotype::point const & input, Phenotype::point const & output);
+        void disable_phenotypes(Phenotype::point const &input, Phenotype::point const &output);
 
 
         /**
@@ -158,7 +158,7 @@ namespace NeuralNetwork {
          * @param output Output Point
          * @return Boolean if a path overrides
          */
-        bool path_overrides(Phenotype::point const & input, Phenotype::point const & output);
+        bool path_overrides(Phenotype::point const &input, Phenotype::point const &output);
 
         /**
          * If we have a new layer, we need to reassign phenotypes
@@ -186,7 +186,7 @@ namespace NeuralNetwork {
          * @param phenotype The new phenotype to create the mutation from
          * @param score The original score
          */
-        void new_mutation(Phenotype * phenotype, long double score);
+        void new_mutation(Phenotype *phenotype, float score);
 
         /**
          * Creates a new phenotype
@@ -205,7 +205,7 @@ namespace NeuralNetwork {
          * Util to run over the phenotypes
          * @param cb The callback to run over all the phenotypes
          */
-        void iterate_phenotypes(phenotype_cb & cb) const;
+        void iterate_phenotypes(phenotype_cb &cb) const;
     };
 
     using Topology_ptr = std::shared_ptr<Topology>;

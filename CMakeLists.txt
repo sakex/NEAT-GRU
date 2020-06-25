@@ -69,8 +69,8 @@ ELSE ()
             )
     SET(PUB_HEADERS ${PUB_HEADERS}
             NeuralNetwork/NN.h
-            Private/Connection.h
-            Private/Neuron.h
+            NeuralNetwork/Connection.h
+            NeuralNetwork/Neuron.h
             )
 
     TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})

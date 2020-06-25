@@ -18,7 +18,7 @@ public:
      *
      * @param _sim C struct simulation to be run
      */
-    explicit GameBinding(Simulation * _sim);
+    explicit GameBinding(Simulation *_sim);
 
     ~GameBinding() override = default;
 
@@ -37,11 +37,11 @@ private:
     std::vector<float> do_run_generation() override;
 
     /// Empty body for now
-    void do_post_training(NN* network) override;
+    void do_post_training(NN *network) override;
 
 private:
     /// The simulation to be run
-    Simulation * sim;
+    Simulation *sim;
 
     /// Number of networks in the last generation (bookkeeping)
     size_t _size;

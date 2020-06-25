@@ -15,7 +15,7 @@ namespace NeuralNetwork {
             last_result(0) {
     }
 
-    Mutation::Mutation(Phenotype *_phenotype, long double const _last_result) :
+    Mutation::Mutation(Phenotype *_phenotype, float const _last_result) :
             phenotype{_phenotype},
             field(0),
             last_result{_last_result} {
@@ -40,8 +40,8 @@ namespace NeuralNetwork {
 
     void Mutation::set_field(int value) {
         field = value;
-        interval[0] = static_cast<double>(-INFINITY);
-        interval[1] = static_cast<double>(INFINITY);
+        interval[0] = static_cast<float>(-INFINITY);
+        interval[1] = static_cast<float>(INFINITY);
         interval_found = false;
         direction = 0;
         iterations = 0;
@@ -51,13 +51,13 @@ namespace NeuralNetwork {
         best_historical_wealth = 0;
     }
 
-    void Mutation::mutate(long double const wealth) {
-        const double weight = MutationField::get(field, phenotype);
+    void Mutation::mutate(float const wealth) {
+        const float weight = MutationField::get(field, phenotype);
         if (wealth > best_historical_wealth) {
             best_historical_wealth = wealth;
             best_historical_weight = weight;
         }
-        const long double delta = wealth - last_result;
+        const float delta = wealth - last_result;
         const int prev_direction = direction;
         if (direction == 0 || direction == 1)
             direction = delta > 0 ? 1 : -1;
@@ -73,13 +73,13 @@ namespace NeuralNetwork {
         }
         if (!interval_found) {
             ++unfruitful;
-            MutationField::set(field, phenotype, weight + gradient * direction);
+            MutationField::set(field, phenotype, weight + static_cast<float>(gradient * direction));
             gradient--;
             if (!gradient)
                 unfruitful = 1000;
         } else {
             iterations++;
-            const double new_weight = (interval[1] + interval[0]) / 2;
+            const float new_weight = (interval[1] + interval[0]) / 2.f;
             MutationField::set(field, phenotype, new_weight);
         }
         if (std::abs(interval[0] - interval[1]) < .5)
@@ -92,7 +92,7 @@ namespace NeuralNetwork {
     }
 
     Mutation &Mutation::operator=(Mutation const &base) {
-        if(&base == this) return *this;
+        if (&base == this) return *this;
         phenotype = base.phenotype;
         interval_found = base.interval_found;
         direction = base.direction;

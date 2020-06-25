@@ -6,7 +6,7 @@
  */
 
 
-#include "../Private/Neuron.h"
+#include "Neuron.h"
 #include "../bindings/bindings.h"
 #include "NN.h"
 
@@ -15,15 +15,18 @@ namespace NeuralNetwork {
         return value / (1.f + std::abs(value));
     }
 
-    inline Connection::Connection(float const _input_weight, float const _memory_weight, float const riw, float const rmw,
-                           float const uiw, float const umw, Neuron *output) :
-            input_weight(_input_weight),
-            memory_weight(_memory_weight),
-            reset_input_weight(riw),
-            reset_memory_weight(rmw),
-            update_input_weight(uiw),
-            update_memory_weight(umw),
-            output{output} {
+    inline void
+    Connection::init(float const _input_weight, float const _memory_weight, float const riw, float const rmw,
+                     float const umw, Neuron
+                     *_output) {
+        memory = 0.f;
+        prev_input = 0.f;
+        input_weight = _input_weight;
+        memory_weight = _memory_weight;
+        reset_input_weight = riw;
+        reset_memory_weight = rmw;
+        update_memory_weight = umw;
+        output = _output;
     }
 
     inline void Connection::activate(float const value) {
@@ -33,9 +36,9 @@ namespace NeuralNetwork {
         // std::cout << "FIRST: " << memory * memory_weight << " " << value * input_weight << std::endl;
 
         output->increment_state(memory * memory_weight,
-                              value * input_weight,
-                              value * reset_input_weight + memory * reset_memory_weight,
-                              value * update_memory_weight + memory * update_memory_weight);
+                                value * input_weight,
+                                value * reset_input_weight + memory * reset_memory_weight,
+                                value * update_memory_weight + memory * update_memory_weight);
     }
 
     inline void Connection::reset_state() {
@@ -49,42 +52,42 @@ namespace NeuralNetwork {
 
 namespace NeuralNetwork {
 
-    Neuron::Neuron() : input(0.0) {
+    Neuron::Neuron() :
+            input(0.f),
+            memory(0.f),
+            update(0.f),
+            reset(0.f),
+            prev_reset(0.f),
+            last_added(0),
+            connections{nullptr},
+            activated(false) {
+    }
+
+    Neuron::~Neuron() {
+        delete[] connections;
     }
 
     void
     Neuron::add_connection(Neuron *neuron, float const input_weight, float const memory_weight, float const riw,
-                           float const rmw,
-                           float const uiw, float const umw) {
-        connections.emplace_back(input_weight, memory_weight, riw, rmw, uiw, umw, neuron);
+                           float const rmw, float const umw) {
+        connections[last_added++].init(input_weight, memory_weight, riw, rmw, umw, neuron);
     }
-
-    /*inline void Neuron::increment_state(xmm const && new_values) {
-        xmm registers = {memory, input, reset, update};
-        registers.simd = _mm_add_ss(new_values.simd, registers.simd);
-        memory = registers.data[0];
-        input = registers.data[1];
-        reset = registers.data[2];
-        update = registers.data[3];
-    }*/
 
     inline void Neuron::increment_state(float const mem, float const inp, float const res, float const upd) {
         memory += mem;
         input += inp;
         reset += res;
         update += upd;
-    }
-
-
-    inline void Neuron::set_value(float new_value) {
-        input = new_value;
+        activated = true;
     }
 
     inline void Neuron::set_input_value(float new_value) {
         input = new_value;
+        activated = true;
     }
 
     inline float Neuron::get_value() {
+        if (!activated) return 0.f;
         float const update_gate = sigmoid(std::abs(update));
         float const reset_gate = sigmoid(std::abs(reset));
 
@@ -103,16 +106,18 @@ namespace NeuralNetwork {
         input = 0.f;
         update = 0.f;
         memory = 0.f;
+        activated = false;
     }
 
     inline void Neuron::feed_forward() {
+        if (!activated) return;
         float const update_gate = sigmoid(std::abs(update));
         float const reset_gate = sigmoid(std::abs(reset));
 
         const float current_memory = std::tanh(input + memory * reset_gate);
         const float value = update_gate * memory + (1.f - update_gate) * current_memory;
-        for (Connection &connection : connections) {
-            connection.activate(value);
+        for (int i = 0; i < last_added; ++i) {
+            connections[i].activate(value);
         }
         prev_reset = reset_gate;
         reset_value();
@@ -123,9 +128,19 @@ namespace NeuralNetwork {
         reset_value();
         reset = 0.;
         prev_reset = 0.;
-        for (Connection &connection : connections) {
-            connection.reset_state();
+        for (int i = 0; i < last_added; ++i) {
+            connections[i].reset_state();
         }
+    }
+
+    inline void Neuron::set_connections_count(int count) {
+        input = 0.f;
+        memory = 0.f;
+        update = 0.f;
+        reset = 0.f;
+        prev_reset = 0.f;
+        last_added = 0;
+        connections = new Connection[count]();
     }
 }
 
@@ -178,25 +193,25 @@ namespace NeuralNetwork {
         }
         input_size = sizes[0];
         output_size = sizes.back();
-        layers = new Neuron[neurons_count];
+        layers = new Neuron[neurons_count]();
         Topology::relationships_map &relationships = topology->get_relationships();
         for (auto &it : relationships) {
+            Neuron *input_neuron_ptr = &layers[layer_addresses[it.first[0]] + it.first[1]];
+            input_neuron_ptr->set_connections_count(it.second.size());
             for (Phenotype *phenotype : it.second) {
                 if (phenotype->is_disabled()) {
                     continue;
                 }
-                Phenotype::point input = phenotype->get_input();
                 Phenotype::point output = phenotype->get_output();
                 float const input_weight = phenotype->get_input_weight();
                 float const memory_weight = phenotype->get_memory_weight();
                 float const reset_input_weight = phenotype->get_reset_input_weight();
                 float const reset_memory_weight = phenotype->get_reset_memory_weight();
-                float const update_input_weight = phenotype->get_update_input_weight();
+
                 float const update_memory_weight = phenotype->get_update_memory_weight();
-                Neuron *input_neuron_ptr = &layers[layer_addresses[input[0]] + input[1]];
                 Neuron *output_neuron_ptr = &layers[layer_addresses[output[0]] + output[1]];
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
-                                                 reset_memory_weight, update_input_weight, update_memory_weight);
+                                                 reset_memory_weight, update_memory_weight);
             }
         }
         delete[] layer_addresses;
@@ -212,7 +227,6 @@ namespace NeuralNetwork {
         for (int it = 0; it < output_size; ++it) {
             Neuron *neuron = &layers[neurons_count - output_size + it];
             out[it] = neuron->get_value();
-            neuron->set_value(0);
         }
         softmax(out, output_size);
         return out;

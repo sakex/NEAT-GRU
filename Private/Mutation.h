@@ -26,7 +26,7 @@ namespace NeuralNetwork {
 
     class Mutation {
         /*
-         * Gradient descent first searches for a range between two doubles
+         * Gradient descent first searches for a range between two floats
          * Once it found it, it divides the range in two until finding the right value
          * */
     public:
@@ -34,7 +34,7 @@ namespace NeuralNetwork {
 
         ~Mutation() = default;
 
-        explicit Mutation(Phenotype *, long double);
+        explicit Mutation(Phenotype *, float);
 
         Mutation &operator=(Mutation const &);
 
@@ -45,7 +45,7 @@ namespace NeuralNetwork {
 
         unsigned get_unfruitful() const;
 
-        void mutate(long double);
+        void mutate(float);
 
         bool operator!() const;
 
@@ -56,15 +56,15 @@ namespace NeuralNetwork {
     private:
         Phenotype *phenotype;
         int field;
-        double interval[2] = {static_cast<double>(-INFINITY), static_cast<double>(INFINITY)};
-        bool interval_found = false;
+        float interval[2] = {static_cast<float>(-INFINITY), static_cast<float>(INFINITY)};
         int direction = 0;
         unsigned iterations = 0;
         unsigned unfruitful = 0;
         int gradient = 10;
-        long double last_result;
-        long double best_historical_wealth = 0;
-        double best_historical_weight = 0;
+        float last_result;
+        float best_historical_wealth = 0;
+        float best_historical_weight = 0;
+        bool interval_found = false;
     };
 
 } /* namespace NeuralNetwork */

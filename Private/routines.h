@@ -21,7 +21,7 @@ namespace NeuralNetwork {
     /**
      * Transforms a double c array into its softmax
      * @param input The input array
-     * @param size The number of doubles in the array
+     * @param size The number of floats in the array
      */
     void softmax(double * input, unsigned size);
 

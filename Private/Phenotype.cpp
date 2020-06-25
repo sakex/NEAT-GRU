@@ -10,11 +10,11 @@
 namespace NeuralNetwork {
 
     Phenotype::Phenotype(point const &_input, long const ev_number) :
-            Phenotype(_input, .1, .1, .1, .1, .1, .1, ev_number) {
+            Phenotype(_input, .1f, .1f, .1f, .1f, .1f, ev_number) {
     }
 
     Phenotype::Phenotype(point const &_input, float const _input_weight, float const _memory_weight,
-                         float const riw, float const rmw, float const uiw, float const umw,
+                         float const riw, float const rmw, float const umw,
                          long const ev_number) :
             input{_input[0], _input[1]},
             output{0, 0},
@@ -22,7 +22,6 @@ namespace NeuralNetwork {
             memory_weight(_memory_weight),
             reset_input_weight(riw),
             reset_memory_weight(rmw),
-            update_input_weight(uiw),
             update_memory_weight(umw),
             evolution_number(ev_number),
             disabled(false) {
@@ -30,7 +29,7 @@ namespace NeuralNetwork {
 
     Phenotype::Phenotype(point const &_input, point const &_output,
                          float const _input_weight, float const _memory_weight,
-                         float const riw, float const rmw, float const uiw, float const umw, const bool _disabled,
+                         float const riw, float const rmw, float const umw, const bool _disabled,
                          long const ev_number) :
             input{_input[0], _input[1]},
             output{_output[0], _output[1]},
@@ -38,7 +37,6 @@ namespace NeuralNetwork {
             memory_weight(_memory_weight),
             reset_input_weight(riw),
             reset_memory_weight(rmw),
-            update_input_weight(uiw),
             update_memory_weight(umw),
             evolution_number(ev_number),
             disabled(_disabled) {
@@ -46,9 +44,9 @@ namespace NeuralNetwork {
 
     Phenotype::Phenotype(point const &input, point const &output,
                          float const _input_weight, float const _memory_weight,
-                         float const riw, float const rmw, float const uiw, float const umw,
+                         float const riw, float const rmw, float const umw,
                          long const ev_number) :
-            Phenotype(input, output, _input_weight, _memory_weight, riw, rmw, uiw, umw, false, ev_number) {
+            Phenotype(input, output, _input_weight, _memory_weight, riw, rmw, umw, false, ev_number) {
     }
 
     Phenotype::Phenotype(Phenotype const &base) :
@@ -58,7 +56,6 @@ namespace NeuralNetwork {
         memory_weight = base.memory_weight;
         reset_memory_weight = base.reset_memory_weight;
         reset_input_weight = base.reset_input_weight;
-        update_input_weight = base.update_input_weight;
         update_memory_weight = base.update_memory_weight;
         evolution_number = base.evolution_number;
         disabled = base.disabled;
@@ -78,10 +75,6 @@ namespace NeuralNetwork {
 
     void Phenotype::set_reset_memory_weight(float const new_weight) {
         reset_memory_weight = new_weight;
-    }
-
-    void Phenotype::set_update_input_weight(float const new_weight) {
-        update_input_weight = new_weight;
     }
 
     void Phenotype::set_update_memory_weight(float const new_weight) {
@@ -121,10 +114,6 @@ namespace NeuralNetwork {
         return reset_memory_weight;
     }
 
-    float Phenotype::get_update_input_weight() const {
-        return update_input_weight;
-    }
-
     float Phenotype::get_update_memory_weight() const {
         return update_memory_weight;
     }
@@ -159,7 +148,6 @@ namespace NeuralNetwork {
                           ",\"memory_weight\":" + std::to_string(memory_weight) +
                           ",\"reset_input_weight\":" + std::to_string(reset_input_weight) +
                           ",\"reset_memory_weight\":" + std::to_string(reset_memory_weight) +
-                          ",\"update_input_weight\":" + std::to_string(update_input_weight) +
                           ",\"update_memory_weight\":" + std::to_string(update_memory_weight) +
                           ",\"disabled\":"
                           + (disabled ? "true" : "false") + "}";
