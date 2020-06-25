@@ -11,8 +11,19 @@
 #include "NN.h"
 
 namespace NeuralNetwork {
-    inline float sigmoid(float const value) {
+    inline float fast_sigmoid(float const value) {
         return value / (1.f + std::abs(value));
+    }
+
+    inline float fast_tanh(float const x){
+        if(std::abs(x) >= 4.97) {
+            float const values[2] = {-1., 1.};
+            return values[x > 0.];
+        }
+        float const x2 = x * x;
+        float const a = x * (135135.0f + x2 * (17325.0f + x2 * (378.0f + x2)));
+        float const b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
+        return a / b;
     }
 
     inline void
@@ -32,7 +43,7 @@ namespace NeuralNetwork {
 
     inline void Connection::activate(float const value) {
         float const prev_reset = output->get_prev_reset();
-        memory = std::tanh(prev_input * input_weight + memory_weight * prev_reset * memory);
+        memory = fast_tanh(prev_input * input_weight + memory_weight * prev_reset * memory);
         prev_input = value;
         // std::cout << "FIRST: " << memory * memory_weight << " " << value * input_weight << std::endl;
 
@@ -90,14 +101,14 @@ namespace NeuralNetwork {
 
     inline float Neuron::get_value() {
         if (!activated) return 0.f;
-        float const update_gate = sigmoid(update);
-        float const reset_gate = sigmoid(reset);
+        float const update_gate = fast_sigmoid(update);
+        float const reset_gate = fast_sigmoid(reset);
 
-        const float current_memory = std::tanh(input + memory * reset_gate);
+        const float current_memory = fast_tanh(input + memory * reset_gate);
         const float value = update_gate * memory + (1.f - update_gate) * current_memory;
         prev_reset = reset_gate;
         reset_value();
-        return std::tanh(value);
+        return fast_tanh(value);
     }
 
     inline float Neuron::get_prev_reset() const {
@@ -124,10 +135,10 @@ namespace NeuralNetwork {
 
     inline void Neuron::feed_forward() {
         if (!activated) return;
-        float const update_gate = sigmoid(update);
-        float const reset_gate = sigmoid(reset);
+        float const update_gate = fast_sigmoid(update);
+        float const reset_gate = fast_sigmoid(reset);
 
-        const float current_memory = std::tanh(input + memory * reset_gate);
+        const float current_memory = fast_tanh(input + memory * reset_gate);
         const float value = update_gate * memory + (1.f - update_gate) * current_memory;
         for (int i = 0; i < last_added; ++i) {
             connections[i].activate(value);
