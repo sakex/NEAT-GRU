@@ -59,7 +59,7 @@ namespace NeuralNetwork {
         int direction = 0;
         unsigned iterations = 0;
         unsigned unfruitful = 0;
-        int step = 10;
+        float step = .5;
         float last_result;
         float best_historical_wealth = 0;
         float best_historical_weight = 0;

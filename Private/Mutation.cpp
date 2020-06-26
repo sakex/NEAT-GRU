@@ -40,7 +40,6 @@ namespace NeuralNetwork {
 
     void Mutation::set_field(int value) {
         field = value;
-        direction = 0;
         iterations = 0;
         unfruitful = 0;
         step = 10;
@@ -54,7 +53,7 @@ namespace NeuralNetwork {
             best_historical_wealth = wealth;
             best_historical_weight = weight;
         }
-        const float delta = (wealth - last_result);
+        const float delta = wealth - last_result;
         if (direction == 0 || direction == 1)
             direction = delta > 0 ? 1 : -1;
         else if (direction == -1)
@@ -64,12 +63,12 @@ namespace NeuralNetwork {
         if (prev_weight != weight)
             MutationField::set(field, phenotype,
                                weight +
-                               static_cast<float>(step * direction) * std::abs(delta / (prev_weight - weight)));
+                               static_cast<float>(direction) * step * std::abs(delta / (prev_weight - weight)));
         else
             MutationField::set(field, phenotype,
-                               weight + static_cast<float>(step * direction));
+                               weight + static_cast<float>(direction) * step);
         iterations++;
-        step--;
+        step += wealth - last_result;
         last_result = wealth;
         prev_weight = weight;
     }
