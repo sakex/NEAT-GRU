@@ -15,8 +15,9 @@ namespace NeuralNetwork {
         return value / (1.f + std::abs(value));
     }
 
-    inline Connection::Connection(float const _input_weight, float const _memory_weight, float const riw, float const rmw,
-                           float const uiw, float const umw, Neuron *output) :
+    inline Connection::Connection(float const _input_weight, float const _memory_weight, float const riw,
+                                  float const rmw,
+                                  float const uiw, float const umw, Neuron *output) :
             input_weight(_input_weight),
             memory_weight(_memory_weight),
             reset_input_weight(riw),
@@ -33,9 +34,9 @@ namespace NeuralNetwork {
         // std::cout << "FIRST: " << memory * memory_weight << " " << value * input_weight << std::endl;
 
         output->increment_state(memory * memory_weight,
-                              value * input_weight,
-                              value * reset_input_weight + memory * reset_memory_weight,
-                              value * update_memory_weight + memory * update_memory_weight);
+                                value * input_weight,
+                                value * reset_input_weight + memory * reset_memory_weight,
+                                value * update_memory_weight + memory * update_memory_weight);
     }
 
     inline void Connection::reset_state() {
@@ -130,16 +131,30 @@ namespace NeuralNetwork {
 }
 
 namespace NeuralNetwork {
+    /*inline
+    float fast_exp(float x) {
+        x = 1.0 + x / 1024;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        x *= x;
+        return x;
+    }*/
+
     inline void softmax(float *input, unsigned size) {
-        float total = 0;
+        double total = 0;
         for (unsigned i = 0; i < size; ++i) {
-            if (input[i] < 0.) input[i] = 0.;
-            else total += input[i];
+            input[i] = exp(input[i]);
+            total += input[i];
         }
-        if (total > 1) {
-            for (unsigned i = 0; i < size; ++i) {
-                input[i] /= total;
-            }
+        for (unsigned i = 0; i < size; ++i) {
+            input[i] /= total;
         }
     }
 
