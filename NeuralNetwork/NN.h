@@ -9,9 +9,8 @@
 #define NEURALNETWORK_NN_H_
 
 #include <iostream>
-#include "../Private/Connection.h"
+#include "Connection.h"
 #include "Topology.h"
-#include "../Private/xmm_union.h"
 
 
 /// Namespace containing the different classes relevant for the neural network
@@ -38,7 +37,7 @@ namespace NeuralNetwork {
          * @param inputs_vector C float array of inputs
          * @return a vector of weights
          */
-        float * compute(const float *inputs_vector);
+        float *compute(const float *inputs_vector);
 
         /**
          * Inits the Network from a topology

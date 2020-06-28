@@ -10,19 +10,19 @@
 namespace NeuralNetwork {
 
     Phenotype::Phenotype(point const &_input, long const ev_number) :
-            Phenotype(_input, .1, .1, .1, .1, .1, .1, ev_number) {
+            Phenotype(_input, .1f, .1f, .1f, .1f, .1f, .1f, ev_number) {
     }
 
     Phenotype::Phenotype(point const &_input, float const _input_weight, float const _memory_weight,
-                         float const riw, float const rmw, float const uiw, float const umw,
+                         float const riw, float const uiw, float const rmw, float const umw,
                          long const ev_number) :
             input{_input[0], _input[1]},
             output{0, 0},
             input_weight(_input_weight),
             memory_weight(_memory_weight),
             reset_input_weight(riw),
-            reset_memory_weight(rmw),
             update_input_weight(uiw),
+            reset_memory_weight(rmw),
             update_memory_weight(umw),
             evolution_number(ev_number),
             disabled(false) {
@@ -30,15 +30,15 @@ namespace NeuralNetwork {
 
     Phenotype::Phenotype(point const &_input, point const &_output,
                          float const _input_weight, float const _memory_weight,
-                         float const riw, float const rmw, float const uiw, float const umw, const bool _disabled,
+                         float const riw, float const uiw, float const rmw, float const umw, const bool _disabled,
                          long const ev_number) :
             input{_input[0], _input[1]},
             output{_output[0], _output[1]},
             input_weight(_input_weight),
             memory_weight(_memory_weight),
             reset_input_weight(riw),
-            reset_memory_weight(rmw),
             update_input_weight(uiw),
+            reset_memory_weight(rmw),
             update_memory_weight(umw),
             evolution_number(ev_number),
             disabled(_disabled) {
@@ -46,9 +46,9 @@ namespace NeuralNetwork {
 
     Phenotype::Phenotype(point const &input, point const &output,
                          float const _input_weight, float const _memory_weight,
-                         float const riw, float const rmw, float const uiw, float const umw,
+                         float const riw, float const uiw, float const rmw, float const umw,
                          long const ev_number) :
-            Phenotype(input, output, _input_weight, _memory_weight, riw, rmw, uiw, umw, false, ev_number) {
+            Phenotype(input, output, _input_weight, _memory_weight, riw, uiw, rmw, umw, false, ev_number) {
     }
 
     Phenotype::Phenotype(Phenotype const &base) :
@@ -117,12 +117,12 @@ namespace NeuralNetwork {
         return reset_input_weight;
     }
 
-    float Phenotype::get_reset_memory_weight() const {
-        return reset_memory_weight;
-    }
-
     float Phenotype::get_update_input_weight() const {
         return update_input_weight;
+    }
+
+    float Phenotype::get_reset_memory_weight() const {
+        return reset_memory_weight;
     }
 
     float Phenotype::get_update_memory_weight() const {

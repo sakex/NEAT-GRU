@@ -91,8 +91,8 @@ namespace NeuralNetwork {
         float input_weight;
         float memory_weight;
         float reset_input_weight;
-        float reset_memory_weight;
         float update_input_weight;
+        float reset_memory_weight;
         float update_memory_weight;
         long int evolution_number;
         bool disabled;

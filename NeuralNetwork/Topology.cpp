@@ -12,11 +12,11 @@ constexpr unsigned MAX_UNFRUITFUL = 10;
 
 namespace NeuralNetwork {
 
-    double Topology::delta_compatibility(Topology &top1, Topology &top2) {
+    float Topology::delta_compatibility(Topology &top1, Topology &top2) {
         // see http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
         // chapter 4.1
-        double disjoints = 0, common = 0;
-        double W = 0;
+        float disjoints = 0, common = 0;
+        float W = 0;
         for (std::pair<long, Phenotype *> pair : top1.ev_number_index) {
             std::unordered_map<long, Phenotype *>::const_iterator search_second =
                     top2.ev_number_index.find(pair.first);
@@ -30,10 +30,10 @@ namespace NeuralNetwork {
                                 - search_second->second->get_reset_input_weight())
                      + std::abs(pair.second->get_reset_memory_weight()
                                 - search_second->second->get_reset_memory_weight())
-                     + std::abs(pair.second->get_update_input_weight()
-                                - search_second->second->get_update_input_weight())
                      + std::abs(pair.second->get_update_memory_weight()
-                                - search_second->second->get_update_memory_weight());
+                                - search_second->second->get_update_memory_weight())
+                     + std::abs(pair.second->get_update_input_weight()
+                                - search_second->second->get_update_input_weight());
             } else {
                 disjoints++;
             }
@@ -41,8 +41,8 @@ namespace NeuralNetwork {
         size_t const size1 = top1.ev_number_index.size();
         size_t const size2 = top2.ev_number_index.size();
         disjoints += (size1 - common);
-        double const N = size1 + size2 <= 20 ? 1 : double(size1 + size2) / 20;
-        double const output = 2 * disjoints / N + W / common;
+        float const N = size1 + size2 <= 20 ? 1 : float(size1 + size2) / 20;
+        float const output = 2 * disjoints / N + W / common;
         // printf("COMMON: %f, DISJOINTS: %f, W: %f, O: %f\n", common, disjoints, W, output);
         return output;
     }
@@ -146,12 +146,12 @@ namespace NeuralNetwork {
         return layers;
     }
 
-    void Topology::set_last_result(const long double result) {
+    void Topology::set_last_result(const float result) {
         last_result = result;
         if (last_result > best_historical_result) best_historical_result = last_result;
     }
 
-    long double Topology::get_last_result() const {
+    float Topology::get_last_result() const {
         return last_result;
     }
 
@@ -163,8 +163,6 @@ namespace NeuralNetwork {
         if (phenotype->is_disabled()) return;
         Phenotype::point input = phenotype->get_input();
         Phenotype::point output = phenotype->get_output();
-        if (!layers)
-            throw NoLayer();
         if (input[1] + 1 > layers_size[input[0]]) {
             layers_size[input[0]] = input[1] + 1;
         }
@@ -313,7 +311,8 @@ namespace NeuralNetwork {
         int output_index = Random::random_between(input_index + 1, max_layer);
         int output_position = 0;
         if (output_index < layers - 1) {
-            output_position = Random::random_number(std::min(layers_size[output_index], Train::Constants::MAX_PER_LAYER));
+            output_position = Random::random_number(
+                    std::min(layers_size[output_index], Train::Constants::MAX_PER_LAYER));
             if (output_position >= layers_size[output_index]) {
                 new_output = true;
             }
@@ -338,7 +337,7 @@ namespace NeuralNetwork {
         return added_phenotypes;
     }
 
-    void Topology::new_mutation(Phenotype *last_phenotype, long double const wealth) {
+    void Topology::new_mutation(Phenotype *last_phenotype, float const wealth) {
         mutations.emplace(last_phenotype, wealth);
     }
 
@@ -347,14 +346,14 @@ namespace NeuralNetwork {
         using utils::Random;
         Phenotype::coordinate coordinate{input, output};
         long const ev_number = Generation::number(coordinate);
-        double input_weight = Random::random_between(-100, 100) / 100.0;
-        double const memory_weight = Random::random_between(-100, 100) / 100.0;
-        double const reset_input_weight = Random::random_between(-100, 100) / 100.0;
-        double const reset_memory_weight = Random::random_between(-100, 100) / 100.0;
-        double const update_input_weight = Random::random_between(-100, 100) / 100.0;
-        double const update_memory_weight = Random::random_between(-100, 100) / 100.0;
+        float input_weight = Random::random_between(-100, 100) / 100.0f;
+        float const memory_weight = Random::random_between(-100, 100) / 100.0f;
+        float const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
+        float const update_input_weight = Random::random_between(-100, 100) / 100.0f;
+        float const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
+        float const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
         auto *phenotype = new Phenotype(input, output, input_weight, memory_weight, reset_input_weight,
-                                        reset_memory_weight, update_input_weight, update_memory_weight, ev_number);
+                                        update_input_weight, reset_memory_weight, update_memory_weight, ev_number);
         add_relationship(phenotype);
         return phenotype;
     }

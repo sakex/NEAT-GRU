@@ -10,7 +10,7 @@
 
 namespace NeuralNetwork {
     struct InvalidField : std::exception {
-        char const * what() const noexcept override {
+        char const *what() const noexcept override {
             return "Invalid field";
         }
     };
@@ -21,50 +21,50 @@ namespace NeuralNetwork {
 
     template<>
     struct __MutationField<0> {
-        static double get(Phenotype *);
+        static float get(Phenotype *);
 
-        static void set(Phenotype *, double);
+        static void set(Phenotype *, float);
     };
 
     template<>
     struct __MutationField<1> {
-        static double get(Phenotype *);
+        static float get(Phenotype *);
 
-        static void set(Phenotype *, double);
+        static void set(Phenotype *, float);
     };
 
     template<>
     struct __MutationField<2> {
-        static double get(Phenotype *);
+        static float get(Phenotype *);
 
-        static void set(Phenotype *, double);
+        static void set(Phenotype *, float);
     };
 
     template<>
     struct __MutationField<3> {
-        static double get(Phenotype *);
+        static float get(Phenotype *);
 
-        static void set(Phenotype *, double);
+        static void set(Phenotype *, float);
     };
 
     template<>
     struct __MutationField<4> {
-        static double get(Phenotype *);
+        static float get(Phenotype *);
 
-        static void set(Phenotype *, double);
+        static void set(Phenotype *, float);
     };
 
     template<>
     struct __MutationField<5> {
-        static double get(Phenotype *);
+        static float get(Phenotype *);
 
-        static void set(Phenotype *, double);
+        static void set(Phenotype *, float);
     };
 
     struct MutationField {
-        static double get(int, Phenotype *);
+        static float get(int, Phenotype *);
 
-        static void set(int, Phenotype *, double);
+        static void set(int, Phenotype *, float);
     };
 }
 

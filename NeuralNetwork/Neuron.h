@@ -9,7 +9,6 @@
 #ifndef NEURALNETWORK_NEURON_H_
 #define NEURALNETWORK_NEURON_H_
 
-#include <vector>
 #include <iostream>
 #include <cmath>
 
@@ -24,13 +23,11 @@ namespace NeuralNetwork {
     public:
         Neuron();
 
-        virtual ~Neuron() = default;
+        virtual ~Neuron();
 
         void add_connection(Neuron *, float, float, float, float, float, float);
 
         void increment_state(float mem, float inp, float res, float upd);
-
-        void set_value(float new_value);
 
         void set_input_value(float new_value);
 
@@ -42,13 +39,19 @@ namespace NeuralNetwork {
 
         void reset_state();
 
+        void set_connections_count(int count);
+
+        void init();
+
     private:
         float input = 0.f;
         float memory = 0.f;
         float update = 0.f;
         float reset = 0.f;
         float prev_reset = 0.f;
-        std::vector<Connection> connections;
+        int last_added = 0;
+        Connection *connections{nullptr};
+        bool activated = false;
 
     private:
         void reset_value();
