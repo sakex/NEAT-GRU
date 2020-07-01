@@ -96,9 +96,9 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::set_input_value(float new_value) {
-        input = new_value + bias_input;
-        update = bias_update;
-        reset = bias_reset;
+        input = new_value;
+        update = -10.f;
+        reset = -10.f;
         activated = true;
     }
 
