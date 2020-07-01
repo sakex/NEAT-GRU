@@ -8,8 +8,9 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
     using namespace NeuralNetwork;
     Topology topology;
     int max_layers = 0;
+
     std::vector<Phenotype *> new_phenotypes;
-    for (auto &it : j) {
+    for (auto &it : j["phenotypes"]) {
         Phenotype::point input = {it["input"][0], it["input"][1]};
         Phenotype::point output = {it["output"][0], it["output"][1]};
         if (output[0] > max_layers)
@@ -22,12 +23,24 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
         float const update_memory_weight = it["update_memory_weight"];
         bool disabled = it["disabled"];
         new_phenotypes.push_back(
-                new Phenotype(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight, reset_memory_weight,
+                new Phenotype(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight,
+                              reset_memory_weight,
                               update_memory_weight, disabled, 0));
     }
     topology.set_layers(max_layers + 1);
     for (Phenotype *phen_ptr : new_phenotypes) {
         topology.add_relationship(phen_ptr, true);
+    }
+    for (auto &it : j["biases"]) {
+        auto &it_neuron = it["neuron"];
+        auto &it_bias = it["bias"];
+        std::array<int, 2> neuron = {it_neuron[0], it_neuron[1]};
+        Bias const bias{
+                it_bias["bias_input"],
+                it_bias["bias_update"],
+                it_bias["bias_reset"]
+        };
+        topology.set_bias(neuron, bias);
     }
     return topology;
 }

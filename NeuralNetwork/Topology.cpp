@@ -82,12 +82,20 @@ namespace NeuralNetwork {
         last_result = base.last_result;
         result_before_mutation = base.last_result;
         best_historical_result = 0;
-        phenotype_cb cb = [this](Phenotype *phenotype) {
-            if (phenotype->is_disabled()) return;
-            auto *copy = new Phenotype(*phenotype);
-            add_to_relationships_map(copy);
-        };
-        base.iterate_phenotypes(cb);
+        for(auto &it: base.relationships) {
+            Bias const bias = it.second.bias;
+            std::vector<Phenotype*> connections;
+            connections.reserve(it.second.phenotypes.size());
+            for(Phenotype * phenotype: it.second.phenotypes){
+                auto * copy = new Phenotype(*phenotype);
+                connections.push_back(copy);
+                ev_number_index[copy->get_ev_number()] = copy;
+            }
+            relationships[it.first] = PhenotypeAndBias {
+                bias,
+                connections
+            };
+        }
     }
 
     Topology::~Topology() {
@@ -97,30 +105,6 @@ namespace NeuralNetwork {
         iterate_phenotypes(cb);
         relationships.clear();
         ev_number_index.clear();
-    }
-
-    Topology &Topology::operator=(Topology const &base) {
-        if (this != &base) {
-            layers = base.layers;
-            layers_size = base.layers_size;
-            last_result = base.last_result;
-            result_before_mutation = base.last_result;
-            best_historical_result = 0;
-            phenotype_cb cb = [](Phenotype *phenotype) {
-                delete phenotype;
-            };
-            iterate_phenotypes(cb);
-            relationships.clear();
-            ev_number_index.clear();
-            for (auto &it : base.relationships) {
-                for (Phenotype *phenotype : it.second) {
-                    if (phenotype->is_disabled()) continue;
-                    auto *copy = new Phenotype(*phenotype);
-                    add_to_relationships_map(copy);
-                }
-            }
-        }
-        return *this;
     }
 
     bool Topology::operator==(NeuralNetwork::Topology const &comparison) const {
@@ -231,12 +215,22 @@ namespace NeuralNetwork {
     }
 
     void Topology::add_to_relationships_map(Phenotype *phenotype) {
+        using utils::Random;
         Phenotype::point input = phenotype->get_input();
         auto iterator = relationships.find(input);
+        Bias bias{
+                Random::random_between(-100, 100) / 100.0f,
+                Random::random_between(-100, 100) / 100.0f,
+                Random::random_between(-100, 100) / 100.0f,
+        };
         if (iterator != relationships.end()) {
-            iterator->second.push_back(phenotype);
+            iterator->second.bias = bias;
+            iterator->second.phenotypes.push_back(phenotype);
         } else {
-            relationships[input] = std::vector<Phenotype *>{phenotype};
+            relationships[input] = PhenotypeAndBias{
+                    bias,
+                    std::vector<Phenotype *>{phenotype}
+            };
         }
         ev_number_index[phenotype->get_ev_number()] = phenotype;
     }
@@ -246,7 +240,7 @@ namespace NeuralNetwork {
         auto iterator = relationships.find(input);
         if (iterator == relationships.end())
             return;
-        std::vector<Phenotype *> base_vector = iterator->second;
+        std::vector<Phenotype *> &base_vector = iterator->second.phenotypes;
         Phenotype *&back = base_vector.back();
         for (Phenotype *&it : base_vector) {
             if (it == back || it->is_disabled()) {
@@ -265,7 +259,7 @@ namespace NeuralNetwork {
         relationships_map::const_iterator iterator = relationships.find(input);
         if (iterator == relationships.end())
             return false;
-        std::vector<Phenotype *> base_vector = iterator->second;
+        std::vector<Phenotype *> base_vector = iterator->second.phenotypes;
         for (Phenotype *it : base_vector) {
             if (it->is_disabled()) {
                 continue;
@@ -283,7 +277,7 @@ namespace NeuralNetwork {
 
     void Topology::resize(int const new_max) {
         for (auto &it : relationships) {
-            for (Phenotype *phenotype : it.second) {
+            for (Phenotype *phenotype : it.second.phenotypes) {
                 phenotype->resize(new_max - 1, new_max);
             }
         }
@@ -301,6 +295,11 @@ namespace NeuralNetwork {
     }
 
 
+    /**
+     * Creates vector of new phenotypes to add to a copy of a topology
+     *
+     * @return
+     */
     std::vector<Phenotype *> Topology::mutate() {
         // Input must already exist and output may or may not exist
         using utils::Random;
@@ -358,13 +357,29 @@ namespace NeuralNetwork {
         return phenotype;
     }
 
+    void Topology::set_bias(std::array<int, 2> neuron, Bias const bias) {
+        auto iterator = relationships.find(neuron);
+        iterator->second.bias = bias;
+    }
+
     std::string Topology::parse_to_string() const {
-        std::string output = "[";
+        std::string output = R"({"phenotypes":[)";
         phenotype_cb cb = [&output](Phenotype *phenotype) -> void {
             output += phenotype->to_string() + ",";
         };
         iterate_phenotypes(cb);
         output.replace(output.end() - 1, output.end(), "]");
+        output += ",\"biases\": [";
+        for (auto &it: relationships) {
+            Bias bias = it.second.bias;
+            output += R"({"neuron": [)" + std::to_string(it.first[0]) + "," + std::to_string(it.first[1]) + "],"
+                      + R"("bias":{"bias_input":)" + std::to_string(bias.bias_input)
+                      + R"(,"bias_update":)" + std::to_string(bias.bias_update)
+                      + R"(,"bias_reset":)" + std::to_string(bias.bias_reset)
+                      + "}},";
+        }
+        output.replace(output.end() - 1, output.end(), "]");
+        output += "}";
         return output;
     }
 
@@ -375,7 +390,7 @@ namespace NeuralNetwork {
 
     void Topology::iterate_phenotypes(phenotype_cb &cb) const {
         for (auto const &it : relationships) {
-            for (Phenotype *phenotype : it.second) {
+            for (Phenotype *phenotype : it.second.phenotypes) {
                 cb(phenotype);
             }
         }

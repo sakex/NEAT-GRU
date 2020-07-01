@@ -13,6 +13,7 @@
 #include <cmath>
 
 #include "Connection.h"
+#include "../Private/Bias.h"
 
 
 namespace NeuralNetwork {
@@ -41,7 +42,7 @@ namespace NeuralNetwork {
 
         void set_connections_count(int count);
 
-        void init();
+        void set_bias(Bias);
 
     private:
         float input = 0.f;
@@ -50,6 +51,9 @@ namespace NeuralNetwork {
         float reset = 0.f;
         float prev_reset = 0.f;
         int last_added = 0;
+        float bias_input = 0.f;
+        float bias_update = 0.f;
+        float bias_reset = 0.f;
         Connection *connections{nullptr};
         bool activated = false;
 

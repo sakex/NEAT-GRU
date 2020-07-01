@@ -10,13 +10,15 @@
 #include "../bindings/bindings.h"
 #include "NN.h"
 
+#include <cmath>
+
 namespace NeuralNetwork {
     inline float fast_sigmoid(float const value) {
         return value / (1.f + std::abs(value));
     }
 
-    inline float fast_tanh(float const x){
-        if(std::abs(x) >= 4.97) {
+    inline float fast_tanh(float const x) {
+        if (std::abs(x) >= 4.97) {
             float const values[2] = {-1., 1.};
             return values[x > 0.];
         }
@@ -45,7 +47,6 @@ namespace NeuralNetwork {
         float const prev_reset = output->get_prev_reset();
         memory = fast_tanh(prev_input * input_weight + memory_weight * prev_reset * memory);
         prev_input = value;
-        // std::cout << "FIRST: " << memory * memory_weight << " " << value * input_weight << std::endl;
 
         float const update_mem = memory * memory_weight;
         output->increment_state(update_mem,
@@ -96,6 +97,8 @@ namespace NeuralNetwork {
 
     inline void Neuron::set_input_value(float new_value) {
         input = new_value;
+        update = -10.f;
+        reset = -10.f;
         activated = true;
     }
 
@@ -116,21 +119,20 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::reset_value() {
-        input = 0.f;
-        update = 0.f;
+        input = bias_input;
+        update = bias_update;
+        reset = bias_reset;
         memory = 0.f;
         activated = false;
     }
 
-    inline void Neuron::init() {
-        input = 0.f;
-        memory = 0.f;
-        update = 0.f;
-        reset = 0.f;
-        prev_reset = 0.f;
-        last_added = 0;
-        activated = false;
-        connections = nullptr;
+    inline void Neuron::set_bias(Bias bias) {
+        bias_input = bias.bias_input;
+        bias_update = bias.bias_update;
+        bias_reset = bias.bias_reset;
+        input = bias_input;
+        update = bias_update;
+        reset = bias_reset;
     }
 
     inline void Neuron::feed_forward() {
@@ -150,7 +152,6 @@ namespace NeuralNetwork {
 
     inline void Neuron::reset_state() {
         reset_value();
-        reset = 0.;
         prev_reset = 0.;
         for (int i = 0; i < last_added; ++i) {
             connections[i].reset_state();
@@ -158,7 +159,6 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::set_connections_count(int count) {
-        init();
         connections = new Connection[count]();
     }
 }
@@ -167,11 +167,11 @@ namespace NeuralNetwork {
     inline void softmax(float *input, unsigned size) {
         double total = 0;
         for (unsigned i = 0; i < size; ++i) {
-            input[i] = exp(input[i]);
+            input[i] = static_cast<float>(exp(static_cast<double>(input[i])));
             total += input[i];
         }
         for (unsigned i = 0; i < size; ++i) {
-            input[i] /= total;
+            input[i] /= static_cast<float>(total);
         }
     }
 
@@ -214,8 +214,9 @@ namespace NeuralNetwork {
         Topology::relationships_map &relationships = topology->get_relationships();
         for (auto &it : relationships) {
             Neuron *input_neuron_ptr = &layers[layer_addresses[it.first[0]] + it.first[1]];
-            input_neuron_ptr->set_connections_count(it.second.size());
-            for (Phenotype *phenotype : it.second) {
+            input_neuron_ptr->set_bias(it.second.bias);
+            input_neuron_ptr->set_connections_count(it.second.phenotypes.size());
+            for (Phenotype *phenotype : it.second.phenotypes) {
                 Phenotype::point output = phenotype->get_output();
                 float const input_weight = phenotype->get_input_weight();
                 float const update_input_weight = phenotype->get_update_input_weight();
@@ -228,9 +229,6 @@ namespace NeuralNetwork {
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
                                                  update_input_weight, reset_memory_weight, update_memory_weight);
             }
-        }
-        for (int it = neurons_count - output_size; it < neurons_count; ++it) {
-            layers[it].init();
         }
         delete[] layer_addresses;
     }

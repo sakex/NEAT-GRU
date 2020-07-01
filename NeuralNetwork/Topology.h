@@ -19,6 +19,7 @@
 
 #include "../Private/Mutation.h"
 #include "../Private/Generation.h" // Global evolution number
+#include "../Private/Bias.h"
 
 #include "../Serializer/Serializer.hpp"
 #include "../Private/Random.h"
@@ -28,9 +29,14 @@
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
 
+    struct PhenotypeAndBias {
+        Bias bias;
+        std::vector<Phenotype *> phenotypes;
+    };
+
     class Topology : public Serializer::Serializable {
     public:
-        using relationships_map = std::unordered_map<Phenotype::point, std::vector<Phenotype *>>;
+        using relationships_map = std::unordered_map<Phenotype::point, PhenotypeAndBias>;
 
     public:
         /**
@@ -55,8 +61,6 @@ namespace NeuralNetwork {
         Topology(Topology const &);
 
         ~Topology() override;
-
-        Topology &operator=(Topology const &);
 
     public:
         // Operators
@@ -96,6 +100,8 @@ namespace NeuralNetwork {
 
         /// Get the layers sizes
         std::vector<int> const &get_layers_size() const;
+
+        void set_bias(std::array<int, 2>, Bias);
 
     public:
         // Species evolution methods

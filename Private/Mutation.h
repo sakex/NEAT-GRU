@@ -56,14 +56,15 @@ namespace NeuralNetwork {
     private:
         Phenotype *phenotype;
         int field;
+        float interval[2] = {static_cast<float>(-INFINITY), static_cast<float>(INFINITY)};
+        bool interval_found = false;
         int direction = 0;
         unsigned iterations = 0;
         unsigned unfruitful = 0;
-        float step = .5;
+        int gradient = 10;
         float last_result;
         float best_historical_wealth = 0;
         float best_historical_weight = 0;
-        float prev_weight = 0.f;
     };
 
 } /* namespace NeuralNetwork */

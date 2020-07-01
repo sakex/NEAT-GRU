@@ -108,8 +108,8 @@ namespace std {
         size_t operator()(const NeuralNetwork::Phenotype::point &p) const noexcept{
             std::hash<int> hasher;
             std::size_t result = 111;
-            result = (result << 1) ^ hasher(p[0]);
-            result = (result << 1) ^ hasher(p[1]);
+            result = (result << 1u) ^ hasher(p[0]);
+            result = (result << 1u) ^ hasher(p[1]);
             return result;
         }
     };
@@ -119,8 +119,8 @@ namespace std {
         size_t operator()(const NeuralNetwork::Phenotype::coordinate &arr) const noexcept{
             std::hash<NeuralNetwork::Phenotype::point> hasher;
             std::size_t result = 144451;
-            result = (result << 1) ^ hasher(arr[0]);
-            result = (result << 1) ^ hasher(arr[1]);
+            result = (result << 1u) ^ hasher(arr[0]);
+            result = (result << 1u) ^ hasher(arr[1]);
             return result;
         }
     };
