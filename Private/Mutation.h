@@ -51,8 +51,6 @@ namespace NeuralNetwork {
 
         void set_field(int);
 
-        int get_field() const;
-
     private:
         Phenotype *phenotype;
         int field;

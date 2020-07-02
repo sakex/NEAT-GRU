@@ -34,10 +34,6 @@ namespace NeuralNetwork {
         return unfruitful;
     }
 
-    int Mutation::get_field() const {
-        return field;
-    }
-
     void Mutation::set_field(int value) {
         field = value;
         iterations = 0;

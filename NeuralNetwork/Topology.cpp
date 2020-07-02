@@ -43,7 +43,6 @@ namespace NeuralNetwork {
         disjoints += (size1 - common);
         float const N = size1 + size2 <= 20 ? 1 : float(size1 + size2) / 20;
         float const output = 2 * disjoints / N + W / common;
-        // printf("COMMON: %f, DISJOINTS: %f, W: %f, O: %f\n", common, disjoints, W, output);
         return output;
     }
 
@@ -75,25 +74,39 @@ namespace NeuralNetwork {
         return best_copy;
     }
 
-    Topology::Topology(Topology const &base) :
-            relationships(), ev_number_index(), mutations() {
+    Topology::Topology() : relationships(),
+                           ev_number_index(),
+                           mutations(),
+                           fields_order{0, 1, 2, 3, 4, 5},
+                           current_field(0) {
+
+    }
+
+    Topology::Topology(Topology const &base) : relationships(),
+                                               ev_number_index(),
+                                               mutations(),
+                                               fields_order{0, 1, 2, 3, 4, 5},
+                                               current_field(0) {
+        static std::random_device rd;
+        static std::mt19937 g(rd());
+        std::shuffle(fields_order.begin(), fields_order.end(), g);
         layers = base.layers;
         layers_size = base.layers_size;
         last_result = base.last_result;
         result_before_mutation = base.last_result;
         best_historical_result = 0;
-        for(auto &it: base.relationships) {
+        for (auto &it: base.relationships) {
             Bias const bias = it.second.bias;
-            std::vector<Phenotype*> connections;
+            std::vector<Phenotype *> connections;
             connections.reserve(it.second.phenotypes.size());
-            for(Phenotype * phenotype: it.second.phenotypes){
-                auto * copy = new Phenotype(*phenotype);
+            for (Phenotype *phenotype: it.second.phenotypes) {
+                auto *copy = new Phenotype(*phenotype);
                 connections.push_back(copy);
                 ev_number_index[copy->get_ev_number()] = copy;
             }
-            relationships[it.first] = PhenotypeAndBias {
-                bias,
-                connections
+            relationships[it.first] = PhenotypeAndBias{
+                    bias,
+                    connections
             };
         }
     }
@@ -175,9 +188,8 @@ namespace NeuralNetwork {
         Mutation &mutation = mutations.front();
         if (mutation.get_iterations() >= MAX_ITERATIONS || mutation.get_unfruitful() >= MAX_UNFRUITFUL) {
             mutation.set_back_to_max();
-            int field = mutation.get_field();
-            if (field != 5) {
-                mutation.set_field(field + 1);
+            if (current_field != 5) {
+                mutation.set_field(fields_order[++current_field]);
                 return true;
             }
             mutations.pop();

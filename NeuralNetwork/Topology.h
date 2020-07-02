@@ -56,7 +56,7 @@ namespace NeuralNetwork {
 
     public:
         // Rule of 3
-        Topology() = default;
+        Topology();
 
         Topology(Topology const &);
 
@@ -134,6 +134,8 @@ namespace NeuralNetwork {
         relationships_map relationships;
         std::unordered_map<long, Phenotype *> ev_number_index;
         std::queue<Mutation> mutations;
+        std::array<int, 6> fields_order;
+        int current_field;
 
     private:
         // Sub types / static
