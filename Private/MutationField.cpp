@@ -66,6 +66,8 @@ namespace NeuralNetwork {
                 return __MutationField<3>::get(phenotype);
             case 4:
                 return __MutationField<4>::get(phenotype);
+            case 5:
+                return __MutationField<5>::get(phenotype);
             default:
                 throw InvalidField();
         }
@@ -87,6 +89,9 @@ namespace NeuralNetwork {
                 break;
             case 4:
                 __MutationField<4>::set(phenotype, value);
+                break;
+            case 5:
+                __MutationField<5>::set(phenotype, value);
                 break;
             default:
                 throw InvalidField();
