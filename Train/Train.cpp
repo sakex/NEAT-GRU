@@ -176,7 +176,7 @@ namespace Train {
     }
 
     void Train::reassign_species(std::vector<Topology_ptr> &topologies) {
-        topologies[0] = std::make_shared<Topology>(*best_historical_topology);
+        topologies[0] = best_historical_topology;
         species.clear();
         size_t topologies_size = topologies.size();
         std::mutex mutex;
@@ -257,7 +257,7 @@ namespace Train {
         if (best_historical_topology == nullptr
             || (max > best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
-            best_historical_topology = std::make_shared<Topology>(*best);
+            best_historical_topology = best;
         }
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "
                   << best->get_last_result() << " "
