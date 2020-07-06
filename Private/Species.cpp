@@ -100,8 +100,7 @@ namespace NeuralNetwork {
 
     void Species::update_best(Topology_ptr const &most_successful) {
         if (most_successful->get_last_result() >= best_topology->get_last_result()) {
-            best_topology = std::make_shared<Topology>(*most_successful);
-            best_topology->set_optimized();
+            best_topology = most_successful;
         }
     }
 
