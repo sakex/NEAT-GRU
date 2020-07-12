@@ -24,7 +24,7 @@ namespace NeuralNetwork {
     public:
         Neuron();
 
-        virtual ~Neuron();
+        ~Neuron();
 
         void add_connection(Neuron *, float, float, float, float, float, float);
 

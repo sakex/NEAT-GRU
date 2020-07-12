@@ -29,7 +29,7 @@ namespace NeuralNetwork {
          */
         explicit NN(Topology_ptr const &topology);
 
-        virtual ~NN();
+        ~NN();
 
         /**
          * Compute the Neural Network with given inputs

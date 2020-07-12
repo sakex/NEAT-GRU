@@ -164,7 +164,7 @@ namespace NeuralNetwork {
 }
 
 namespace NeuralNetwork {
-    inline void softmax(float *input, unsigned size) {
+    /*inline void softmax(float *input, unsigned size) {
         double total = 0;
         for (unsigned i = 0; i < size; ++i) {
             input[i] = static_cast<float>(exp(static_cast<double>(input[i])));
@@ -173,7 +173,7 @@ namespace NeuralNetwork {
         for (unsigned i = 0; i < size; ++i) {
             input[i] /= static_cast<float>(total);
         }
-    }
+    }*/
 
     NN::NN() : neurons_count(0),
                layer_count(0),
@@ -243,7 +243,7 @@ namespace NeuralNetwork {
         for (int it = neurons_count - output_size; it < neurons_count; ++it) {
             out[it - neurons_count + output_size] = layers[it].get_value();
         }
-        softmax(out, output_size);
+        // softmax(out, output_size);
         return out;
     }
 
