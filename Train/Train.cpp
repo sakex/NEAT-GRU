@@ -185,8 +185,9 @@ namespace Train {
             if (!topology->is_assigned()) {
                 Species_ptr new_species = std::make_unique<Species>(topology, 1);
                 auto lambda = [&topology, &new_species, &mutex](Topology_ptr &other) {
+                    if(other->is_assigned()) return;
                     float const delta = Topology::delta_compatibility(*topology, *other);
-                    if (!other->is_assigned() && delta <= 1) {
+                    if (delta <= 2) {
                         other->set_assigned(true);
                         mutex.lock();
                         *new_species >> other;
@@ -237,9 +238,11 @@ namespace Train {
     void Train::update_best() {
         Topology_ptr best = nullptr;
         Topology_ptr worst = nullptr;
-        float max = -10000000.f;
-        float min = 100000000.f;
+        float max = std::numeric_limits<float>::min();
+        float min = std::numeric_limits<float>::max();
+
         std::vector<Topology_ptr> topologies = topologies_vector();
+
         for (Topology_ptr &topology : topologies) {
             float result = topology->get_last_result();
             if (result > max) {
@@ -251,14 +254,17 @@ namespace Train {
                 worst = topology;
             }
         }
+
         std::sort(species.begin(), species.end(), [](Species_ptr &spec1, Species_ptr &spec2) -> bool {
             return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
         });
+
         if (best_historical_topology == nullptr
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
             best_historical_topology = best;
         }
+
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "
                   << best->get_last_result() << " "
                   << best_historical_topology->get_last_result() << std::endl;

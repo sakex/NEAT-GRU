@@ -107,8 +107,13 @@ namespace NeuralNetwork {
     void Species::duplicate_best() {
         int topologies_size = static_cast<int>(topologies.size());
         int best_quantity = static_cast<int>(max_individuals) - topologies_size;
-        if (best_quantity > 0)
-            best_topology->new_generation(best_quantity, topologies);
+        if (best_quantity > 0) {
+            best_topology->new_generation(best_quantity - 1, topologies);
+            topologies.push_back(best_topology);
+        }
+        else {
+            topologies[0] = best_topology;
+        }
     }
 
     Topology_ptr Species::get_best() {
