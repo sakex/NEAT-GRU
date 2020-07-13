@@ -255,7 +255,7 @@ namespace Train {
             return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
         });
         if (best_historical_topology == nullptr
-            || (max > best_historical_topology->get_last_result() && best != best_historical_topology)) {
+            || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
             best_historical_topology = best;
         }
