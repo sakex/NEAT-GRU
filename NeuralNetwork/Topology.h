@@ -103,6 +103,10 @@ namespace NeuralNetwork {
 
         void set_bias(std::array<int, 2>, Bias);
 
+        void generate_output_bias();
+
+        std::vector<Bias> const & get_output_bias() const;
+
     public:
         // Species evolution methods
 
@@ -131,6 +135,7 @@ namespace NeuralNetwork {
         float result_before_mutation = 0;
         bool assigned = false;
         std::vector<int> layers_size;
+        std::vector<Bias> output_bias;
         relationships_map relationships;
         std::unordered_map<long, Phenotype *> ev_number_index;
         std::queue<Mutation> mutations;

@@ -69,8 +69,8 @@ namespace NeuralNetwork {
             best_copy->add_relationship(copied_phenotype);
             best_copy->disable_phenotypes(copied_phenotype->get_input(), copied_phenotype->get_output());
             best_copy->new_mutation(copied_phenotype, best_copy->last_result);
-
         }
+        best_copy->generate_output_bias();
         return best_copy;
     }
 
@@ -109,6 +109,7 @@ namespace NeuralNetwork {
                     connections
             };
         }
+        output_bias = base.output_bias;
     }
 
     Topology::~Topology() {
@@ -372,6 +373,25 @@ namespace NeuralNetwork {
     void Topology::set_bias(std::array<int, 2> neuron, Bias const bias) {
         auto iterator = relationships.find(neuron);
         iterator->second.bias = bias;
+    }
+
+    void Topology::generate_output_bias() {
+        using utils::Random;
+        int last_layer_neurons = layers_size.back();
+        output_bias.clear();
+        output_bias.reserve(last_layer_neurons);
+        for(int i = 0; i < last_layer_neurons; ++i){
+            Bias bias{
+                    Random::random_between(-100, 100) / 100.0f,
+                    Random::random_between(-100, 100) / 100.0f,
+                    Random::random_between(-100, 100) / 100.0f,
+            };
+            output_bias.push_back(bias);
+        }
+    }
+
+    std::vector<Bias> const & Topology::get_output_bias() const {
+        return output_bias;
     }
 
     std::string Topology::parse_to_string() const {

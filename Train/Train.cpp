@@ -82,6 +82,7 @@ namespace Train {
                     phenotype->set_output(1, index);
                     initial_topology->add_relationship(phenotype, true);
                 }
+                initial_topology->generate_output_bias();
             }
             *new_species >> initial_topology;
         }

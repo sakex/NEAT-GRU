@@ -230,6 +230,10 @@ namespace NeuralNetwork {
                                                  update_input_weight, reset_memory_weight, update_memory_weight);
             }
         }
+        std::vector<Bias> const & output_bias_vec = topology->get_output_bias();
+        for(int it = neurons_count - output_size; it < neurons_count; ++it) {
+            layers[it].set_bias(output_bias_vec[it - neurons_count + output_size]);
+        }
         delete[] layer_addresses;
     }
 
