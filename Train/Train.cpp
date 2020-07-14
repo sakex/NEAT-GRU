@@ -186,8 +186,8 @@ namespace Train {
                 Species_ptr new_species = std::make_unique<Species>(topology, 1);
                 auto lambda = [&topology, &new_species, &mutex](Topology_ptr &other) {
                     if(other->is_assigned()) return;
-                    float const delta = Topology::delta_compatibility(*topology, *other);
-                    if (delta <= 3) {
+                    double const delta = Topology::delta_compatibility(*topology, *other);
+                    if (delta <= 3.) {
                         other->set_assigned(true);
                         mutex.lock();
                         *new_species >> other;
@@ -204,6 +204,7 @@ namespace Train {
 
     void Train::extinct_species() {
         int species_size = species.size();
+        std::cout << "SPECIES SIZE BEFORE CUT: " << species_size << std::endl;
         int const new_count = 20;
         if (species_size > new_count) {
             std::sort(species.begin(), species.end(), [](Species_ptr &spec1, Species_ptr &spec2) -> bool {

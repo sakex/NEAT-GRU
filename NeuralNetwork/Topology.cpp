@@ -12,11 +12,11 @@ constexpr unsigned MAX_UNFRUITFUL = 10;
 
 namespace NeuralNetwork {
 
-    float Topology::delta_compatibility(Topology &top1, Topology &top2) {
+    double Topology::delta_compatibility(Topology &top1, Topology &top2) {
         // see http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
         // chapter 4.1
-        float disjoints = 0, common = 0;
-        float W = 0;
+        double disjoints = 0, common = 0;
+        double W = 0;
         for (std::pair<long, Phenotype *> pair : top1.ev_number_index) {
             std::unordered_map<long, Phenotype *>::const_iterator search_second =
                     top2.ev_number_index.find(pair.first);
@@ -41,8 +41,8 @@ namespace NeuralNetwork {
         size_t const size1 = top1.ev_number_index.size();
         size_t const size2 = top2.ev_number_index.size();
         disjoints += (size1 - common);
-        float const N = 6 * (size1 + size2) <= 20 ? 1 : float(size1 + size2) / 120;
-        float const output = 2 * disjoints / N + W / common;
+        double const N = (size1 + size2) <= 120 ? 1. : double(size1 + size2) / 120.;
+        double const output = 2. * disjoints / N + W / (common * 6);
         return output;
     }
 
