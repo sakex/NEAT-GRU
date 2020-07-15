@@ -371,8 +371,12 @@ namespace NeuralNetwork {
     }
 
     void Topology::set_bias(std::array<int, 2> neuron, Bias const bias) {
-        auto iterator = relationships.find(neuron);
-        iterator->second.bias = bias;
+        if (neuron[0] != layers - 1) {
+            auto iterator = relationships.find(neuron);
+            iterator->second.bias = bias;
+        } else {
+            output_bias[neuron[1]] = bias;
+        }
     }
 
     void Topology::generate_output_bias() {
@@ -380,7 +384,7 @@ namespace NeuralNetwork {
         int last_layer_neurons = layers_size.back();
         output_bias.clear();
         output_bias.reserve(last_layer_neurons);
-        for(int i = 0; i < last_layer_neurons; ++i){
+        for (int i = 0; i < last_layer_neurons; ++i) {
             Bias bias{
                     Random::random_between(-100, 100) / 100.0f,
                     Random::random_between(-100, 100) / 100.0f,
@@ -390,7 +394,7 @@ namespace NeuralNetwork {
         }
     }
 
-    std::vector<Bias> const & Topology::get_output_bias() const {
+    std::vector<Bias> const &Topology::get_output_bias() const {
         return output_bias;
     }
 
@@ -405,6 +409,14 @@ namespace NeuralNetwork {
         for (auto &it: relationships) {
             Bias bias = it.second.bias;
             output += R"({"neuron": [)" + std::to_string(it.first[0]) + "," + std::to_string(it.first[1]) + "],"
+                      + R"("bias":{"bias_input":)" + std::to_string(bias.bias_input)
+                      + R"(,"bias_update":)" + std::to_string(bias.bias_update)
+                      + R"(,"bias_reset":)" + std::to_string(bias.bias_reset)
+                      + "}},";
+        }
+        for (size_t it = 0; it < output_bias.size(); ++it) {
+            Bias const &bias = output_bias[it];
+            output += R"({"neuron": [)" + std::to_string(layers - 1) + "," + std::to_string(it) + "],"
                       + R"("bias":{"bias_input":)" + std::to_string(bias.bias_input)
                       + R"(,"bias_update":)" + std::to_string(bias.bias_update)
                       + R"(,"bias_reset":)" + std::to_string(bias.bias_reset)
