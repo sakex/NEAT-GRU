@@ -375,7 +375,7 @@ namespace NeuralNetwork {
             auto iterator = relationships.find(neuron);
             iterator->second.bias = bias;
         } else {
-            if(output_bias.size() != layers_size.back()) output_bias.resize(layers_size.back());
+            if(output_bias.size() != (unsigned long)layers_size.back()) output_bias.resize(layers_size.back());
             output_bias[neuron[1]] = bias;
         }
     }
