@@ -190,7 +190,7 @@ namespace Train {
                 auto lambda = [&topology, &new_species, &mutex](Topology_ptr &other) {
                     if(other->is_assigned()) return;
                     double const delta = Topology::delta_compatibility(*topology, *other);
-                    if (delta <= 3.) {
+                    if (delta <= 1.) {
                         other->set_assigned(true);
                         mutex.lock();
                         *new_species >> other;

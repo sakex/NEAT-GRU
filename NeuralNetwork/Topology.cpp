@@ -41,8 +41,8 @@ namespace NeuralNetwork {
         size_t const size1 = top1.ev_number_index.size();
         size_t const size2 = top2.ev_number_index.size();
         disjoints += (size1 - common);
-        double const N = (size1 + size2) <= 120 ? 1. : double(size1 + size2) / 120.;
-        double const output = 2. * disjoints / N + W / (common * 6);
+        double const N = (size1 + size2) <= 60 ? 1. : double(size1 + size2) / 60.;
+        double const output = 2. * disjoints / N + W / (common * 3.);
         return output;
     }
 
