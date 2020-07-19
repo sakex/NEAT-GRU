@@ -7,8 +7,8 @@
 
 #include "Topology.h"
 
-constexpr unsigned MAX_ITERATIONS = 0;
-constexpr unsigned MAX_UNFRUITFUL = 0;
+#define MAX_ITERATIONS 0
+#define MAX_UNFRUITFUL 0
 
 namespace NeuralNetwork {
 
@@ -18,7 +18,7 @@ namespace NeuralNetwork {
         double disjoints = 0, common = 0;
         double W = 0;
         for (std::pair<long, Phenotype *> pair : top1.ev_number_index) {
-            std::unordered_map<long, Phenotype *>::const_iterator search_second =
+            auto search_second =
                     top2.ev_number_index.find(pair.first);
             if (search_second != top2.ev_number_index.end()) {
                 common++;
@@ -59,7 +59,7 @@ namespace NeuralNetwork {
         // Preloading
         std::unordered_map<long, Phenotype *> &copy_ev_number_index = best_copy->ev_number_index;
         for (std::pair<long, Phenotype *> pair : worst->ev_number_index) {
-            std::unordered_map<long, Phenotype *>::const_iterator search_best =
+            auto search_best =
                     copy_ev_number_index.find(pair.first);
             if (search_best != copy_ev_number_index.end()) {
                 continue;
@@ -182,6 +182,7 @@ namespace NeuralNetwork {
     }
 
     bool Topology::optimize() {
+#if MAX_ITERATIONS > 0 || MAX_UNFRUITFUL > 0
         size_t mutations_queued = mutations.size();
         if (!mutations_queued) {
             return false;
@@ -205,6 +206,9 @@ namespace NeuralNetwork {
         }
         mutation.mutate(last_result);
         return true;
+#else
+        return false;
+#endif
     }
 
     bool Topology::mutation_positive() const {
@@ -269,7 +273,7 @@ namespace NeuralNetwork {
 
     bool Topology::path_overrides(Phenotype::point const &input,
                                   Phenotype::point const &output) {
-        relationships_map::const_iterator iterator = relationships.find(input);
+        auto iterator = relationships.find(input);
         if (iterator == relationships.end())
             return false;
         std::vector<Phenotype *> base_vector = iterator->second.phenotypes;
@@ -375,7 +379,7 @@ namespace NeuralNetwork {
             auto iterator = relationships.find(neuron);
             iterator->second.bias = bias;
         } else {
-            if(output_bias.size() != (unsigned long)layers_size.back()) output_bias.resize(layers_size.back());
+            if (output_bias.size() != (unsigned long) layers_size.back()) output_bias.resize(layers_size.back());
             output_bias[neuron[1]] = bias;
         }
     }

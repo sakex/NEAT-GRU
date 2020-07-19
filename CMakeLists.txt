@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(neat_gru)
-SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_STANDARD 17)
 
 
 if (NOT CMAKE_BUILD_TYPE)
