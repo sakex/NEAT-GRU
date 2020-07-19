@@ -7,8 +7,8 @@
 
 #include "Topology.h"
 
-constexpr unsigned MAX_ITERATIONS = 10;
-constexpr unsigned MAX_UNFRUITFUL = 10;
+constexpr unsigned MAX_ITERATIONS = 0;
+constexpr unsigned MAX_UNFRUITFUL = 0;
 
 namespace NeuralNetwork {
 
