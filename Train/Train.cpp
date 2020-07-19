@@ -115,12 +115,13 @@ namespace Train {
                 no_progress = 0;
             } else {
                 no_progress++;
-                if (no_progress == 500) {
-                    std::cout << "500 generations without progress, exciting" << std::endl;
+                if (no_progress == 50) {
+                    std::cout << "50 generations without progress, ending" << std::endl;
                     break;
                 }
             }
-            reset_species();
+            if(it % 10 == 0)
+                reset_species();
             utils::Timer selection_timer("NATURAL SELECTION");
             natural_selection();
             selection_timer.stop();
@@ -190,7 +191,7 @@ namespace Train {
                 auto lambda = [&topology, &new_species, &mutex](Topology_ptr &other) {
                     if(other->is_assigned()) return;
                     double const delta = Topology::delta_compatibility(*topology, *other);
-                    if (delta <= 1.) {
+                    if (delta <= 3.) {
                         other->set_assigned(true);
                         mutex.lock();
                         *new_species >> other;
