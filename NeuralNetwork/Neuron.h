@@ -26,15 +26,15 @@ namespace NeuralNetwork {
 
         ~Neuron();
 
-        void add_connection(Neuron *, float, float, float, float, float, float);
+        void add_connection(Neuron *, double, double, double, double, double, double);
 
-        void increment_state(float mem, float inp, float res, float upd);
+        void increment_state(double mem, double inp, double res, double upd);
 
-        void set_input_value(float new_value);
+        void set_input_value(double new_value);
 
-        float get_value();
+        double get_value();
 
-        float get_prev_reset() const;
+        double get_prev_reset() const;
 
         void feed_forward();
 
@@ -45,15 +45,15 @@ namespace NeuralNetwork {
         void set_bias(Bias);
 
     private:
-        float input = 0.f;
-        float memory = 0.f;
-        float update = 0.f;
-        float reset = 0.f;
-        float prev_reset = 0.f;
+        double input = 0.f;
+        double memory = 0.f;
+        double update = 0.f;
+        double reset = 0.f;
+        double prev_reset = 0.f;
         int last_added = 0;
-        float bias_input = 0.f;
-        float bias_update = 0.f;
-        float bias_reset = 0.f;
+        double bias_input = 0.f;
+        double bias_update = 0.f;
+        double bias_reset = 0.f;
         Connection *connections{nullptr};
 
     private:

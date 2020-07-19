@@ -7,9 +7,9 @@
 
 
 struct Bias {
-    float bias_input = 0.f;
-    float bias_update = 0.f;
-    float bias_reset = 0.f;
+    double bias_input = 0.f;
+    double bias_update = 0.f;
+    double bias_reset = 0.f;
 };
 
 

@@ -144,12 +144,12 @@ namespace NeuralNetwork {
         return layers;
     }
 
-    void Topology::set_last_result(const float result) {
+    void Topology::set_last_result(const double result) {
         last_result = result;
         if (last_result > best_historical_result) best_historical_result = last_result;
     }
 
-    float Topology::get_last_result() const {
+    double Topology::get_last_result() const {
         return last_result;
     }
 
@@ -353,7 +353,7 @@ namespace NeuralNetwork {
         return added_phenotypes;
     }
 
-    void Topology::new_mutation(Phenotype *last_phenotype, float const wealth) {
+    void Topology::new_mutation(Phenotype *last_phenotype, double const wealth) {
         mutations.emplace(last_phenotype, wealth);
     }
 
@@ -362,12 +362,12 @@ namespace NeuralNetwork {
         using utils::Random;
         Phenotype::coordinate coordinate{input, output};
         long const ev_number = Generation::number(coordinate);
-        float input_weight = Random::random_between(-100, 100) / 100.0f;
-        float const memory_weight = Random::random_between(-100, 100) / 100.0f;
-        float const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
-        float const update_input_weight = Random::random_between(-100, 100) / 100.0f;
-        float const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
-        float const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
+        double input_weight = Random::random_between(-100, 100) / 100.0f;
+        double const memory_weight = Random::random_between(-100, 100) / 100.0f;
+        double const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
+        double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
+        double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
+        double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
         auto *phenotype = new Phenotype(input, output, input_weight, memory_weight, reset_input_weight,
                                         update_input_weight, reset_memory_weight, update_memory_weight, ev_number);
         add_relationship(phenotype);

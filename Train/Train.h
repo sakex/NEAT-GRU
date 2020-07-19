@@ -112,13 +112,13 @@ namespace Train {
          * Pairs topologies and their results returned by the Simulation
          * @param results the results from the simulation's run_generation()
          */
-        void assign_results(std::vector<float> const &results);
+        void assign_results(std::vector<double> const &results);
 
         /**
          * Calls run_generation on the Game
          * @return a vector of results
          */
-        std::vector<float> run_generation();
+        std::vector<double> run_generation();
 
         /// Do the natural selection
         void natural_selection();

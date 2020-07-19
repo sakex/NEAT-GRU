@@ -19,23 +19,23 @@ namespace NeuralNetwork {
     public:
         Connection() = default;
 
-        void init(float, float, float, float, float, float, Neuron *);
+        void init(double, double, double, double, double, double, Neuron *);
 
         ~Connection() = default;
 
-        void activate(float);
+        void activate(double);
 
         void reset_state();
 
     private:
-        float memory = 0.f;
-        float prev_input = 0.f;
-        float input_weight = 0.f;
-        float memory_weight = 0.f;
-        float reset_input_weight = 0.f;
-        float update_input_weight = 0.f;
-        float reset_memory_weight = 0.f;
-        float update_memory_weight = 0.f;
+        double memory = 0.f;
+        double prev_input = 0.f;
+        double input_weight = 0.f;
+        double memory_weight = 0.f;
+        double reset_input_weight = 0.f;
+        double update_input_weight = 0.f;
+        double reset_memory_weight = 0.f;
+        double update_memory_weight = 0.f;
         Neuron *output;
     };
 

@@ -4,8 +4,6 @@ SET(CMAKE_CUDA_STANDARD 14)
 
 ADD_LIBRARY(NEAT_CUDA
         NN.cu
-        Connection.cu
-        Neuron.cu
         )
 
 SET(PUB_HEADERS

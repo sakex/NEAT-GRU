@@ -28,7 +28,7 @@ public:
 public:
     TrendGame();
 
-    std::vector<float> do_run_generation() override;
+    std::vector<double> do_run_generation() override;
 
     void do_reset_players(NN *nets, size_t count) override;
 

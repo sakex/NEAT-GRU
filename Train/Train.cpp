@@ -47,7 +47,7 @@ namespace Train {
     void Train::random_new_species() {
         using utils::Random;
         Species_ptr new_species = std::make_unique<Species>();
-        int const connections_per_input = std::ceil((float) outputs_count / (float) inputs_count);
+        int const connections_per_input = std::ceil((double) outputs_count / (double) inputs_count);
         std::vector<int> not_added;
         int output_index = 0;
         for (int i = 0; i < inputs_count; ++i) {
@@ -66,12 +66,12 @@ namespace Train {
             initial_topology->set_layers(2);
             for (int i = 0; i < inputs_count; ++i) {
                 Phenotype::point input = {0, i};
-                float input_weight = Random::random_between(-100, 100) / 100.0f;
-                float const memory_weight = Random::random_between(-100, 100) / 100.0f;
-                float const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
-                float const update_input_weight = Random::random_between(-100, 100) / 100.0f;
-                float const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
-                float const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
+                double input_weight = Random::random_between(-100, 100) / 100.0f;
+                double const memory_weight = Random::random_between(-100, 100) / 100.0f;
+                double const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
+                double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
+                double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
+                double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
 
                 for (int j = 0; j < connections_per_input; ++j) {
                     int index = not_added[not_added_it];
@@ -91,7 +91,7 @@ namespace Train {
         species.emplace_back(std::move(new_species));
     }
 
-    inline void Train::assign_results(std::vector<float> const &results) {
+    inline void Train::assign_results(std::vector<double> const &results) {
         size_t const size = results.size();
 #if DEBUG
         assert(size == last_topologies.size());
@@ -107,7 +107,7 @@ namespace Train {
         for (int it = 0; it != iterations; ++it) { // iterations < 0 -> run forever = other end conditions
             std::cout << it << std::endl;
             utils::Timer run_timer("RUN GENERATION");
-            std::vector<float> results = run_generation();
+            std::vector<double> results = run_generation();
             run_timer.stop();
             assign_results(results);
             update_best();
@@ -223,7 +223,7 @@ namespace Train {
         }
     }
 
-    inline std::vector<float> Train::run_generation() {
+    inline std::vector<double> Train::run_generation() {
         return game->run_generation();
     }
 
@@ -243,13 +243,13 @@ namespace Train {
     void Train::update_best() {
         Topology_ptr best = nullptr;
         Topology_ptr worst = nullptr;
-        float max = std::numeric_limits<float>::min();
-        float min = std::numeric_limits<float>::max();
+        double max = std::numeric_limits<double>::min();
+        double min = std::numeric_limits<double>::max();
 
         std::vector<Topology_ptr> topologies = topologies_vector();
 
         for (Topology_ptr &topology : topologies) {
-            float result = topology->get_last_result();
+            double result = topology->get_last_result();
             if (result > max) {
                 max = result;
                 best = topology;

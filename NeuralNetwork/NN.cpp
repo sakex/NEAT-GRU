@@ -13,24 +13,24 @@
 #include <cmath>
 
 namespace NeuralNetwork {
-    inline float fast_sigmoid(float const value) {
+    inline double fast_sigmoid(double const value) {
         return value / (1.f + std::abs(value));
     }
 
-    inline float fast_tanh(float const x) {
+    inline double fast_tanh(double const x) {
         if (std::abs(x) >= 4.97) {
-            float const values[2] = {-1., 1.};
+            double const values[2] = {-1., 1.};
             return values[x > 0.];
         }
-        float const x2 = x * x;
-        float const a = x * (135135.0f + x2 * (17325.0f + x2 * (378.0f + x2)));
-        float const b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
+        double const x2 = x * x;
+        double const a = x * (135135.0f + x2 * (17325.0f + x2 * (378.0f + x2)));
+        double const b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
         return a / b;
     }
 
     inline void
-    Connection::init(float const _input_weight, float const _memory_weight, float const riw, float const uiw,
-                     float const rmw, float const umw, Neuron
+    Connection::init(double const _input_weight, double const _memory_weight, double const riw, double const uiw,
+                     double const rmw, double const umw, Neuron
                      *_output) {
         memory = 0.f;
         prev_input = 0.f;
@@ -43,12 +43,12 @@ namespace NeuralNetwork {
         output = _output;
     }
 
-    inline void Connection::activate(float const value) {
-        float const prev_reset = output->get_prev_reset();
+    inline void Connection::activate(double const value) {
+        double const prev_reset = output->get_prev_reset();
         memory = fast_tanh(prev_input * input_weight + memory_weight * prev_reset * memory);
         prev_input = value;
 
-        float const update_mem = memory * memory_weight;
+        double const update_mem = memory * memory_weight;
         output->increment_state(update_mem,
                                 value * input_weight,
                                 value * reset_input_weight + memory * reset_memory_weight,
@@ -81,36 +81,36 @@ namespace NeuralNetwork {
     }
 
     void
-    Neuron::add_connection(Neuron *neuron, float const input_weight, float const memory_weight, float const riw,
-                           float const uiw, float const rmw, float const umw) {
+    Neuron::add_connection(Neuron *neuron, double const input_weight, double const memory_weight, double const riw,
+                           double const uiw, double const rmw, double const umw) {
         connections[last_added++].init(input_weight, memory_weight, riw, uiw, rmw, umw, neuron);
     }
 
-    inline void Neuron::increment_state(float const mem, float const inp, float const res, float const upd) {
+    inline void Neuron::increment_state(double const mem, double const inp, double const res, double const upd) {
         memory += mem;
         input += inp;
         reset += res;
         update += upd;
     }
 
-    inline void Neuron::set_input_value(float new_value) {
+    inline void Neuron::set_input_value(double new_value) {
         input = new_value;
         update = -10.f;
         reset = -10.f;
     }
 
-    inline float Neuron::get_value() {
-        float const update_gate = fast_sigmoid(update);
-        float const reset_gate = fast_sigmoid(reset);
+    inline double Neuron::get_value() {
+        double const update_gate = fast_sigmoid(update);
+        double const reset_gate = fast_sigmoid(reset);
 
-        const float current_memory = fast_tanh(input + memory * reset_gate);
-        const float value = update_gate * memory + (1.f - update_gate) * current_memory;
+        const double current_memory = fast_tanh(input + memory * reset_gate);
+        const double value = update_gate * memory + (1.f - update_gate) * current_memory;
         prev_reset = reset_gate;
         reset_value();
         return fast_tanh(value);
     }
 
-    inline float Neuron::get_prev_reset() const {
+    inline double Neuron::get_prev_reset() const {
         return prev_reset;
     }
 
@@ -131,11 +131,11 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::feed_forward() {
-        float const update_gate = fast_sigmoid(update);
-        float const reset_gate = fast_sigmoid(reset);
+        double const update_gate = fast_sigmoid(update);
+        double const reset_gate = fast_sigmoid(reset);
 
-        const float current_memory = fast_tanh(input + memory * reset_gate);
-        const float value = update_gate * memory + (1.f - update_gate) * current_memory;
+        const double current_memory = fast_tanh(input + memory * reset_gate);
+        const double value = update_gate * memory + (1.f - update_gate) * current_memory;
         for (int i = 0; i < last_added; ++i) {
             connections[i].activate(value);
         }
@@ -158,14 +158,14 @@ namespace NeuralNetwork {
 }
 
 namespace NeuralNetwork {
-    /*inline void softmax(float *input, unsigned size) {
+    /*inline void softmax(double *input, unsigned size) {
         double total = 0;
         for (unsigned i = 0; i < size; ++i) {
-            input[i] = static_cast<float>(exp(static_cast<double>(input[i])));
+            input[i] = static_cast<double>(exp(static_cast<double>(input[i])));
             total += input[i];
         }
         for (unsigned i = 0; i < size; ++i) {
-            input[i] /= static_cast<float>(total);
+            input[i] /= static_cast<double>(total);
         }
     }*/
 
@@ -212,12 +212,12 @@ namespace NeuralNetwork {
             input_neuron_ptr->set_connections_count(it.second.phenotypes.size());
             for (Phenotype *phenotype : it.second.phenotypes) {
                 Phenotype::point output = phenotype->get_output();
-                float const input_weight = phenotype->get_input_weight();
-                float const update_input_weight = phenotype->get_update_input_weight();
-                float const memory_weight = phenotype->get_memory_weight();
-                float const reset_input_weight = phenotype->get_reset_input_weight();
-                float const reset_memory_weight = phenotype->get_reset_memory_weight();
-                float const update_memory_weight = phenotype->get_update_memory_weight();
+                double const input_weight = phenotype->get_input_weight();
+                double const update_input_weight = phenotype->get_update_input_weight();
+                double const memory_weight = phenotype->get_memory_weight();
+                double const reset_input_weight = phenotype->get_reset_input_weight();
+                double const reset_memory_weight = phenotype->get_reset_memory_weight();
+                double const update_memory_weight = phenotype->get_update_memory_weight();
 
                 Neuron *output_neuron_ptr = &layers[layer_addresses[output[0]] + output[1]];
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
@@ -231,13 +231,13 @@ namespace NeuralNetwork {
         delete[] layer_addresses;
     }
 
-    inline float *NN::compute(const float *inputs_vector) {
+    inline double *NN::compute(const double *inputs_vector) {
         set_inputs(inputs_vector);
         for (int it = 0; it < neurons_count - output_size; ++it) {
             layers[it].feed_forward();
         }
-        float *out;
-        out = new float[output_size];
+        double *out;
+        out = new double[output_size];
         for (int it = neurons_count - output_size; it < neurons_count; ++it) {
             out[it - neurons_count + output_size] = layers[it].get_value();
         }
@@ -251,7 +251,7 @@ namespace NeuralNetwork {
         }
     }
 
-    inline void NN::set_inputs(const float *inputs_array) {
+    inline void NN::set_inputs(const double *inputs_array) {
         for (int i = 0; i < input_size; ++i) {
             layers[i].set_input_value(inputs_array[i]);
         }
@@ -260,8 +260,8 @@ namespace NeuralNetwork {
 
 } /* namespace NeuralNetwork */
 
-float *compute_network(NN *net, const float *inputs) {
-    float *outputs = net->compute(inputs);
+double *compute_network(NN *net, const double *inputs) {
+    double *outputs = net->compute(inputs);
     return outputs;
 }
 

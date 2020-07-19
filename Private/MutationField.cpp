@@ -6,55 +6,55 @@
 
 namespace NeuralNetwork {
 
-    float __MutationField<0>::get(NeuralNetwork::Phenotype *phenotype) {
+    double __MutationField<0>::get(NeuralNetwork::Phenotype *phenotype) {
         return phenotype->get_input_weight();
     }
 
-    void __MutationField<0>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+    void __MutationField<0>::set(NeuralNetwork::Phenotype *phenotype, double const value) {
         phenotype->set_input_weight(value);
     }
 
-    float __MutationField<1>::get(NeuralNetwork::Phenotype *phenotype) {
+    double __MutationField<1>::get(NeuralNetwork::Phenotype *phenotype) {
         return phenotype->get_memory_weight();
     }
 
-    void __MutationField<1>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+    void __MutationField<1>::set(NeuralNetwork::Phenotype *phenotype, double const value) {
         phenotype->set_memory_weight(value);
     }
 
-    float __MutationField<2>::get(NeuralNetwork::Phenotype *phenotype) {
+    double __MutationField<2>::get(NeuralNetwork::Phenotype *phenotype) {
         return phenotype->get_reset_input_weight();
     }
 
-    void __MutationField<2>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+    void __MutationField<2>::set(NeuralNetwork::Phenotype *phenotype, double const value) {
         phenotype->set_reset_input_weight(value);
     }
 
-    float __MutationField<3>::get(NeuralNetwork::Phenotype *phenotype) {
+    double __MutationField<3>::get(NeuralNetwork::Phenotype *phenotype) {
         return phenotype->get_reset_memory_weight();
     }
 
-    void __MutationField<3>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+    void __MutationField<3>::set(NeuralNetwork::Phenotype *phenotype, double const value) {
         phenotype->set_reset_memory_weight(value);
     }
 
-    float __MutationField<4>::get(NeuralNetwork::Phenotype *phenotype) {
+    double __MutationField<4>::get(NeuralNetwork::Phenotype *phenotype) {
         return phenotype->get_update_memory_weight();
     }
 
-    void __MutationField<4>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+    void __MutationField<4>::set(NeuralNetwork::Phenotype *phenotype, double const value) {
         phenotype->set_update_memory_weight(value);
     }
 
-    float __MutationField<5>::get(NeuralNetwork::Phenotype *phenotype) {
+    double __MutationField<5>::get(NeuralNetwork::Phenotype *phenotype) {
         return phenotype->get_update_input_weight();
     }
 
-    void __MutationField<5>::set(NeuralNetwork::Phenotype *phenotype, float const value) {
+    void __MutationField<5>::set(NeuralNetwork::Phenotype *phenotype, double const value) {
         phenotype->set_update_input_weight(value);
     }
 
-    float MutationField::get(int field, NeuralNetwork::Phenotype *phenotype) {
+    double MutationField::get(int field, NeuralNetwork::Phenotype *phenotype) {
         switch (field) {
             case 0:
                 return __MutationField<0>::get(phenotype);
@@ -73,7 +73,7 @@ namespace NeuralNetwork {
         }
     }
 
-    void MutationField::set(int field, NeuralNetwork::Phenotype *phenotype, float value) {
+    void MutationField::set(int field, NeuralNetwork::Phenotype *phenotype, double value) {
         switch (field) {
             case 0:
                 __MutationField<0>::set(phenotype, value);

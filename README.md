@@ -25,7 +25,7 @@
     
       #include <neat/Game/Game.h>
       class Simulation: public Game {
-        std::vector<float> do_run_generation() override {...}
+        std::vector<double> do_run_generation() override {...}
         void do_reset_players(NN * nets, size_t count) override {...};
         void do_post_training(Topology_ptr topology) override {...};
       }

@@ -9,7 +9,7 @@
 
 namespace Game {
 
-    std::vector<float> Game::run_generation() {
+    std::vector<double> Game::run_generation() {
         return do_run_generation();
     }
 

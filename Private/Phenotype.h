@@ -23,27 +23,27 @@ namespace NeuralNetwork {
         //constructors
         explicit Phenotype(point const &, long);
 
-        explicit Phenotype(point const &, float, float, float, float, float, float, long);
+        explicit Phenotype(point const &, double, double, double, double, double, double, long);
 
-        explicit Phenotype(point const &, point const &, float, float, float, float, float, float, bool, long);
+        explicit Phenotype(point const &, point const &, double, double, double, double, double, double, bool, long);
 
-        explicit Phenotype(point const &, point const &, float, float, float, float, float, float, long);
+        explicit Phenotype(point const &, point const &, double, double, double, double, double, double, long);
 
         Phenotype(Phenotype const &);
 
     public:
         // setters
-        void set_input_weight(float);
+        void set_input_weight(double);
 
-        void set_memory_weight(float);
+        void set_memory_weight(double);
 
-        void set_reset_input_weight(float);
+        void set_reset_input_weight(double);
 
-        void set_reset_memory_weight(float);
+        void set_reset_memory_weight(double);
 
-        void set_update_input_weight(float);
+        void set_update_input_weight(double);
 
-        void set_update_memory_weight(float);
+        void set_update_memory_weight(double);
 
         void set_disabled(bool);
 
@@ -64,17 +64,17 @@ namespace NeuralNetwork {
 
         long get_ev_number() const;
 
-        float get_input_weight() const;
+        double get_input_weight() const;
 
-        float get_memory_weight() const;
+        double get_memory_weight() const;
 
-        float get_reset_input_weight() const;
+        double get_reset_input_weight() const;
 
-        float get_reset_memory_weight() const;
+        double get_reset_memory_weight() const;
 
-        float get_update_input_weight() const;
+        double get_update_input_weight() const;
 
-        float get_update_memory_weight() const;
+        double get_update_memory_weight() const;
 
         bool is_disabled() const;
 
@@ -88,12 +88,12 @@ namespace NeuralNetwork {
     private:
         point input;
         point output;
-        float input_weight;
-        float memory_weight;
-        float reset_input_weight;
-        float update_input_weight;
-        float reset_memory_weight;
-        float update_memory_weight;
+        double input_weight;
+        double memory_weight;
+        double reset_input_weight;
+        double update_input_weight;
+        double reset_memory_weight;
+        double update_memory_weight;
         long int evolution_number;
         bool disabled;
 

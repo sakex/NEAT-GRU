@@ -15,7 +15,7 @@ namespace NeuralNetwork {
             last_result(0) {
     }
 
-    Mutation::Mutation(Phenotype *_phenotype, float const _last_result) :
+    Mutation::Mutation(Phenotype *_phenotype, double const _last_result) :
             phenotype{_phenotype},
             field(0),
             last_result{_last_result} {
@@ -42,13 +42,13 @@ namespace NeuralNetwork {
         best_historical_wealth = 0;
     }
 
-    void Mutation::mutate(float const wealth) {
-        const float weight = MutationField::get(field, phenotype);
+    void Mutation::mutate(double const wealth) {
+        const double weight = MutationField::get(field, phenotype);
         if (wealth > best_historical_wealth) {
             best_historical_wealth = wealth;
             best_historical_weight = weight;
         }
-        const float delta = wealth - last_result;
+        const double delta = wealth - last_result;
         const int prev_direction = direction;
         if (direction == 0 || direction == 1)
             direction = delta > 0 ? 1 : -1;
@@ -64,13 +64,13 @@ namespace NeuralNetwork {
         }
         if (!interval_found) {
             ++unfruitful;
-            MutationField::set(field, phenotype, weight + static_cast<float>(gradient * direction));
+            MutationField::set(field, phenotype, weight + static_cast<double>(gradient * direction));
             gradient--;
             if (!gradient)
                 unfruitful = 1000;
         } else {
             iterations++;
-            const float new_weight = (interval[1] + interval[0]) / 2;
+            const double new_weight = (interval[1] + interval[0]) / 2;
             MutationField::set(field, phenotype, new_weight);
         }
         if (std::abs(interval[0] - interval[1]) < .5)

@@ -9,7 +9,7 @@
 #include <array>
 #include "constants.h"
 
-typedef std::array<float, NUMBERS> numbers_list;
+typedef std::array<double, NUMBERS> numbers_list;
 
 class MemoryGrid {
 public:

@@ -13,8 +13,8 @@ namespace NeuralNetwork {
             Phenotype(_input, .1f, .1f, .1f, .1f, .1f, .1f, ev_number) {
     }
 
-    Phenotype::Phenotype(point const &_input, float const _input_weight, float const _memory_weight,
-                         float const riw, float const uiw, float const rmw, float const umw,
+    Phenotype::Phenotype(point const &_input, double const _input_weight, double const _memory_weight,
+                         double const riw, double const uiw, double const rmw, double const umw,
                          long const ev_number) :
             input{_input[0], _input[1]},
             output{0, 0},
@@ -29,8 +29,8 @@ namespace NeuralNetwork {
     }
 
     Phenotype::Phenotype(point const &_input, point const &_output,
-                         float const _input_weight, float const _memory_weight,
-                         float const riw, float const uiw, float const rmw, float const umw, const bool _disabled,
+                         double const _input_weight, double const _memory_weight,
+                         double const riw, double const uiw, double const rmw, double const umw, const bool _disabled,
                          long const ev_number) :
             input{_input[0], _input[1]},
             output{_output[0], _output[1]},
@@ -45,8 +45,8 @@ namespace NeuralNetwork {
     }
 
     Phenotype::Phenotype(point const &input, point const &output,
-                         float const _input_weight, float const _memory_weight,
-                         float const riw, float const uiw, float const rmw, float const umw,
+                         double const _input_weight, double const _memory_weight,
+                         double const riw, double const uiw, double const rmw, double const umw,
                          long const ev_number) :
             Phenotype(input, output, _input_weight, _memory_weight, riw, uiw, rmw, umw, false, ev_number) {
     }
@@ -64,27 +64,27 @@ namespace NeuralNetwork {
         disabled = base.disabled;
     }
 
-    void Phenotype::set_input_weight(float const new_weight) {
+    void Phenotype::set_input_weight(double const new_weight) {
         input_weight = new_weight;
     }
 
-    void Phenotype::set_memory_weight(float const new_weight) {
+    void Phenotype::set_memory_weight(double const new_weight) {
         memory_weight = new_weight;
     }
 
-    void Phenotype::set_reset_input_weight(float const new_weight) {
+    void Phenotype::set_reset_input_weight(double const new_weight) {
         reset_input_weight = new_weight;
     }
 
-    void Phenotype::set_reset_memory_weight(float const new_weight) {
+    void Phenotype::set_reset_memory_weight(double const new_weight) {
         reset_memory_weight = new_weight;
     }
 
-    void Phenotype::set_update_input_weight(float const new_weight) {
+    void Phenotype::set_update_input_weight(double const new_weight) {
         update_input_weight = new_weight;
     }
 
-    void Phenotype::set_update_memory_weight(float const new_weight) {
+    void Phenotype::set_update_memory_weight(double const new_weight) {
         update_memory_weight = new_weight;
     }
 
@@ -105,27 +105,27 @@ namespace NeuralNetwork {
         return output;
     }
 
-    float Phenotype::get_input_weight() const {
+    double Phenotype::get_input_weight() const {
         return input_weight;
     }
 
-    float Phenotype::get_memory_weight() const {
+    double Phenotype::get_memory_weight() const {
         return memory_weight;
     }
 
-    float Phenotype::get_reset_input_weight() const {
+    double Phenotype::get_reset_input_weight() const {
         return reset_input_weight;
     }
 
-    float Phenotype::get_update_input_weight() const {
+    double Phenotype::get_update_input_weight() const {
         return update_input_weight;
     }
 
-    float Phenotype::get_reset_memory_weight() const {
+    double Phenotype::get_reset_memory_weight() const {
         return reset_memory_weight;
     }
 
-    float Phenotype::get_update_memory_weight() const {
+    double Phenotype::get_update_memory_weight() const {
         return update_memory_weight;
     }
 

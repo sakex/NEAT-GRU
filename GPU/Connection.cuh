@@ -16,23 +16,23 @@ namespace NeuralNetwork {
     public:
         __device__ Connection() = default;
 
-        __device__ Connection(float _input_weight, float _memory_weight, float riw, float rmw,
-                                       float uiw, float umw, Neuron *output);
+        __device__ Connection(double _input_weight, double _memory_weight, double riw, double rmw,
+                                       double uiw, double umw, Neuron *output);
 
-        __device__ void init(float _input_weight, float _memory_weight, float riw, float rmw,
-                                      float uiw, float umw, Neuron *output);
+        __device__ void init(double _input_weight, double _memory_weight, double riw, double rmw,
+                                      double uiw, double umw, Neuron *output);
 
-        __device__ void activate(float value);
+        __device__ void activate(double value);
 
     private:
-        float memory = 0.;
-        float prev_input = 0.;
-        float input_weight;
-        float memory_weight;
-        float reset_input_weight;
-        float reset_memory_weight;
-        float update_input_weight;
-        float update_memory_weight;
+        double memory = 0.;
+        double prev_input = 0.;
+        double input_weight;
+        double memory_weight;
+        double reset_input_weight;
+        double reset_memory_weight;
+        double update_input_weight;
+        double update_memory_weight;
         Neuron *output;
     };
 }

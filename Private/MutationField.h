@@ -21,50 +21,50 @@ namespace NeuralNetwork {
 
     template<>
     struct __MutationField<0> {
-        static float get(Phenotype *);
+        static double get(Phenotype *);
 
-        static void set(Phenotype *, float);
+        static void set(Phenotype *, double);
     };
 
     template<>
     struct __MutationField<1> {
-        static float get(Phenotype *);
+        static double get(Phenotype *);
 
-        static void set(Phenotype *, float);
+        static void set(Phenotype *, double);
     };
 
     template<>
     struct __MutationField<2> {
-        static float get(Phenotype *);
+        static double get(Phenotype *);
 
-        static void set(Phenotype *, float);
+        static void set(Phenotype *, double);
     };
 
     template<>
     struct __MutationField<3> {
-        static float get(Phenotype *);
+        static double get(Phenotype *);
 
-        static void set(Phenotype *, float);
+        static void set(Phenotype *, double);
     };
 
     template<>
     struct __MutationField<4> {
-        static float get(Phenotype *);
+        static double get(Phenotype *);
 
-        static void set(Phenotype *, float);
+        static void set(Phenotype *, double);
     };
 
     template<>
     struct __MutationField<5> {
-        static float get(Phenotype *);
+        static double get(Phenotype *);
 
-        static void set(Phenotype *, float);
+        static void set(Phenotype *, double);
     };
 
     struct MutationField {
-        static float get(int, Phenotype *);
+        static double get(int, Phenotype *);
 
-        static void set(int, Phenotype *, float);
+        static void set(int, Phenotype *, double);
     };
 }
 

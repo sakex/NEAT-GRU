@@ -5,36 +5,169 @@
 #include "Neuron.cuh"
 #include "NN.cuh"
 
+#include "Connection.cuh"
+
+namespace NeuralNetwork {
+    __device__ Connection::Connection(double const _input_weight, double const _memory_weight,
+                                      double const riw,
+                                      double const rmw,
+                                      double const uiw, double const umw, Neuron *output) :
+            input_weight(_input_weight),
+            memory_weight(_memory_weight),
+            reset_input_weight(riw),
+            reset_memory_weight(rmw),
+            update_input_weight(uiw),
+            update_memory_weight(umw),
+            output{output} {
+    }
+
+    __device__ void Connection::init(double const _input_weight, double const _memory_weight, double const riw,
+                                     double const rmw,
+                                     double const uiw, double const umw, Neuron *_output) {
+        memory = 0;
+        prev_input = 0.;
+        input_weight = _input_weight;
+        memory_weight = _memory_weight;
+        reset_input_weight = riw;
+        reset_memory_weight = rmw;
+        update_input_weight = uiw;
+        update_memory_weight = umw;
+        output = _output;
+    }
+
+    __device__ void Connection::activate(double const value) {
+        double const prev_reset = output->get_prev_reset();
+        memory = prev_input * input_weight + memory_weight * prev_reset * memory;
+        prev_input = value;
+        output->increment_memory(memory * memory_weight);
+        output->increment_input(value * input_weight);
+        output->increment_reset(value * reset_input_weight + memory * reset_memory_weight);
+        output->increment_update(value * update_memory_weight + memory * update_memory_weight);
+    }
+}
+
+#include "Neuron.cuh"
+
+namespace NeuralNetwork {
+    __device__ inline double fast_sigmoid(double const value) {
+        return value / (1.f + std::abs(value));
+    }
+
+
+    __device__ inline double fast_tanh(double const x) {
+        if (std::abs(x) >= 4.97) {
+            double const values[2] = {-1., 1.};
+            return values[x > 0.];
+        }
+        double const x2 = x * x;
+        double const a = x * (135135.0f + x2 * (17325.0f + x2 * (378.0f + x2)));
+        double const b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
+        return a / b;
+    }
+
+    __device__ void
+    Neuron::add_connection(Neuron *neuron, double const input_weight, double const memory_weight, double const riw,
+                           double const rmw,
+                           double const uiw, double const umw) {
+        Connection *co = &connections[last_connection_added++];
+        co->init(input_weight, memory_weight, riw, rmw, uiw, umw, neuron);
+    }
+
+    __device__ void Neuron::init() {
+        connections = nullptr;
+        input = 0.;
+        memory = 0.;
+        update = 0.;
+        reset = 0.;
+        prev_reset = 0.;
+        last_connection_added = 0;
+    }
+
+    __device__ void Neuron::set_connections_count(size_t const value) {
+        connections = new Connection[value];
+    }
+
+    __device__ void Neuron::increment_input(const double inc_value) {
+        atomicAdd(&input, inc_value);
+    }
+
+    __device__ void Neuron::increment_update(const double inc_value) {
+        atomicAdd(&update, inc_value);
+    }
+
+    __device__ void Neuron::increment_memory(const double inc_value) {
+        atomicAdd(&memory, inc_value);
+    }
+
+    __device__ void Neuron::increment_reset(const double inc_value) {
+        atomicAdd(&reset, inc_value);
+    }
+
+    __device__  void Neuron::set_value(double new_value) {
+        input = new_value;
+    }
+
+    __device__ double Neuron::get_prev_reset() const {
+        return prev_reset;
+    }
+
+    __device__ double Neuron::compute_value() {
+        const double update_gate = fast_sigmoid(update);
+        const double reset_gate = fast_sigmoid(reset);
+        const double current_memory = fast_tanh(input + memory * reset_gate);
+        const double value = update_gate * memory + (1.f - update_gate) * current_memory;
+        prev_reset = reset_gate;
+        reset_value();
+        return value;
+    }
+
+    __device__ void Neuron::reset_value() {
+        input = 0.;
+        update = 0.;
+        memory = 0.;
+    }
+
+    __device__ void Neuron::set_input_value(double new_value) {
+        input = new_value;
+    }
+
+    __device__ double Neuron::get_value() {
+        const double update_gate = fast_sigmoid(update);
+        const double reset_gate = fast_sigmoid(reset);
+        const double current_memory = fast_tanh(input + memory * reset_gate);
+        const double value = update_gate * memory + (1.f - update_gate) * current_memory;
+        prev_reset = reset_gate;
+        reset_value();
+        return fast_tanh(value);
+    }
+
+    __device__ void Neuron::free_connections() {
+        delete[]connections;
+        connections = nullptr;
+    }
+}
+
 namespace NeuralNetwork {
 
     size_t NN::current_id = 0;
 
-    float sigmoid(float const value) {
-        return 1 / (1 + std::exp(-value));
-    }
-
-    void softmax(float *input, unsigned size) {
-        float total = 0;
-        for (unsigned i = 0; i < size; ++i) {
-            if (input[i] < 0.) input[i] = 0.;
-            else total += input[i];
-        }
-        if (total > 1) {
-            for (unsigned i = 0; i < size; ++i) {
-                input[i] /= total;
-            }
-        }
-    }
-
     NN::NN() :
+            stream{nullptr},
             neurons_count(0),
             layers{nullptr},
             layer_count(0),
             layer_addresses{nullptr} {
         id = current_id++;
+        cudaStreamCreate(&stream);
     }
 
-    NN::NN(Topology_ptr const &topology) : neurons_count(0), layers(nullptr), layer_count(0), layer_addresses{nullptr} {
+    NN::NN(Topology_ptr const &topology) :
+            stream{nullptr},
+            neurons_count(0),
+            layers(nullptr),
+            layer_count(0),
+            layer_addresses{nullptr} {
+        id = current_id++;
         cudaStreamCreate(&stream);
         init_topology(topology);
     }
@@ -102,12 +235,11 @@ namespace NeuralNetwork {
         std::vector<CUDAConnectionCount> connection_counts;
 
         for (auto &it : relationships) {
-            connection_counts.push_back({
-                                                layer_addresses[it.first[0]] + it.first[1],
-                                                it.second.size()}
+            connection_counts.push_back({layer_addresses[it.first[0]] + it.first[1],
+                                         it.second.phenotypes.size()}
             );
 
-            for (Phenotype *phenotype : it.second) {
+            for (Phenotype *phenotype : it.second.phenotypes) {
                 if (phenotype->is_disabled()) {
                     continue;
                 }
@@ -129,8 +261,8 @@ namespace NeuralNetwork {
         cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
 
         cudaMemcpyAsync(device_counts, connection_counts.data(),
-                   sizeof(CUDAConnectionCount) * connection_counts.size(),
-                   cudaMemcpyHostToDevice, stream);
+                        sizeof(CUDAConnectionCount) * connection_counts.size(),
+                        cudaMemcpyHostToDevice, stream);
 
         set_connections_kernel<<<1, connection_counts.size(), id, stream>>>(layers, device_counts);
 
@@ -140,12 +272,12 @@ namespace NeuralNetwork {
         CUDAPhenotype *device_phenotypes;
         cudaMalloc(&device_phenotypes, sizeof(CUDAPhenotype) * phenotype_vec.size());
         cudaMemcpyAsync(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
-                   cudaMemcpyHostToDevice, stream);
+                        cudaMemcpyHostToDevice, stream);
         connect_neurons_kernel<<<1, 1, id, stream>>>(layers, device_phenotypes, phenotype_vec.size());
         cudaFree(device_phenotypes);
     }
 
-    __global__ void ff_connections(Connection *connections, float const value) {
+    __global__ void ff_connections(Connection *connections, double const value) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         connections[tid].activate(value);
     }
@@ -153,18 +285,18 @@ namespace NeuralNetwork {
     __global__ void feed_forward_kernel(Neuron *layer, int from) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         Neuron *n = &layer[from + tid];
-        float const value = n->compute_value();
+        double const value = n->compute_value();
         ff_connections<<<1, n->last_connection_added>>>(n->connections, value);
     }
 
-    __global__ void get_result_kernel(Neuron *layer, float *arr, int from) {
+    __global__ void get_result_kernel(Neuron *layer, double *arr, int from) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         arr[tid] = layer[from + tid].get_value();
         layer[from + tid].set_value(0);
     }
 
 
-    float *NN::compute(const float *inputs_array) {
+    double *NN::compute(const double *inputs_array) {
         set_inputs(inputs_array);
         size_t pos = 0;
 
@@ -179,14 +311,13 @@ namespace NeuralNetwork {
         int to = layer_addresses[pos + 1];
         int distance = to - from;
 
-        auto *output = new float[distance];
-        float *dev_output;
-        cudaMalloc(&dev_output, distance * sizeof(float));
+        auto *output = new double[distance];
+        double *dev_output;
+        cudaMalloc(&dev_output, distance * sizeof(double));
         get_result_kernel<<<1, distance, id, stream>>>(layers, dev_output, from);
         cudaStreamSynchronize(stream);
-        cudaMemcpyAsync(output, dev_output, distance * sizeof(float), cudaMemcpyDeviceToHost, stream);
+        cudaMemcpyAsync(output, dev_output, distance * sizeof(double), cudaMemcpyDeviceToHost, stream);
         cudaFree(dev_output);
-        softmax(output, distance);
         return output;
     }
 
@@ -198,19 +329,19 @@ namespace NeuralNetwork {
         }*/
     }
 
-    __global__ void set_input_kernel(Neuron *layer, float const *inputs) {
+    __global__ void set_input_kernel(Neuron *layer, double const *inputs) {
         unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
         layer[tid].set_input_value(inputs[tid]);
     }
 
-    void NN::set_inputs(const float *inputs_array) {
+    void NN::set_inputs(const double *inputs_array) {
         int const from = layer_addresses[0];
         int const to = layer_addresses[1];
         int const distance = to - from;
 
-        float *dev_inputs;
-        cudaMalloc(&dev_inputs, distance * sizeof(float));
-        cudaMemcpyAsync(dev_inputs, inputs_array, distance * sizeof(float), cudaMemcpyHostToDevice, stream);
+        double *dev_inputs;
+        cudaMalloc(&dev_inputs, distance * sizeof(double));
+        cudaMemcpyAsync(dev_inputs, inputs_array, distance * sizeof(double), cudaMemcpyHostToDevice, stream);
 
         set_input_kernel<<<1, distance, id, stream>>>(layers, dev_inputs);
         cudaFree(dev_inputs);

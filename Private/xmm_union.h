@@ -9,7 +9,7 @@
 
 union alignas(16) xmm {
     __m128 simd;
-    float data[4];
+    double data[4];
 };
 
 #endif //NEAT_GRU_XMM_UNION_H

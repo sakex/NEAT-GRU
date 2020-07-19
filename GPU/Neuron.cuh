@@ -12,30 +12,30 @@ namespace NeuralNetwork {
 
     class Neuron {
     public:
-        __device__ void add_connection(Neuron *, float, float, float, float, float, float);
+        __device__ void add_connection(Neuron *, double, double, double, double, double, double);
 
 
-        __device__ void increment_input(float inc_value);
+        __device__ void increment_input(double inc_value);
 
-        __device__ void increment_update(float inc_value);
+        __device__ void increment_update(double inc_value);
 
-        __device__ void increment_memory(float inc_value);
+        __device__ void increment_memory(double inc_value);
 
-        __device__ void increment_reset(float inc_value);
+        __device__ void increment_reset(double inc_value);
 
-        __device__  void set_value(float new_value);
+        __device__  void set_value(double new_value);
 
-        __device__ float get_prev_reset() const;
+        __device__ double get_prev_reset() const;
 
-        __device__ float compute_value();
+        __device__ double compute_value();
 
         __device__ void reset_value();
 
         __device__ void set_connections_count(size_t);
 
-        __device__ void set_input_value(float new_value);
+        __device__ void set_input_value(double new_value);
 
-        __device__ float get_value();
+        __device__ double get_value();
 
         __device__ void free_connections();
 
@@ -46,11 +46,11 @@ namespace NeuralNetwork {
         size_t last_connection_added;
 
     private:
-        float input;
-        float memory;
-        float update;
-        float reset;
-        float prev_reset;
+        double input;
+        double memory;
+        double update;
+        double reset;
+        double prev_reset;
     };
 }
 

@@ -13,9 +13,9 @@ void GameBinding::do_reset_players(NN *brains, size_t size) {
     (*sim->reset_players)(sim->context, void_brains, sizeof(NN), static_cast<unsigned>(size));
 }
 
-std::vector<float> GameBinding::do_run_generation() {
-    float *results = (*sim->run_generation)(sim->context);
-    std::vector<float> ret(results, results + _size);
+std::vector<double> GameBinding::do_run_generation() {
+    double *results = (*sim->run_generation)(sim->context);
+    std::vector<double> ret(results, results + _size);
     free(results);
     return ret;
 }

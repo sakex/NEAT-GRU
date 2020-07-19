@@ -37,10 +37,10 @@ namespace NeuralNetwork {
         /**
          * Compute the Neural Network with given inputs
          *
-         * @param inputs_vector C float array of inputs
+         * @param inputs_vector C double array of inputs
          * @return a vector of weights
          */
-        float *compute(const float *inputs_vector);
+        double *compute(const double *inputs_vector);
 
         /**
          * Inits the Network from a topology
@@ -62,9 +62,9 @@ namespace NeuralNetwork {
     private:
         /**
          * Sets the inputs on the first layer
-         * @param inputs_vector Array of floats to initiate the inputs
+         * @param inputs_vector Array of doubles to initiate the inputs
          */
-        void set_inputs(const float *inputs_vector);
+        void set_inputs(const double *inputs_vector);
 
         /// Delete data
         void delete_layers();

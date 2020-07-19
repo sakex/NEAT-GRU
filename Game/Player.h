@@ -43,7 +43,7 @@ namespace Game {
          * Getter to get results
          * @return Loss function output
          */
-        float get_result();
+        double get_result();
 
     protected:
         /// The NeuralNetwork of the player
@@ -64,7 +64,7 @@ namespace Game {
          * Function to implement for the getter to get results
          * @return Loss function output
          */
-        virtual float do_get_result() = 0;
+        virtual double do_get_result() = 0;
     };
 }
 

@@ -28,7 +28,7 @@ namespace Game {
          *
          * @return vector of scores of the players
          */
-        std::vector<float> run_generation();
+        std::vector<double> run_generation();
 
 
         /**
@@ -53,7 +53,7 @@ namespace Game {
          *
          * @return vector of scores of the players
          */
-        virtual std::vector<float> do_run_generation() = 0;
+        virtual std::vector<double> do_run_generation() = 0;
 
         /**
          * Function to be implemented to reset the players

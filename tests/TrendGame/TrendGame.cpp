@@ -37,13 +37,13 @@ void TrendGame::generate_dataset() {
     }
 }
 
-std::vector<float> TrendGame::do_run_generation() {
+std::vector<double> TrendGame::do_run_generation() {
     auto const &_datasets = datasets;
     auto cb = [&_datasets](Player &player) {
-        std::array<float, DIFFERENT_NUMBERS> input{};
+        std::array<double, DIFFERENT_NUMBERS> input{};
         for (Dataset const &ds: _datasets) {
             for (size_t it = 0; it < ds.data.size(); ++it) {
-                float *result;
+                double *result;
                 int const index = ds.data[it];
                 for (auto &i: input) i = -1.;
                 input[index] = 1.;
@@ -57,7 +57,7 @@ std::vector<float> TrendGame::do_run_generation() {
         }
     };
     std::for_each(players.begin(), players.end(), cb);
-    std::vector<float> outputs;
+    std::vector<double> outputs;
     outputs.reserve(players.size());
     std::transform(players.begin(), players.end(),
                    std::back_inserter(outputs),
@@ -74,15 +74,15 @@ void TrendGame::do_reset_players(NN *nets, size_t count) {
 void TrendGame::do_post_training(NN *net) {
     Player player{net, 0};
     generate_dataset();
-    float input[DIFFERENT_NUMBERS];
+    double input[DIFFERENT_NUMBERS];
     for (Dataset &ds: datasets) {
         std::vector<int> sequence;
         sequence.reserve(datasets[0].data.size());
         for (size_t it = 0; it < ds.data.size(); ++it) {
             int const index = ds.data[it];
-            for (float &v: input) v = -1.;
+            for (double &v: input) v = -1.;
             input[index] = 1.;
-            float *result = player.network->compute(input);
+            double *result = player.network->compute(input);
             auto max_elem = std::max_element(result, result + DIFFERENT_NUMBERS);
             int const max_index = std::distance(result, max_elem);
             player.score -= (max_index != ds.most_frequent[it]);

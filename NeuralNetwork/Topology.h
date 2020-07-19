@@ -78,10 +78,10 @@ namespace NeuralNetwork {
         int get_layers() const;
 
         /// Set last score
-        void set_last_result(float);
+        void set_last_result(double);
 
         /// Get last score
-        float get_last_result() const;
+        double get_last_result() const;
 
         /// Get all relationships
         relationships_map &get_relationships();
@@ -130,9 +130,9 @@ namespace NeuralNetwork {
     private:
         // Data
         int layers = 0;
-        float last_result = 0;
-        float best_historical_result = 0;
-        float result_before_mutation = 0;
+        double last_result = 0;
+        double best_historical_result = 0;
+        double result_before_mutation = 0;
         bool assigned = false;
         std::vector<int> layers_size;
         std::vector<Bias> output_bias;
@@ -198,7 +198,7 @@ namespace NeuralNetwork {
          * @param phenotype The new phenotype to create the mutation from
          * @param score The original score
          */
-        void new_mutation(Phenotype *phenotype, float score);
+        void new_mutation(Phenotype *phenotype, double score);
 
         /**
          * Creates a new phenotype

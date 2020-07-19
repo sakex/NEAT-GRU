@@ -19,7 +19,7 @@ namespace Game {
         do_reset(new_brain);
     }
 
-    float Player::get_result() {
+    double Player::get_result() {
         return do_get_result();
     }
 
