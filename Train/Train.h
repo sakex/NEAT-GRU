@@ -46,12 +46,13 @@ namespace Train {
          * @param _game The game on which we train our networks
          * @param _iterations Number of iterations until we end, set to less than 0 for infinite training
          * @param _max_individuals Maximum number of players for a given generation
+         * @param _max_species Maximum number of species for a given generation
          * @param _max_layers Maximum number of layers in a given network
          * @param _max_per_layer Maximum number of neurons per layer in a given network
          * @param inputs Number of input Neurons on the first layer of the Neural Networks
          * @param outputs Number of output Neurons on the last layer of the Neural Networks
          */
-        Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_layers, int _max_per_layer, int inputs,
+        Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species, int _max_layers, int _max_per_layer, int inputs,
               int outputs);
 
         /**
@@ -60,13 +61,14 @@ namespace Train {
          * @param _game The game on which we train our networks
          * @param _iterations Number of iterations until we end, set to less than 0 for infinite training
          * @param _max_individuals Maximum number of players for a given generation
+         * _max_species Maximum number of species for a given generation
          * @param _max_layers Maximum number of layers in a given network
          * @param _max_per_layer Maximum number of neurons per layer in a given network
          * @param inputs Number of input Neurons on the first layer of the Neural Networks
          * @param outputs Number of output Neurons on the last layer of the Neural Networks
          * @param top The pretrained topology to continue training
          */
-        Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_layers, int _max_per_layer, int inputs,
+        Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species, int _max_layers, int _max_per_layer, int inputs,
               int outputs, Topology_ptr top);
 
         ~Train();
@@ -86,6 +88,7 @@ namespace Train {
         int inputs_count;
         int outputs_count;
         int max_individuals;
+        int max_species;
         bool new_best = false;
         std::vector<Topology_ptr> last_topologies;
 

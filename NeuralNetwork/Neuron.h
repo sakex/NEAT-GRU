@@ -55,7 +55,6 @@ namespace NeuralNetwork {
         float bias_update = 0.f;
         float bias_reset = 0.f;
         Connection *connections{nullptr};
-        bool activated = false;
 
     private:
         void reset_value();

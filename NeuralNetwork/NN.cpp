@@ -73,8 +73,7 @@ namespace NeuralNetwork {
             reset(0.f),
             prev_reset(0.f),
             last_added(0),
-            connections{nullptr},
-            activated(false) {
+            connections{nullptr} {
     }
 
     Neuron::~Neuron() {
@@ -92,18 +91,15 @@ namespace NeuralNetwork {
         input += inp;
         reset += res;
         update += upd;
-        activated = true;
     }
 
     inline void Neuron::set_input_value(float new_value) {
         input = new_value;
         update = -10.f;
         reset = -10.f;
-        activated = true;
     }
 
     inline float Neuron::get_value() {
-        if (!activated) return 0.f;
         float const update_gate = fast_sigmoid(update);
         float const reset_gate = fast_sigmoid(reset);
 
@@ -123,7 +119,6 @@ namespace NeuralNetwork {
         update = bias_update;
         reset = bias_reset;
         memory = 0.f;
-        activated = false;
     }
 
     inline void Neuron::set_bias(Bias bias) {
@@ -136,7 +131,6 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::feed_forward() {
-        if (!activated) return;
         float const update_gate = fast_sigmoid(update);
         float const reset_gate = fast_sigmoid(reset);
 
@@ -230,8 +224,8 @@ namespace NeuralNetwork {
                                                  update_input_weight, reset_memory_weight, update_memory_weight);
             }
         }
-        std::vector<Bias> const & output_bias_vec = topology->get_output_bias();
-        for(int it = neurons_count - output_size; it < neurons_count; ++it) {
+        std::vector<Bias> const &output_bias_vec = topology->get_output_bias();
+        for (int it = neurons_count - output_size; it < neurons_count; ++it) {
             layers[it].set_bias(output_bias_vec[it - neurons_count + output_size]);
         }
         delete[] layer_addresses;

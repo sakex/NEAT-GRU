@@ -11,7 +11,7 @@ int Train::Constants::MAX_LAYERS = 0;
 int Train::Constants::MAX_PER_LAYER = 0;
 
 namespace Train {
-    Train::Train(Game::Game *_game, int _iterations, int _max_individuals,
+    Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species,
                  int _max_layers, int _max_per_layer, int inputs, int outputs) :
             best_historical_topology{Topology_ptr{nullptr}}, brains{nullptr} {
         game = _game;
@@ -19,18 +19,20 @@ namespace Train {
         inputs_count = inputs;
         outputs_count = outputs;
         max_individuals = _max_individuals;
+        max_species = _max_species;
         Constants::MAX_LAYERS = _max_layers;
         Constants::MAX_PER_LAYER = _max_per_layer;
         random_new_species();
     }
 
-    Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_layers, int _max_per_layer,
+    Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species, int _max_layers, int _max_per_layer,
                  int inputs, int outputs, Topology_ptr top) :
             game(_game), best_historical_topology{std::move(top)}, brains{nullptr} {
         iterations = _iterations;
         inputs_count = inputs;
         outputs_count = outputs;
         max_individuals = _max_individuals;
+        max_species = _max_species;
         Constants::MAX_LAYERS = _max_layers;
         Constants::MAX_PER_LAYER = _max_per_layer;
         Species_ptr new_species = std::make_unique<Species>();
@@ -206,17 +208,17 @@ namespace Train {
     void Train::extinct_species() {
         int species_size = species.size();
         std::cout << "SPECIES SIZE BEFORE CUT: " << species_size << std::endl;
-        int const new_count = 20;
+        int const new_count = std::min(max_species, species_size);
         if (species_size > new_count) {
             std::sort(species.begin(), species.end(), [](Species_ptr &spec1, Species_ptr &spec2) -> bool {
                 return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
             });
             int const cut_at = species_size - new_count;
-            int const new_max = max_individuals / new_count;
             species.erase(species.begin(), species.begin() + cut_at);
-            for (Species_ptr &spec: species) {
-                spec->set_max_individuals(new_max);
-            }
+        }
+        int const new_max = max_individuals / new_count;
+        for (Species_ptr &spec: species) {
+            spec->set_max_individuals(new_max);
         }
     }
 
