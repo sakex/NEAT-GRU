@@ -88,19 +88,19 @@ namespace NeuralNetwork {
     }
 
     __device__ void Neuron::increment_input(const double inc_value) {
-        atomicAdd(&input, inc_value);
+        atomicAdd((float*)&input, (float)inc_value);
     }
 
     __device__ void Neuron::increment_update(const double inc_value) {
-        atomicAdd(&update, inc_value);
+        atomicAdd((float*)&update, (float)inc_value);
     }
 
     __device__ void Neuron::increment_memory(const double inc_value) {
-        atomicAdd(&memory, inc_value);
+        atomicAdd((float*)&memory, (float)inc_value);
     }
 
     __device__ void Neuron::increment_reset(const double inc_value) {
-        atomicAdd(&reset, inc_value);
+        atomicAdd((float*)&reset, (float)inc_value);
     }
 
     __device__  void Neuron::set_value(double new_value) {

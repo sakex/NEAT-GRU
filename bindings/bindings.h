@@ -41,6 +41,22 @@ void reset_network_state(NN *net);
 NN *network_from_string(char const *serialized);
 
 /**
+ * Generate a neural network from a topology pointer
+ *
+ * @param topology - Pointer to a topology to convert
+ * @return - Pointer to a neural network on the heap
+ */
+NN *network_from_topology(Topology *topology);
+
+/**
+ * Serializes a topology pointer to string
+ *
+ * @param topology - Topology pointer to be serialized
+ * @return - A c string representing the serialized topology
+ */
+char * topology_to_string(Topology * topology);
+
+/**
  * Binding to call Train::fit
  *
  * @param sim Simulation to run

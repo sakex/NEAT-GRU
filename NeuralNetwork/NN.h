@@ -27,7 +27,7 @@ namespace NeuralNetwork {
          * Constructor with a topology as input
          * @param topology Topology from which we create the Neural Network
          */
-        explicit NN(Topology_ptr const &topology);
+        explicit NN(Topology &topology);
 
         ~NN();
 
@@ -43,7 +43,7 @@ namespace NeuralNetwork {
          * Inits the Network from a topology
          * @param topology The input topology
          */
-        void init_topology(Topology_ptr const &topology);
+        void init_topology(Topology &topology);
 
         /// Resets the hidden state to 0
         void reset_state();

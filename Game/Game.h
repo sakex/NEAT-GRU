@@ -42,9 +42,10 @@ namespace Game {
         /**
          * Action to run after the training is done
          *
-         * @param network The network of the best historical topology
+         * @param history The historic of the best topologies
+         * @param size The size of the array of history
          */
-        void post_training(NN* network);
+        void post_training(Topology const * history, size_t size);
 
     private:
 
@@ -66,9 +67,10 @@ namespace Game {
         /**
          * Function to be implemented for the action to be run after the training
          *
-         * @param network The network of the best historical topology
+         * @param history The historic of the best topologies
+         * @param size The size of the array of history
          */
-        virtual void do_post_training(NN* network) = 0;
+        virtual void do_post_training(Topology const * history, size_t size) = 0;
 
     };
 }

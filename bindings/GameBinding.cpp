@@ -20,6 +20,6 @@ std::vector<double> GameBinding::do_run_generation() {
     return ret;
 }
 
-void GameBinding::do_post_training(NN * network) {
-    (*sim->post_training)(sim->context, network);
+void GameBinding::do_post_training(Topology const * history, size_t size) {
+    (*sim->post_training)(sim->context, history, sizeof(Topology), size);
 }

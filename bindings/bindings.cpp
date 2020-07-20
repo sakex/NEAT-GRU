@@ -8,8 +8,20 @@ NN *network_from_string(char const *serialized) {
     using json = nlohmann::json;
     json j = json::parse(serialized);
     Topology_ptr topology = std::make_unique<Topology>(TopologyParser::parse(j));
-    auto *net = new NN(topology);
+    auto *net = new NN(*topology);
     return net;
+}
+
+NN *network_from_topology(Topology *topology) {
+    auto *net = new NN(*topology);
+    return net;
+}
+
+char * topology_to_string(Topology * topology) {
+    std::string serialized = topology->parse_to_string();
+    char * out = (char*)malloc(sizeof(char)*serialized.length());
+    for(size_t i = 0; i < sizeof(out); ++i) out[i] = serialized[i];
+    return out;
 }
 
 void fit(void *s, int const iterations, int const max_individuals, int const max_species, int const max_layers,

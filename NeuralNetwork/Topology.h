@@ -127,6 +127,14 @@ namespace NeuralNetwork {
         void new_generation(size_t children_count,
                             std::vector<std::shared_ptr<Topology>> &output);
 
+
+        /**
+         * Serializes the topology to string
+         *
+         * @return - A string containing the serialized topology
+         */
+        std::string parse_to_string() const override;
+
     private:
         // Data
         int layers = 0;
@@ -210,9 +218,6 @@ namespace NeuralNetwork {
                                  Phenotype::point const &output);
 
     private:
-        // Utils
-        std::string parse_to_string() const override;
-
         /**
          * Util to run over the phenotypes
          * @param cb The callback to run over all the phenotypes

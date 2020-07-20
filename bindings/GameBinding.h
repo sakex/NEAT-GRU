@@ -36,8 +36,13 @@ private:
      */
     std::vector<double> do_run_generation() override;
 
-    /// Empty body for now
-    void do_post_training(NN *network) override;
+    /**
+     * Action to run at the end of the training period
+     *
+     * @param history - Historically best topologies
+     * @param size - Size of the topologies
+     */
+    void do_post_training(Topology const * history, size_t size) override;
 
 private:
     /// The simulation to be run

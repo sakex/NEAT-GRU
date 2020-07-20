@@ -20,6 +20,7 @@ namespace Train {
         outputs_count = outputs;
         max_individuals = _max_individuals;
         max_species = _max_species;
+        history.reserve(_iterations);
         Constants::MAX_LAYERS = _max_layers;
         Constants::MAX_PER_LAYER = _max_per_layer;
         random_new_species();
@@ -33,6 +34,7 @@ namespace Train {
         outputs_count = outputs;
         max_individuals = _max_individuals;
         max_species = _max_species;
+        history.reserve(_iterations);
         Constants::MAX_LAYERS = _max_layers;
         Constants::MAX_PER_LAYER = _max_per_layer;
         Species_ptr new_species = std::make_unique<Species>();
@@ -172,7 +174,7 @@ namespace Train {
         delete[] brains;
         brains = new NN[size]();
         for (size_t it = 0; it < size; ++it) {
-            brains[it].init_topology(last_topologies[it]);
+            brains[it].init_topology(*last_topologies[it]);
         }
         game->reset_players(brains, size);
         std::cout << "SPECIES: " << species.size() <<
@@ -191,7 +193,7 @@ namespace Train {
                 auto lambda = [&topology, &new_species, &mutex](Topology_ptr &other) {
                     if(other->is_assigned()) return;
                     double const delta = Topology::delta_compatibility(*topology, *other);
-                    if (delta <= 3.) {
+                    if (delta <= 2.) {
                         other->set_assigned(true);
                         mutex.lock();
                         *new_species >> other;
@@ -243,7 +245,7 @@ namespace Train {
     void Train::update_best() {
         Topology_ptr best = nullptr;
         Topology_ptr worst = nullptr;
-        double max = std::numeric_limits<double>::min();
+        double max = -std::numeric_limits<double>::max();
         double min = std::numeric_limits<double>::max();
 
         std::vector<Topology_ptr> topologies = topologies_vector();
@@ -268,6 +270,7 @@ namespace Train {
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
             best_historical_topology = best;
+            history.emplace_back(*best);
         }
 
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "
@@ -276,10 +279,9 @@ namespace Train {
     }
 
     void Train::post_training() const {
-        Serializer::to_file(best_historical_topology->to_string(), "topology.json");
-        auto *net = new NN(best_historical_topology);
-        game->post_training(net);
-        delete net;
+        /*Serializer::to_file(best_historical_topology->to_string(), "topology.json");
+        auto *net = new NN(*best_historical_topology);*/
+        game->post_training(history.data(), history.size());
     }
 
 

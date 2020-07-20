@@ -21,6 +21,7 @@ typedef struct Simulation {
      *
      * @param cont Context to call the method on
      * @param networks New neural networks for the next generation
+     * @param ptr_size Size of a NN
      * @param size Number of networks passed
      */
     void (*reset_players)(void *cont, void *networks, unsigned ptr_size, unsigned size);
@@ -28,9 +29,10 @@ typedef struct Simulation {
     /**
      *
      * @param cont Context to call the method on
-     * @param network The best historical network to run the post training on
+     * @param ptr_size Size of a topology
+     * @param history The best historical topologies
      */
-    void (*post_training)(void *cont, NN * network);
+    void (*post_training)(void *cont, Topology const * history, unsigned ptr_size, size_t size);
 
     /// Optional field, if a context has to be kept
     void *context;

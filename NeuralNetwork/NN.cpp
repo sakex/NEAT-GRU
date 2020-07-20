@@ -176,7 +176,7 @@ namespace NeuralNetwork {
                layers{nullptr} {
     }
 
-    NN::NN(Topology_ptr const &topology) : neurons_count(0),
+    NN::NN(Topology &topology) : neurons_count(0),
                                            layer_count(0),
                                            input_size(0),
                                            output_size(0),
@@ -192,9 +192,9 @@ namespace NeuralNetwork {
         delete[] layers;
     }
 
-    void NN::init_topology(Topology_ptr const &topology) {
-        layer_count = topology->get_layers();
-        std::vector<int> const &sizes = topology->get_layers_size();
+    void NN::init_topology(Topology &topology) {
+        layer_count = topology.get_layers();
+        std::vector<int> const &sizes = topology.get_layers_size();
         int *layer_addresses = new int[layer_count];
         neurons_count = 0;
         int i = 0;
@@ -205,7 +205,7 @@ namespace NeuralNetwork {
         input_size = sizes[0];
         output_size = sizes.back();
         layers = new Neuron[neurons_count]();
-        Topology::relationships_map &relationships = topology->get_relationships();
+        Topology::relationships_map &relationships = topology.get_relationships();
         for (auto &it : relationships) {
             Neuron *input_neuron_ptr = &layers[layer_addresses[it.first[0]] + it.first[1]];
             input_neuron_ptr->set_bias(it.second.bias);
@@ -224,7 +224,7 @@ namespace NeuralNetwork {
                                                  update_input_weight, reset_memory_weight, update_memory_weight);
             }
         }
-        std::vector<Bias> const &output_bias_vec = topology->get_output_bias();
+        std::vector<Bias> const &output_bias_vec = topology.get_output_bias();
         for (int it = neurons_count - output_size; it < neurons_count; ++it) {
             layers[it].set_bias(output_bias_vec[it - neurons_count + output_size]);
         }

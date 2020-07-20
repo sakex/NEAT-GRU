@@ -146,6 +146,7 @@ namespace Train {
         /// Action to be executed after the training
         void post_training() const;
 
+        std::vector<Topology> history;
     };
 }
 
