@@ -17,10 +17,10 @@ NN *network_from_topology(Topology *topology) {
     return net;
 }
 
-char * topology_to_string(Topology * topology) {
+char *topology_to_string(Topology *topology) {
     std::string serialized = topology->parse_to_string();
-    char * out = (char*)malloc(sizeof(char)*serialized.length());
-    for(size_t i = 0; i < sizeof(out); ++i) out[i] = serialized[i];
+    char *out = (char *) malloc(sizeof(char) * serialized.length());
+    strcpy(out, serialized.c_str());
     return out;
 }
 
