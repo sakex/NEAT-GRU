@@ -109,7 +109,8 @@ namespace NeuralNetwork {
                     connections
             };
         }
-        output_bias = base.output_bias;
+        output_bias.reserve(base.output_bias.size());
+        for(auto const & bias: base.output_bias) output_bias.emplace_back(bias);
     }
 
     Topology::~Topology() {

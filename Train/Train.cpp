@@ -122,7 +122,7 @@ namespace Train {
                     break;
                 }
             }
-            if(it % 10 == 0)
+            if(it % 20 == 0)
                 reset_species();
             utils::Timer selection_timer("NATURAL SELECTION");
             natural_selection();
@@ -269,8 +269,9 @@ namespace Train {
         if (best_historical_topology == nullptr
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
+            best_historical_topology = best;
             Topology best_copy(*best);
-            history.push_back(best_copy);
+            history.push_back(std::move(best_copy));
         }
 
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "
