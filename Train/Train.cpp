@@ -269,8 +269,8 @@ namespace Train {
         if (best_historical_topology == nullptr
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
-            best_historical_topology = best;
-            history.emplace_back(*best);
+            Topology best_copy(*best);
+            history.push_back(best_copy);
         }
 
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "
