@@ -7,8 +7,8 @@
 
 #include "Topology.h"
 
-#define MAX_ITERATIONS 10
-#define MAX_UNFRUITFUL 10
+#define MAX_ITERATIONS 0
+#define MAX_UNFRUITFUL 0
 
 namespace NeuralNetwork {
 
