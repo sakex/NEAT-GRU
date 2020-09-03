@@ -32,7 +32,7 @@
 #include "../NeuralNetwork/NN.h"
 #endif
 
-/// Namespace that solely countains the Train class
+/// Namespace that solely contains the Train class
 namespace Train {
     using namespace NeuralNetwork;
 
@@ -75,9 +75,6 @@ namespace Train {
 
         /// Starts training
         void start();
-
-    public:
-        Topology_ptr get_best() const;
 
     private:
         // Members

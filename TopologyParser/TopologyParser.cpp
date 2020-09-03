@@ -9,10 +9,10 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
     Topology topology;
     int max_layers = 0;
 
-    std::vector<Phenotype *> new_phenotypes;
+    std::vector<Gene *> new_genes;
     for (auto &it : j["phenotypes"]) {
-        Phenotype::point input = {it["input"][0], it["input"][1]};
-        Phenotype::point output = {it["output"][0], it["output"][1]};
+        Gene::point input = {it["input"][0], it["input"][1]};
+        Gene::point output = {it["output"][0], it["output"][1]};
         if (output[0] > max_layers)
             max_layers = output[0];
         double const input_weight = it["input_weight"];
@@ -22,13 +22,13 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
         double const reset_memory_weight = it["reset_memory_weight"];
         double const update_memory_weight = it["update_memory_weight"];
         bool disabled = it["disabled"];
-        new_phenotypes.push_back(
-                new Phenotype(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight,
-                              reset_memory_weight,
-                              update_memory_weight, disabled, 0));
+        new_genes.push_back(
+                new Gene(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight,
+                         reset_memory_weight,
+                         update_memory_weight, disabled, 0));
     }
     topology.set_layers(max_layers + 1);
-    for (Phenotype *phen_ptr : new_phenotypes) {
+    for (Gene *phen_ptr : new_genes) {
         topology.add_relationship(phen_ptr, true);
     }
     for (auto &it : j["biases"]) {

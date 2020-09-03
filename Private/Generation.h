@@ -11,19 +11,19 @@
 #include <unordered_map>
 #include <string>
 #include <mutex>
-#include "Phenotype.h"
+#include "Gene.h"
 
 namespace NeuralNetwork {
 
     class Generation {
     public:
-        static long number(Phenotype::coordinate const &);
+        static long number(Gene::coordinate const &);
 
         static void reset();
 
     private:
         static long _counter;
-        static std::unordered_map<Phenotype::coordinate, long> evolutions;
+        static std::unordered_map<Gene::coordinate, long> evolutions;
         static std::mutex mutex;
     };
 

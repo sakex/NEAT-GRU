@@ -209,15 +209,15 @@ namespace NeuralNetwork {
         for (auto &it : relationships) {
             Neuron *input_neuron_ptr = &layers[layer_addresses[it.first[0]] + it.first[1]];
             input_neuron_ptr->set_bias(it.second.bias);
-            input_neuron_ptr->set_connections_count(it.second.phenotypes.size());
-            for (Phenotype *phenotype : it.second.phenotypes) {
-                Phenotype::point output = phenotype->get_output();
-                double const input_weight = phenotype->get_input_weight();
-                double const update_input_weight = phenotype->get_update_input_weight();
-                double const memory_weight = phenotype->get_memory_weight();
-                double const reset_input_weight = phenotype->get_reset_input_weight();
-                double const reset_memory_weight = phenotype->get_reset_memory_weight();
-                double const update_memory_weight = phenotype->get_update_memory_weight();
+            input_neuron_ptr->set_connections_count(it.second.genes.size());
+            for (Gene *gene : it.second.genes) {
+                Gene::point output = gene->get_output();
+                double const input_weight = gene->get_input_weight();
+                double const update_input_weight = gene->get_update_input_weight();
+                double const memory_weight = gene->get_memory_weight();
+                double const reset_input_weight = gene->get_reset_input_weight();
+                double const reset_memory_weight = gene->get_reset_memory_weight();
+                double const update_memory_weight = gene->get_update_memory_weight();
 
                 Neuron *output_neuron_ptr = &layers[layer_addresses[output[0]] + output[1]];
                 input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
@@ -231,8 +231,8 @@ namespace NeuralNetwork {
         delete[] layer_addresses;
     }
 
-    inline double *NN::compute(const double *inputs_vector) {
-        set_inputs(inputs_vector);
+    inline double *NN::compute(const double *inputs_array) {
+        set_inputs(inputs_array);
         for (int it = 0; it < neurons_count - output_size; ++it) {
             layers[it].feed_forward();
         }

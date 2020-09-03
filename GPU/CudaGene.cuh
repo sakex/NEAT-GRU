@@ -2,11 +2,11 @@
 // Created by alexandre on 16.06.20.
 //
 
-#ifndef NEAT_GRU_CUDAPHENOTYPE_CUH
-#define NEAT_GRU_CUDAPHENOTYPE_CUH
+#ifndef NEAT_GRU_CUDAGENE_CUH
+#define NEAT_GRU_CUDAGENE_CUH
 
 
-struct CUDAPhenotype {
+struct CUDAGene {
     double const input_weight;
     double const memory_weight;
     double const reset_input_weight;
@@ -22,4 +22,4 @@ struct CUDAConnectionCount {
     size_t count;
 };
 
-#endif //NEAT_GRU_CUDAPHENOTYPE_CUH
+#endif //NEAT_GRU_CUDAGENE_CUH

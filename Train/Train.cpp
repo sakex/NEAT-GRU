@@ -67,7 +67,7 @@ namespace Train {
             Topology_ptr initial_topology = std::make_shared<Topology>();
             initial_topology->set_layers(2);
             for (int i = 0; i < inputs_count; ++i) {
-                Phenotype::point input = {0, i};
+                Gene::point input = {0, i};
                 double input_weight = Random::random_between(-100, 100) / 100.0f;
                 double const memory_weight = Random::random_between(-100, 100) / 100.0f;
                 double const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
@@ -78,13 +78,13 @@ namespace Train {
                 for (int j = 0; j < connections_per_input; ++j) {
                     int index = not_added[not_added_it];
                     ++not_added_it;
-                    Phenotype::point output = {1, index};
-                    Phenotype::coordinate coordinate = {input, output};
-                    auto *phenotype = new Phenotype(input, input_weight, memory_weight, reset_input_weight,
-                                                    update_input_weight, reset_memory_weight, update_memory_weight,
-                                                    Generation::number(coordinate));
-                    phenotype->set_output(1, index);
-                    initial_topology->add_relationship(phenotype, true);
+                    Gene::point output = {1, index};
+                    Gene::coordinate coordinate = {input, output};
+                    auto *gene = new Gene(input, input_weight, memory_weight, reset_input_weight,
+                                               update_input_weight, reset_memory_weight, update_memory_weight,
+                                               Generation::number(coordinate));
+                    gene->set_output(1, index);
+                    initial_topology->add_relationship(gene, true);
                 }
                 initial_topology->generate_output_bias();
             }
@@ -285,8 +285,4 @@ namespace Train {
         game->post_training(history.data(), history.size());
     }
 
-
-    Topology_ptr Train::get_best() const {
-        return best_historical_topology;
-    }
 }

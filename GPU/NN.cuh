@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <iostream>
-#include "CudaPhenotype.cuh"
+#include "CudaGene.cuh"
 #include "../NeuralNetwork/Topology.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -24,13 +24,14 @@ namespace NeuralNetwork {
     class NN {
     public:
         static size_t current_id;
+
         NN();
 
         /**
          * Constructor with a topology as input
          * @param topology Topology from which we create the Neural Network
          */
-        explicit NN(Topology_ptr const &topology);
+        explicit NN(Topology &topology);
 
         virtual ~NN();
 
@@ -40,22 +41,29 @@ namespace NeuralNetwork {
          * @param inputs_vector C double array of inputs
          * @return a vector of weights
          */
-        double *compute(const double *inputs_vector);
+        __device__ double *compute(
+                const double *inputs_vector,
+                size_t from,
+                size_t to,
+                size_t output_size,
+                double *out,
+                size_t write_from
+        );
 
         /**
          * Inits the Network from a topology
          * @param topology The input topology
          */
-        void init_topology(Topology_ptr const &topology);
+        void init_topology(Topology &topology);
 
         /// Resets the hidden state to 0
-        void reset_state();
+        __device__ void reset_state();
 
     private:
         int neurons_count;
         Neuron *layers;
         int layer_count;
-        int * layer_addresses;
+        int *layer_addresses;
         cudaStream_t stream;
         size_t id;
 
@@ -64,7 +72,7 @@ namespace NeuralNetwork {
          * Sets the inputs on the first layer
          * @param inputs_vector Array of doubles to initiate the inputs
          */
-        void set_inputs(const double *inputs_vector);
+        __device__ void set_inputs(const double *inputs_vector, size_t from, size_t to);
 
         /// Delete data
         void delete_layers();

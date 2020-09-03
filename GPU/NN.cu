@@ -8,24 +8,11 @@
 #include "Connection.cuh"
 
 namespace NeuralNetwork {
-    __device__ Connection::Connection(double const _input_weight, double const _memory_weight,
-                                      double const riw,
-                                      double const rmw,
-                                      double const uiw, double const umw, Neuron *output) :
-            input_weight(_input_weight),
-            memory_weight(_memory_weight),
-            reset_input_weight(riw),
-            reset_memory_weight(rmw),
-            update_input_weight(uiw),
-            update_memory_weight(umw),
-            output{output} {
-    }
-
     __device__ void Connection::init(double const _input_weight, double const _memory_weight, double const riw,
                                      double const rmw,
                                      double const uiw, double const umw, Neuron *_output) {
-        memory = 0;
-        prev_input = 0.;
+        memory = 0.f;
+        prev_input = 0.f;
         input_weight = _input_weight;
         memory_weight = _memory_weight;
         reset_input_weight = riw;
@@ -39,14 +26,20 @@ namespace NeuralNetwork {
         double const prev_reset = output->get_prev_reset();
         memory = prev_input * input_weight + memory_weight * prev_reset * memory;
         prev_input = value;
-        output->increment_memory(memory * memory_weight);
-        output->increment_input(value * input_weight);
-        output->increment_reset(value * reset_input_weight + memory * reset_memory_weight);
-        output->increment_update(value * update_memory_weight + memory * update_memory_weight);
+
+        double const update_mem = memory * memory_weight;
+        output->increment_state(update_mem,
+                                value * input_weight,
+                                value * reset_input_weight + memory * reset_memory_weight,
+                                value * update_input_weight + memory * update_memory_weight);
+
+    }
+
+    __device__ inline void Connection::reset_state() {
+        memory = 0.f;
+        prev_input = 0.f;
     }
 }
-
-#include "Neuron.cuh"
 
 namespace NeuralNetwork {
     __device__ inline double fast_sigmoid(double const value) {
@@ -83,42 +76,16 @@ namespace NeuralNetwork {
         last_connection_added = 0;
     }
 
-    __device__ void Neuron::set_connections_count(size_t const value) {
-        connections = new Connection[value];
-    }
-
-    __device__ void Neuron::increment_input(const double inc_value) {
-        atomicAdd((float*)&input, (float)inc_value);
-    }
-
-    __device__ void Neuron::increment_update(const double inc_value) {
-        atomicAdd((float*)&update, (float)inc_value);
-    }
-
-    __device__ void Neuron::increment_memory(const double inc_value) {
-        atomicAdd((float*)&memory, (float)inc_value);
-    }
-
-    __device__ void Neuron::increment_reset(const double inc_value) {
-        atomicAdd((float*)&reset, (float)inc_value);
-    }
-
-    __device__  void Neuron::set_value(double new_value) {
-        input = new_value;
+    __device__ inline void
+    Neuron::increment_state(double const mem, double const inp, double const res, double const upd) {
+        memory += mem;
+        input += inp;
+        reset += res;
+        update += upd;
     }
 
     __device__ double Neuron::get_prev_reset() const {
         return prev_reset;
-    }
-
-    __device__ double Neuron::compute_value() {
-        const double update_gate = fast_sigmoid(update);
-        const double reset_gate = fast_sigmoid(reset);
-        const double current_memory = fast_tanh(input + memory * reset_gate);
-        const double value = update_gate * memory + (1.f - update_gate) * current_memory;
-        prev_reset = reset_gate;
-        reset_value();
-        return value;
     }
 
     __device__ void Neuron::reset_value() {
@@ -145,6 +112,31 @@ namespace NeuralNetwork {
         delete[]connections;
         connections = nullptr;
     }
+
+    __device__ inline void Neuron::set_connections_count(size_t count) {
+        connections = new Connection[count]();
+    }
+
+    __device__ inline void Neuron::feed_forward() {
+        double const update_gate = fast_sigmoid(update);
+        double const reset_gate = fast_sigmoid(reset);
+
+        const double current_memory = fast_tanh(input + memory * reset_gate);
+        const double value = update_gate * memory + (1.f - update_gate) * current_memory;
+        for (int i = 0; i < last_connection_added; ++i) {
+            connections[i].activate(value);
+        }
+        prev_reset = reset_gate;
+        reset_value();
+    }
+
+    __device__ inline void Neuron::reset_state() {
+        reset_value();
+        prev_reset = 0.;
+        for (int i = 0; i < last_connection_added; ++i) {
+            connections[i].reset_state();
+        }
+    }
 }
 
 namespace NeuralNetwork {
@@ -158,24 +150,36 @@ namespace NeuralNetwork {
             layer_count(0),
             layer_addresses{nullptr} {
         id = current_id++;
-        cudaStreamCreate(&stream);
+        cudaError_t err = cudaStreamCreate(&stream);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
     }
 
-    NN::NN(Topology_ptr const &topology) :
+    NN::NN(Topology &topology) :
             stream{nullptr},
             neurons_count(0),
             layers(nullptr),
             layer_count(0),
             layer_addresses{nullptr} {
         id = current_id++;
-        cudaStreamCreate(&stream);
+        cudaError_t err = cudaStreamCreate(&stream);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
         init_topology(topology);
     }
 
     NN::~NN() {
         delete[] layer_addresses;
         delete_layers();
-        cudaStreamDestroy(stream);
+        cudaError_t err = cudaStreamDestroy(stream);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
     }
 
     __global__ void free_connections_kernel(Neuron *neurons) {
@@ -185,7 +189,11 @@ namespace NeuralNetwork {
 
     void NN::delete_layers() {
         free_connections_kernel<<<1, neurons_count, id, stream>>>(layers);
-        cudaFree(layers);
+        cudaError_t err = cudaFree(layers);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
     }
 
     __global__ void init_kernel(Neuron *neurons) {
@@ -200,9 +208,9 @@ namespace NeuralNetwork {
         input_neuron_ptr->set_connections_count(count->count);
     }
 
-    __global__ void connect_neurons_kernel(Neuron *layers, CUDAPhenotype *phenotypes, size_t N) {
+    __global__ void connect_neurons_kernel(Neuron *layers, CUDAGene *genes, size_t N) {
         for (size_t it = 0; it < N; ++it) {
-            CUDAPhenotype *phen = &phenotypes[it];
+            CUDAGene *phen = &genes[it];
             Neuron *input_neuron_ptr = &layers[phen->input_pos];
             Neuron *output_neuron_ptr = &layers[phen->output_pos];
 
@@ -217,9 +225,9 @@ namespace NeuralNetwork {
         }
     }
 
-    void NN::init_topology(Topology_ptr const &topology) {
-        layer_count = topology->get_layers();
-        std::vector<int> const &sizes = topology->get_layers_size();
+    void NN::init_topology(Topology &topology) {
+        layer_count = topology.get_layers();
+        std::vector<int> const &sizes = topology.get_layers_size();
         layer_addresses = new int[layer_count + 1];
         neurons_count = 0;
         int i = 0;
@@ -228,123 +236,212 @@ namespace NeuralNetwork {
             neurons_count += sizes[i];
         }
         layer_addresses[i] = neurons_count;
-        cudaMalloc(&layers, sizeof(Neuron) * neurons_count);
+        cudaError_t err = cudaMalloc(&layers, sizeof(Neuron) * neurons_count);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
         init_kernel<<<1, neurons_count, id, stream>>>(layers);
-        Topology::relationships_map &relationships = topology->get_relationships();
-        std::vector<CUDAPhenotype> phenotype_vec;
+        Topology::relationships_map &relationships = topology.get_relationships();
+        std::vector<CUDAGene> gene_vec;
         std::vector<CUDAConnectionCount> connection_counts;
 
         for (auto &it : relationships) {
             connection_counts.push_back({layer_addresses[it.first[0]] + it.first[1],
-                                         it.second.phenotypes.size()}
+                                         it.second.genes.size()}
             );
 
-            for (Phenotype *phenotype : it.second.phenotypes) {
-                if (phenotype->is_disabled()) {
+            for (Gene *gene : it.second.genes) {
+                if (gene->is_disabled()) {
                     continue;
                 }
-                Phenotype::point input = phenotype->get_input();
-                Phenotype::point output = phenotype->get_output();
-                phenotype_vec.push_back({
-                                                phenotype->get_input_weight(),
-                                                phenotype->get_memory_weight(),
-                                                phenotype->get_reset_input_weight(),
-                                                phenotype->get_reset_memory_weight(),
-                                                phenotype->get_update_input_weight(),
-                                                phenotype->get_update_memory_weight(),
-                                                layer_addresses[input[0]] + input[1],
-                                                layer_addresses[output[0]] + output[1]
-                                        });
+                Gene::point input = gene->get_input();
+                Gene::point output = gene->get_output();
+                gene_vec.push_back({
+                                           gene->get_input_weight(),
+                                           gene->get_memory_weight(),
+                                           gene->get_reset_input_weight(),
+                                           gene->get_reset_memory_weight(),
+                                           gene->get_update_input_weight(),
+                                           gene->get_update_memory_weight(),
+                                           layer_addresses[input[0]] + input[1],
+                                           layer_addresses[output[0]] + output[1]
+                                   });
             }
         }
         CUDAConnectionCount *device_counts;
-        cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
+        err = cudaMalloc(&device_counts, sizeof(CUDAConnectionCount) * connection_counts.size());
 
-        cudaMemcpyAsync(device_counts, connection_counts.data(),
-                        sizeof(CUDAConnectionCount) * connection_counts.size(),
-                        cudaMemcpyHostToDevice, stream);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
+
+        err = cudaMemcpyAsync(device_counts, connection_counts.data(),
+                              sizeof(CUDAConnectionCount) * connection_counts.size(),
+                              cudaMemcpyHostToDevice, stream);
+
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
 
         set_connections_kernel<<<1, connection_counts.size(), id, stream>>>(layers, device_counts);
 
-        cudaFree(device_counts);
+        err = cudaFree(device_counts);
 
-
-        CUDAPhenotype *device_phenotypes;
-        cudaMalloc(&device_phenotypes, sizeof(CUDAPhenotype) * phenotype_vec.size());
-        cudaMemcpyAsync(device_phenotypes, phenotype_vec.data(), sizeof(CUDAPhenotype) * phenotype_vec.size(),
-                        cudaMemcpyHostToDevice, stream);
-        connect_neurons_kernel<<<1, 1, id, stream>>>(layers, device_phenotypes, phenotype_vec.size());
-        cudaFree(device_phenotypes);
-    }
-
-    __global__ void ff_connections(Connection *connections, double const value) {
-        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
-        connections[tid].activate(value);
-    }
-
-    __global__ void feed_forward_kernel(Neuron *layer, int from) {
-        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
-        Neuron *n = &layer[from + tid];
-        double const value = n->compute_value();
-        ff_connections<<<1, n->last_connection_added>>>(n->connections, value);
-    }
-
-    __global__ void get_result_kernel(Neuron *layer, double *arr, int from) {
-        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
-        arr[tid] = layer[from + tid].get_value();
-        layer[from + tid].set_value(0);
-    }
-
-
-    double *NN::compute(const double *inputs_array) {
-        set_inputs(inputs_array);
-        size_t pos = 0;
-
-        for (; pos < layer_count - 1; ++pos) {
-            int from = layer_addresses[pos];
-            int to = layer_addresses[pos + 1];
-            int distance = to - from;
-            feed_forward_kernel<<<1, distance, id, stream>>>(layers, from);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
         }
 
-        int from = layer_addresses[pos];
-        int to = layer_addresses[pos + 1];
-        int distance = to - from;
+        CUDAGene *device_genes;
+        err = cudaMalloc(&device_genes, sizeof(CUDAGene) * gene_vec.size());
 
-        auto *output = new double[distance];
-        double *dev_output;
-        cudaMalloc(&dev_output, distance * sizeof(double));
-        get_result_kernel<<<1, distance, id, stream>>>(layers, dev_output, from);
-        cudaStreamSynchronize(stream);
-        cudaMemcpyAsync(output, dev_output, distance * sizeof(double), cudaMemcpyDeviceToHost, stream);
-        cudaFree(dev_output);
-        return output;
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
+
+        err = cudaMemcpyAsync(device_genes, gene_vec.data(), sizeof(CUDAGene) * gene_vec.size(),
+                              cudaMemcpyHostToDevice, stream);
+
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
+
+        connect_neurons_kernel<<<1, 1, id, stream>>>(layers, device_genes, gene_vec.size());
+        err = cudaFree(device_genes);
+
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
     }
 
-    void NN::reset_state() {
-        /*for (int it = 0; it < layer_count; ++it) {
-            for (size_t j = 0; j < layers[it].size(); ++j) {
-                layers[it][j]->reset_state();
-            }
-        }*/
+    __device__ double *NN::compute(const double *inputs_array,
+                                   size_t const from,
+                                   size_t const to,
+                                   size_t const output_size,
+                                   double *out,
+                                   size_t write_from) {
+        set_inputs(inputs_array, from, to);
+        for (int it = 0; it < neurons_count - output_size; ++it) {
+            layers[it].feed_forward();
+        }
+        for (size_t it = neurons_count - output_size; it < neurons_count; ++it) {
+            out[it - neurons_count + output_size] = layers[it].get_value();
+        }
+        // softmax(out, output_size);
+        return out;
     }
 
-    __global__ void set_input_kernel(Neuron *layer, double const *inputs) {
-        unsigned int tid = blockDim.x * blockIdx.x + threadIdx.x;
-        layer[tid].set_input_value(inputs[tid]);
+    __device__ void NN::reset_state() {
+        for (int it = 0; it < neurons_count; ++it) {
+            layers[it].reset_state();
+        }
     }
 
-    void NN::set_inputs(const double *inputs_array) {
-        int const from = layer_addresses[0];
-        int const to = layer_addresses[1];
-        int const distance = to - from;
-
-        double *dev_inputs;
-        cudaMalloc(&dev_inputs, distance * sizeof(double));
-        cudaMemcpyAsync(dev_inputs, inputs_array, distance * sizeof(double), cudaMemcpyHostToDevice, stream);
-
-        set_input_kernel<<<1, distance, id, stream>>>(layers, dev_inputs);
-        cudaFree(dev_inputs);
+    __device__ void NN::set_inputs(const double *inputs_array, size_t const from, size_t const to) {
+        for (int i = from; i < to; ++i) {
+            layers[i].set_input_value(inputs_array[i]);
+        }
     }
 
 } /* namespace NeuralNetwork */
+
+//
+// Created by alexandre on 03.09.20.
+//
+
+#include "ComputeInstance.cuh"
+
+ComputeInstance *create_compute_instance(Dim dim) {
+    return new ComputeInstance(dim);
+}
+
+ComputeInstance::ComputeInstance(Dim _dim) :
+        dim(_dim) {
+}
+
+
+void ComputeInstance::set_networks(NeuralNetwork::NN *nets, unsigned long int count) {
+    networks = nets;
+    networks_count = count;
+}
+
+void ComputeInstance::update_dataset(double *host_data) {
+    const unsigned int size = dim.x * dim.y * dim.z;
+    const unsigned int bytes = size * sizeof(double);
+
+    cudaError_t err;
+    if (data) {
+        err = cudaFree(data);
+        if (err) {
+            std::cout << cudaGetErrorString(err) << std::endl;
+            throw err;
+        }
+    }
+
+    err = cudaMalloc((double **) &data, bytes);
+    if (err) {
+        std::cout << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+    err = cudaMemcpy(data, host_data, bytes, cudaMemcpyHostToDevice);
+
+    if (err) {
+        std::cout << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+}
+
+__global__ void
+compute_kernel(Dim dim,
+               NeuralNetwork::NN *networks,
+               double *data,
+               const unsigned long int networks_count,
+               const unsigned long int output_size,
+               double *d_output) {
+    unsigned int id = blockDim.x * gridDim.x;
+    if (id < networks_count) {
+        NeuralNetwork::NN *net = &networks[id];
+        // Number of datasets
+        for (size_t i = 0; i < dim.z; ++i) {
+            // Size of each dataset
+            for (size_t j = 0; j < dim.y; ++j) {
+                size_t const from = j * dim.x + i * dim.y;
+                size_t const write_from = j * output_size + i * dim.y;
+                net->compute(data, from, from + dim.x, output_size, d_output, write_from);
+            }
+        }
+        net->reset_state();
+    }
+}
+
+void ComputeInstance::compute(const unsigned int output_size) {
+    const unsigned int size = dim.y * dim.z * output_size * networks_count;
+    const unsigned int bytes = size * sizeof(double);
+    h_output = (double *) malloc(bytes);
+    cudaError_t err = cudaMalloc((double **) &d_output, bytes);
+    if (err) {
+        std::cout << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+    compute_kernel<<<1, networks_count>>>(dim, networks, data, networks_count, output_size, d_output);
+    err = cudaMemcpy(h_output, d_output, bytes, cudaMemcpyDeviceToHost);
+    if (err) {
+        std::cout << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+    err = cudaFree(d_output);
+    if (err) {
+        std::cout << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+}
+
+double *ComputeInstance::get_output() const {
+    return h_output;
+}

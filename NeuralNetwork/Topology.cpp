@@ -17,7 +17,7 @@ namespace NeuralNetwork {
         // chapter 4.1
         double disjoints = 0, common = 0;
         double W = 0;
-        for (std::pair<long, Phenotype *> pair : top1.ev_number_index) {
+        for (std::pair<long, Gene *> pair : top1.ev_number_index) {
             auto search_second =
                     top2.ev_number_index.find(pair.first);
             if (search_second != top2.ev_number_index.end()) {
@@ -57,18 +57,18 @@ namespace NeuralNetwork {
         }
         Topology_ptr best_copy = std::make_shared<Topology>(*best);
         // Preloading
-        std::unordered_map<long, Phenotype *> &copy_ev_number_index = best_copy->ev_number_index;
-        for (std::pair<long, Phenotype *> pair : worst->ev_number_index) {
+        std::unordered_map<long, Gene *> &copy_ev_number_index = best_copy->ev_number_index;
+        for (std::pair<long, Gene *> pair : worst->ev_number_index) {
             auto search_best =
                     copy_ev_number_index.find(pair.first);
             if (search_best != copy_ev_number_index.end()) {
                 continue;
             }
-            auto *copied_phenotype = new Phenotype(*pair.second);
-            copied_phenotype->set_disabled(false);
-            best_copy->add_relationship(copied_phenotype);
-            best_copy->disable_phenotypes(copied_phenotype->get_input(), copied_phenotype->get_output());
-            best_copy->new_mutation(copied_phenotype, best_copy->last_result);
+            auto *copied_gene = new Gene(*pair.second);
+            copied_gene->set_disabled(false);
+            best_copy->add_relationship(copied_gene);
+            best_copy->disable_genes(copied_gene->get_input(), copied_gene->get_output());
+            best_copy->new_mutation(copied_gene, best_copy->last_result);
         }
         best_copy->generate_output_bias();
         return best_copy;
@@ -97,14 +97,14 @@ namespace NeuralNetwork {
         best_historical_result = 0;
         for (auto &it: base.relationships) {
             Bias const bias = it.second.bias;
-            std::vector<Phenotype *> connections;
-            connections.reserve(it.second.phenotypes.size());
-            for (Phenotype *phenotype: it.second.phenotypes) {
-                auto *copy = new Phenotype(*phenotype);
+            std::vector<Gene *> connections;
+            connections.reserve(it.second.genes.size());
+            for (Gene *gene: it.second.genes) {
+                auto *copy = new Gene(*gene);
                 connections.push_back(copy);
                 ev_number_index[copy->get_ev_number()] = copy;
             }
-            relationships[it.first] = PhenotypeAndBias{
+            relationships[it.first] = GeneAndBias{
                     bias,
                     connections
             };
@@ -114,10 +114,10 @@ namespace NeuralNetwork {
     }
 
     Topology::~Topology() {
-        phenotype_cb cb = [](Phenotype *phenotype) {
-            delete phenotype;
+        gene_cb cb = [](Gene *gene) {
+            delete gene;
         };
-        iterate_phenotypes(cb);
+        iterate_genes(cb);
         relationships.clear();
         ev_number_index.clear();
     }
@@ -126,8 +126,8 @@ namespace NeuralNetwork {
         for (auto const &pair: ev_number_index) {
             auto const search = comparison.ev_number_index.find(pair.first);
             bool const not_in = search == comparison.ev_number_index.end();
-            Phenotype *phen1 = pair.second;
-            Phenotype *phen2 = search->second;
+            Gene *phen1 = pair.second;
+            Gene *phen2 = search->second;
             bool const equal = *phen1 == *phen2;
             if (not_in || !equal) return false;
         }
@@ -158,20 +158,20 @@ namespace NeuralNetwork {
         return relationships;
     }
 
-    void Topology::add_relationship(Phenotype *phenotype, const bool init) {
-        if (phenotype->is_disabled()) return;
-        Phenotype::point input = phenotype->get_input();
-        Phenotype::point output = phenotype->get_output();
+    void Topology::add_relationship(Gene *gene, const bool init) {
+        if (gene->is_disabled()) return;
+        Gene::point input = gene->get_input();
+        Gene::point output = gene->get_output();
         if (input[1] + 1 > layers_size[input[0]]) {
             layers_size[input[0]] = input[1] + 1;
         }
         if (!init && output[0] == layers) {
             resize(output[0]);
-            phenotype->decrement_output();
+            gene->decrement_output();
         } else if (output[1] + 1 > layers_size[output[0]]) {
             layers_size[output[0]] = output[1] + 1;
         }
-        add_to_relationships_map(phenotype);
+        add_to_relationships_map(gene);
     }
 
     void Topology::set_assigned(bool _assigned) {
@@ -232,9 +232,9 @@ namespace NeuralNetwork {
         }
     }
 
-    void Topology::add_to_relationships_map(Phenotype *phenotype) {
+    void Topology::add_to_relationships_map(Gene *gene) {
         using utils::Random;
-        Phenotype::point input = phenotype->get_input();
+        Gene::point input = gene->get_input();
         auto iterator = relationships.find(input);
         Bias bias{
                 Random::random_between(-100, 100) / 100.0f,
@@ -243,28 +243,28 @@ namespace NeuralNetwork {
         };
         if (iterator != relationships.end()) {
             iterator->second.bias = bias;
-            iterator->second.phenotypes.push_back(phenotype);
+            iterator->second.genes.push_back(gene);
         } else {
-            relationships[input] = PhenotypeAndBias{
+            relationships[input] = GeneAndBias{
                     bias,
-                    std::vector<Phenotype *>{phenotype}
+                    std::vector<Gene *>{gene}
             };
         }
-        ev_number_index[phenotype->get_ev_number()] = phenotype;
+        ev_number_index[gene->get_ev_number()] = gene;
     }
 
-    void Topology::disable_phenotypes(Phenotype::point const &input,
-                                      Phenotype::point const &output) {
+    void Topology::disable_genes(Gene::point const &input,
+                                      Gene::point const &output) {
         auto iterator = relationships.find(input);
         if (iterator == relationships.end())
             return;
-        std::vector<Phenotype *> &base_vector = iterator->second.phenotypes;
-        Phenotype *&back = base_vector.back();
-        for (Phenotype *&it : base_vector) {
+        std::vector<Gene *> &base_vector = iterator->second.genes;
+        Gene *&back = base_vector.back();
+        for (Gene *&it : base_vector) {
             if (it == back || it->is_disabled()) {
                 continue;
             }
-            Phenotype::point compared_output = it->get_output();
+            Gene::point compared_output = it->get_output();
             if (output == compared_output || path_overrides(compared_output, output)
                 || path_overrides(output, compared_output)) {
                 it->disable();
@@ -272,17 +272,17 @@ namespace NeuralNetwork {
         }
     }
 
-    bool Topology::path_overrides(Phenotype::point const &input,
-                                  Phenotype::point const &output) {
+    bool Topology::path_overrides(Gene::point const &input,
+                                  Gene::point const &output) {
         auto iterator = relationships.find(input);
         if (iterator == relationships.end())
             return false;
-        std::vector<Phenotype *> base_vector = iterator->second.phenotypes;
-        for (Phenotype *it : base_vector) {
+        std::vector<Gene *> base_vector = iterator->second.genes;
+        for (Gene *it : base_vector) {
             if (it->is_disabled()) {
                 continue;
             }
-            Phenotype::point compared_output = it->get_output();
+            Gene::point compared_output = it->get_output();
             if (compared_output == output) {
                 return true;
             } else if (compared_output[0] <= output[0]) {
@@ -295,8 +295,8 @@ namespace NeuralNetwork {
 
     void Topology::resize(int const new_max) {
         for (auto &it : relationships) {
-            for (Phenotype *phenotype : it.second.phenotypes) {
-                phenotype->resize(new_max - 1, new_max);
+            for (Gene *gene : it.second.genes) {
+                gene->resize(new_max - 1, new_max);
             }
         }
         set_layers(new_max + 1);
@@ -305,20 +305,20 @@ namespace NeuralNetwork {
     Topology_ptr Topology::evolve() {
         using utils::Random;
         Topology_ptr new_topology = std::make_shared<Topology>(*this);
-        std::vector<Phenotype *> new_phenotypes = new_topology->mutate();
-        for (auto const last_phenotype: new_phenotypes) {
-            new_topology->new_mutation(last_phenotype, last_result);
+        std::vector<Gene *> new_genes = new_topology->mutate();
+        for (auto const last_gene: new_genes) {
+            new_topology->new_mutation(last_gene, last_result);
         }
         return new_topology;
     }
 
 
     /**
-     * Creates vector of new phenotypes to add to a copy of a topology
+     * Creates vector of new genes to add to a copy of a topology
      *
      * @return
      */
-    std::vector<Phenotype *> Topology::mutate() {
+    std::vector<Gene *> Topology::mutate() {
         // Input must already exist and output may or may not exist
         using utils::Random;
         bool new_output = false;
@@ -338,30 +338,30 @@ namespace NeuralNetwork {
         } else { // if output_index == layers
             new_output = true;
         }
-        Phenotype::point input = {input_index, input_position};
-        Phenotype::point output = {output_index, output_position};
-        Phenotype *last_phenotype = new_phenotype(input, output);
-        std::vector<Phenotype *> added_phenotypes{last_phenotype};
+        Gene::point input = {input_index, input_position};
+        Gene::point output = {output_index, output_position};
+        Gene *last_gene = new_gene(input, output);
+        std::vector<Gene *> added_genes{last_gene};
         if (new_output) {
             int _back = layers_size.back();
-            output = last_phenotype->get_output();
+            output = last_gene->get_output();
             int index = Random::random_number(_back - 1);
-            Phenotype::point output_output = {layers - 1, index};
-            Phenotype *connection = new_phenotype(output, output_output);
-            added_phenotypes.push_back(connection);
+            Gene::point output_output = {layers - 1, index};
+            Gene *connection = new_gene(output, output_output);
+            added_genes.push_back(connection);
         }
-        disable_phenotypes(input, output);
-        return added_phenotypes;
+        disable_genes(input, output);
+        return added_genes;
     }
 
-    void Topology::new_mutation(Phenotype *last_phenotype, double const wealth) {
-        mutations.emplace(last_phenotype, wealth);
+    void Topology::new_mutation(Gene *last_gene, double const wealth) {
+        mutations.emplace(last_gene, wealth);
     }
 
-    Phenotype *Topology::new_phenotype(Phenotype::point const &input,
-                                       Phenotype::point const &output) {
+    Gene *Topology::new_gene(Gene::point const &input,
+                                  Gene::point const &output) {
         using utils::Random;
-        Phenotype::coordinate coordinate{input, output};
+        Gene::coordinate coordinate{input, output};
         long const ev_number = Generation::number(coordinate);
         double input_weight = Random::random_between(-100, 100) / 100.0f;
         double const memory_weight = Random::random_between(-100, 100) / 100.0f;
@@ -369,10 +369,10 @@ namespace NeuralNetwork {
         double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
         double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
         double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-        auto *phenotype = new Phenotype(input, output, input_weight, memory_weight, reset_input_weight,
-                                        update_input_weight, reset_memory_weight, update_memory_weight, ev_number);
-        add_relationship(phenotype);
-        return phenotype;
+        auto *gene = new Gene(input, output, input_weight, memory_weight, reset_input_weight,
+                                   update_input_weight, reset_memory_weight, update_memory_weight, ev_number);
+        add_relationship(gene);
+        return gene;
     }
 
     void Topology::set_bias(std::array<int, 2> neuron, Bias const bias) {
@@ -405,11 +405,11 @@ namespace NeuralNetwork {
     }
 
     std::string Topology::parse_to_string() const {
-        std::string output = R"({"phenotypes":[)";
-        phenotype_cb cb = [&output](Phenotype *phenotype) -> void {
-            output += phenotype->to_string() + ",";
+        std::string output = R"({"genes":[)";
+        gene_cb cb = [&output](Gene *gene) -> void {
+            output += gene->to_string() + ",";
         };
-        iterate_phenotypes(cb);
+        iterate_genes(cb);
         output.replace(output.end() - 1, output.end(), "]");
         output += ",\"biases\": [";
         for (auto &it: relationships) {
@@ -438,10 +438,10 @@ namespace NeuralNetwork {
         return last_result < comparison.last_result;
     }
 
-    void Topology::iterate_phenotypes(phenotype_cb &cb) const {
+    void Topology::iterate_genes(gene_cb &cb) const {
         for (auto const &it : relationships) {
-            for (Phenotype *phenotype : it.second.phenotypes) {
-                cb(phenotype);
+            for (Gene *gene : it.second.genes) {
+                cb(gene);
             }
         }
     }

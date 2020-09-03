@@ -14,22 +14,22 @@
 
 namespace NeuralNetwork {
 
-    class Phenotype : public Serializer::Serializable {
+    class Gene : public Serializer::Serializable {
     public:
         using point = std::array<int, 2>;
         using coordinate = std::array<point, 2>;
 
     public:
         //constructors
-        explicit Phenotype(point const &, long);
+        explicit Gene(point const &, long);
 
-        explicit Phenotype(point const &, double, double, double, double, double, double, long);
+        explicit Gene(point const &, double, double, double, double, double, double, long);
 
-        explicit Phenotype(point const &, point const &, double, double, double, double, double, double, bool, long);
+        explicit Gene(point const &, point const &, double, double, double, double, double, double, bool, long);
 
-        explicit Phenotype(point const &, point const &, double, double, double, double, double, double, long);
+        explicit Gene(point const &, point const &, double, double, double, double, double, double, long);
 
-        Phenotype(Phenotype const &);
+        Gene(Gene const &);
 
     public:
         // setters
@@ -81,9 +81,9 @@ namespace NeuralNetwork {
     public:
         // operators
 
-        bool operator<(Phenotype const &) const;
+        bool operator<(Gene const &) const;
 
-        bool operator==(Phenotype const &) const;
+        bool operator==(Gene const &) const;
 
     private:
         point input;
@@ -104,8 +104,8 @@ namespace NeuralNetwork {
 
 namespace std {
     template<>
-    struct hash<NeuralNetwork::Phenotype::point> {
-        size_t operator()(const NeuralNetwork::Phenotype::point &p) const noexcept{
+    struct hash<NeuralNetwork::Gene::point> {
+        size_t operator()(const NeuralNetwork::Gene::point &p) const noexcept{
             std::hash<int> hasher;
             std::size_t result = 111;
             result = (result << 1u) ^ hasher(p[0]);
@@ -115,9 +115,9 @@ namespace std {
     };
 
     template<>
-    struct hash<NeuralNetwork::Phenotype::coordinate> {
-        size_t operator()(const NeuralNetwork::Phenotype::coordinate &arr) const noexcept{
-            std::hash<NeuralNetwork::Phenotype::point> hasher;
+    struct hash<NeuralNetwork::Gene::coordinate> {
+        size_t operator()(const NeuralNetwork::Gene::coordinate &arr) const noexcept{
+            std::hash<NeuralNetwork::Gene::point> hasher;
             std::size_t result = 144451;
             result = (result << 1u) ^ hasher(arr[0]);
             result = (result << 1u) ^ hasher(arr[1]);

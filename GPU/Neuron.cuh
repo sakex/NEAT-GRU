@@ -15,19 +15,10 @@ namespace NeuralNetwork {
         __device__ void add_connection(Neuron *, double, double, double, double, double, double);
 
 
-        __device__ void increment_input(double inc_value);
+        __device__ void increment_state(double mem, double inp, double res, double upd);
 
-        __device__ void increment_update(double inc_value);
-
-        __device__ void increment_memory(double inc_value);
-
-        __device__ void increment_reset(double inc_value);
-
-        __device__  void set_value(double new_value);
 
         __device__ double get_prev_reset() const;
-
-        __device__ double compute_value();
 
         __device__ void reset_value();
 
@@ -40,6 +31,10 @@ namespace NeuralNetwork {
         __device__ void free_connections();
 
         __device__ void init();
+
+        __device__ void reset_state();
+
+        __device__ void feed_forward();
 
     public:
         Connection *connections;

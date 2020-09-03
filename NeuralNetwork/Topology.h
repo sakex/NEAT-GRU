@@ -29,14 +29,14 @@
 /// Namespace containing the different classes relevant for the neural network
 namespace NeuralNetwork {
 
-    struct PhenotypeAndBias {
+    struct GeneAndBias {
         Bias bias;
-        std::vector<Phenotype *> phenotypes;
+        std::vector<Gene *> genes;
     };
 
     class Topology : public Serializer::Serializable {
     public:
-        using relationships_map = std::unordered_map<Phenotype::point, PhenotypeAndBias>;
+        using relationships_map = std::unordered_map<Gene::point, GeneAndBias>;
 
     public:
         /**
@@ -87,7 +87,7 @@ namespace NeuralNetwork {
         relationships_map &get_relationships();
 
         /// Adds a relationship
-        void add_relationship(Phenotype *, bool init = false);
+        void add_relationship(Gene *, bool init = false);
 
         /// Sets a topology as belonging to a species
         void set_assigned(bool);
@@ -145,31 +145,31 @@ namespace NeuralNetwork {
         std::vector<int> layers_size;
         std::vector<Bias> output_bias;
         relationships_map relationships;
-        std::unordered_map<long, Phenotype *> ev_number_index;
+        std::unordered_map<long, Gene *> ev_number_index;
         std::queue<Mutation> mutations;
         std::array<int, 6> fields_order;
         int current_field;
 
     private:
         // Sub types / static
-        using point_pair = std::array<Phenotype::point, 2>;
-        using phenotype_cb = std::function<void(Phenotype *)>;
+        using point_pair = std::array<Gene::point, 2>;
+        using gene_cb = std::function<void(Gene *)>;
 
     private:
         // Init/add relationship
 
         /**
-         * Adds a phenotype to the phenotype map
-         * @param phenotype Pointer to the phenotype to add
+         * Adds a gene to the gene map
+         * @param gene Pointer to the gene to add
          */
-        void add_to_relationships_map(Phenotype *phenotype);
+        void add_to_relationships_map(Gene *gene);
 
         /**
-         * Recursive algorithm that disables phenotypes that don't get any input
+         * Recursive algorithm that disables genes that don't get any input
          * @param input Input Point
          * @param output Output Point
          */
-        void disable_phenotypes(Phenotype::point const &input, Phenotype::point const &output);
+        void disable_genes(Gene::point const &input, Gene::point const &output);
 
 
         /**
@@ -178,10 +178,10 @@ namespace NeuralNetwork {
          * @param output Output Point
          * @return Boolean if a path overrides
          */
-        bool path_overrides(Phenotype::point const &input, Phenotype::point const &output);
+        bool path_overrides(Gene::point const &input, Gene::point const &output);
 
         /**
-         * If we have a new layer, we need to reassign phenotypes
+         * If we have a new layer, we need to reassign genes
          * @param new_size
          */
         void resize(int new_size);
@@ -196,33 +196,33 @@ namespace NeuralNetwork {
         std::shared_ptr<Topology> evolve();
 
         /**
-         * Mutates a topology and creates new phenotypes
-         * @return a vector of pointers to the newly created phenotypes
+         * Mutates a topology and creates new genes
+         * @return a vector of pointers to the newly created genes
          */
-        std::vector<Phenotype *> mutate();
+        std::vector<Gene *> mutate();
 
         /**
-         * Creates a new mutation based on the newly created phenotypes
-         * @param phenotype The new phenotype to create the mutation from
+         * Creates a new mutation based on the newly created genes
+         * @param gene The new gene to create the mutation from
          * @param score The original score
          */
-        void new_mutation(Phenotype *phenotype, double score);
+        void new_mutation(Gene *gene, double score);
 
         /**
-         * Creates a new phenotype
+         * Creates a new gene
          * @param input Input position of the connection representation
          * @param output Output position of the connection representation
-         * @return New phenotype pointer
+         * @return New gene pointer
          */
-        Phenotype *new_phenotype(Phenotype::point const &input,
-                                 Phenotype::point const &output);
+        Gene *new_gene(Gene::point const &input,
+                            Gene::point const &output);
 
     private:
         /**
-         * Util to run over the phenotypes
-         * @param cb The callback to run over all the phenotypes
+         * Util to run over the genes
+         * @param cb The callback to run over all the genes
          */
-        void iterate_phenotypes(phenotype_cb &cb) const;
+        void iterate_genes(gene_cb &cb) const;
     };
 
     using Topology_ptr = std::shared_ptr<Topology>;

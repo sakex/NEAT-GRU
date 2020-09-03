@@ -22,7 +22,7 @@ SET(NEAT_GRU_SOURCES
         Game/Player.cpp
         Private/Generation.cpp
         Private/Mutation.cpp
-        Private/Phenotype.cpp
+        Private/Gene.cpp
         Private/Species.cpp
         Private/MutationField.cpp
         Private/Random.cpp

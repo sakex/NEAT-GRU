@@ -5,17 +5,17 @@
  *      Author: sakex
  */
 
-#include "Phenotype.h"
+#include "Gene.h"
 
 namespace NeuralNetwork {
 
-    Phenotype::Phenotype(point const &_input, long const ev_number) :
-            Phenotype(_input, .1f, .1f, .1f, .1f, .1f, .1f, ev_number) {
+    Gene::Gene(point const &_input, long const ev_number) :
+            Gene(_input, .1f, .1f, .1f, .1f, .1f, .1f, ev_number) {
     }
 
-    Phenotype::Phenotype(point const &_input, double const _input_weight, double const _memory_weight,
-                         double const riw, double const uiw, double const rmw, double const umw,
-                         long const ev_number) :
+    Gene::Gene(point const &_input, double const _input_weight, double const _memory_weight,
+               double const riw, double const uiw, double const rmw, double const umw,
+               long const ev_number) :
             input{_input[0], _input[1]},
             output{0, 0},
             input_weight(_input_weight),
@@ -28,10 +28,10 @@ namespace NeuralNetwork {
             disabled(false) {
     }
 
-    Phenotype::Phenotype(point const &_input, point const &_output,
-                         double const _input_weight, double const _memory_weight,
-                         double const riw, double const uiw, double const rmw, double const umw, const bool _disabled,
-                         long const ev_number) :
+    Gene::Gene(point const &_input, point const &_output,
+               double const _input_weight, double const _memory_weight,
+               double const riw, double const uiw, double const rmw, double const umw, const bool _disabled,
+               long const ev_number) :
             input{_input[0], _input[1]},
             output{_output[0], _output[1]},
             input_weight(_input_weight),
@@ -44,14 +44,14 @@ namespace NeuralNetwork {
             disabled(_disabled) {
     }
 
-    Phenotype::Phenotype(point const &input, point const &output,
-                         double const _input_weight, double const _memory_weight,
-                         double const riw, double const uiw, double const rmw, double const umw,
-                         long const ev_number) :
-            Phenotype(input, output, _input_weight, _memory_weight, riw, uiw, rmw, umw, false, ev_number) {
+    Gene::Gene(point const &input, point const &output,
+               double const _input_weight, double const _memory_weight,
+               double const riw, double const uiw, double const rmw, double const umw,
+               long const ev_number) :
+            Gene(input, output, _input_weight, _memory_weight, riw, uiw, rmw, umw, false, ev_number) {
     }
 
-    Phenotype::Phenotype(Phenotype const &base) :
+    Gene::Gene(Gene const &base) :
             input(base.input),
             output(base.output) {
         input_weight = base.input_weight;
@@ -64,94 +64,94 @@ namespace NeuralNetwork {
         disabled = base.disabled;
     }
 
-    void Phenotype::set_input_weight(double const new_weight) {
+    void Gene::set_input_weight(double const new_weight) {
         input_weight = new_weight;
     }
 
-    void Phenotype::set_memory_weight(double const new_weight) {
+    void Gene::set_memory_weight(double const new_weight) {
         memory_weight = new_weight;
     }
 
-    void Phenotype::set_reset_input_weight(double const new_weight) {
+    void Gene::set_reset_input_weight(double const new_weight) {
         reset_input_weight = new_weight;
     }
 
-    void Phenotype::set_reset_memory_weight(double const new_weight) {
+    void Gene::set_reset_memory_weight(double const new_weight) {
         reset_memory_weight = new_weight;
     }
 
-    void Phenotype::set_update_input_weight(double const new_weight) {
+    void Gene::set_update_input_weight(double const new_weight) {
         update_input_weight = new_weight;
     }
 
-    void Phenotype::set_update_memory_weight(double const new_weight) {
+    void Gene::set_update_memory_weight(double const new_weight) {
         update_memory_weight = new_weight;
     }
 
-    void Phenotype::set_disabled(bool const value) {
+    void Gene::set_disabled(bool const value) {
         disabled = value;
     }
 
-    void Phenotype::set_output(int const first, int const second) {
+    void Gene::set_output(int const first, int const second) {
         output[0] = first;
         output[1] = second;
     }
 
-    Phenotype::point const &Phenotype::get_input() {
+    Gene::point const &Gene::get_input() {
         return input;
     }
 
-    Phenotype::point const &Phenotype::get_output() {
+    Gene::point const &Gene::get_output() {
         return output;
     }
 
-    double Phenotype::get_input_weight() const {
+    double Gene::get_input_weight() const {
         return input_weight;
     }
 
-    double Phenotype::get_memory_weight() const {
+    double Gene::get_memory_weight() const {
         return memory_weight;
     }
 
-    double Phenotype::get_reset_input_weight() const {
+    double Gene::get_reset_input_weight() const {
         return reset_input_weight;
     }
 
-    double Phenotype::get_update_input_weight() const {
+    double Gene::get_update_input_weight() const {
         return update_input_weight;
     }
 
-    double Phenotype::get_reset_memory_weight() const {
+    double Gene::get_reset_memory_weight() const {
         return reset_memory_weight;
     }
 
-    double Phenotype::get_update_memory_weight() const {
+    double Gene::get_update_memory_weight() const {
         return update_memory_weight;
     }
 
-    long Phenotype::get_ev_number() const {
+    long Gene::get_ev_number() const {
         return evolution_number;
     }
 
-    void Phenotype::decrement_output() {
+    void Gene::decrement_output() {
         output[0]--;
     }
 
-    void Phenotype::disable() {
+    void Gene::disable() {
         disabled = true;
     }
 
-    bool Phenotype::is_disabled() const {
+    bool Gene::is_disabled() const {
         return disabled;
     }
 
-    void Phenotype::resize(int const former_size, int const new_size) {
+    void Gene::resize(int const former_size, int const new_size) {
         if (output[0] == former_size) {
             output[0] = new_size;
         }
     }
 
-    std::string Phenotype::parse_to_string() const {
+    std::string Gene::parse_to_string() const {
         std::string str = "{\"input\":[" + std::to_string(input[0]) + ","
                           + std::to_string(input[1]) + "], \"output\":["
                           + std::to_string(output[0]) + "," + std::to_string(output[1])
@@ -166,11 +166,11 @@ namespace NeuralNetwork {
         return str;
     }
 
-    bool Phenotype::operator<(Phenotype const &that) const {
+    bool Gene::operator<(Gene const &that) const {
         return output[0] < that.output[0];
     }
 
-    bool Phenotype::operator==(Phenotype const &that) const {
+    bool Gene::operator==(Gene const &that) const {
         return input == that.input && output == that.output;
     }
 }

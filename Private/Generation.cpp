@@ -10,14 +10,14 @@
 namespace NeuralNetwork {
 
 long Generation::_counter = 0;
-std::unordered_map<Phenotype::coordinate, long> Generation::evolutions = {};
+std::unordered_map<Gene::coordinate, long> Generation::evolutions = {};
 std::mutex Generation::mutex;
 
 void Generation::reset(){
 	evolutions.clear();
 }
 
-long Generation::number(Phenotype::coordinate const & coordinate){
+long Generation::number(Gene::coordinate const & coordinate){
 	mutex.lock();
 	if(evolutions.find(coordinate) == evolutions.end()){
 		long new_value = ++_counter;

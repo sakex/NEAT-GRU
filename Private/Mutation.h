@@ -13,7 +13,7 @@
 #include <cmath>
 #include <exception>
 
-#include "Phenotype.h"
+#include "Gene.h"
 #include "MutationField.h"
 
 namespace NeuralNetwork {
@@ -34,7 +34,7 @@ namespace NeuralNetwork {
 
         ~Mutation() = default;
 
-        explicit Mutation(Phenotype *, double);
+        explicit Mutation(Gene *, double);
 
         Mutation &operator=(Mutation const &);
 
@@ -52,7 +52,7 @@ namespace NeuralNetwork {
         void set_field(int);
 
     private:
-        Phenotype *phenotype;
+        Gene *gene;
         int field;
         double interval[2] = {static_cast<double>(-INFINITY), static_cast<double>(INFINITY)};
         bool interval_found = false;

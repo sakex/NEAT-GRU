@@ -36,7 +36,7 @@ namespace NeuralNetwork {
         double update_input_weight = 0.f;
         double reset_memory_weight = 0.f;
         double update_memory_weight = 0.f;
-        Neuron *output;
+        Neuron *output{};
     };
 
 }

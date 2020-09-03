@@ -19,7 +19,15 @@ ADD_EXECUTABLE(neat_trend_testing
         )
 
 ADD_TEST(neat_gru neat_trend_testing)
-TARGET_LINK_LIBRARIES(neat_trend_testing NEAT_GRU pthread)
+TARGET_LINK_LIBRARIES(neat_trend_testing NEAT_CUDA pthread)
+
+ADD_EXECUTABLE(gpu_test
+        gpu/gpu_main.cpp
+        gpu/GpuGame.cpp
+        )
+
+ADD_TEST(neat_gru gpu_test)
+TARGET_LINK_LIBRARIES(gpu_test NEAT_GRU pthread)
 
 
 ADD_EXECUTABLE(test_routines test_routines.cpp)

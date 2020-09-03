@@ -34,7 +34,7 @@ namespace NeuralNetwork {
 
         double get_value();
 
-        double get_prev_reset() const;
+        [[nodiscard]] double get_prev_reset() const;
 
         void feed_forward();
 

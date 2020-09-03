@@ -10,6 +10,7 @@ SET(PUB_HEADERS
         NN.cuh
         Connection.cuh
         Neuron.cuh
+        ComputeInstance.cuh
         )
 
 TARGET_SOURCES(NEAT_CUDA PRIVATE ${PUB_HEADERS})
@@ -30,4 +31,4 @@ SET_TARGET_PROPERTIES(
         PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
 
-TARGET_LINK_LIBRARIES(NEAT_CUDA ${CUDA_LIBRARIES} -lcudadevrt)
+TARGET_LINK_LIBRARIES(NEAT_CUDA NEAT_GRU ${CUDA_LIBRARIES} -lcudadevrt)
