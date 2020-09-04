@@ -10,6 +10,14 @@
 #include "../NeuralNetwork/Topology.h"
 #include "structs.h"
 
+#ifndef CUDA_ENABLED
+#include "../NeuralNetwork/NN.h"
+using namespace NeuralNetwork;
+#else
+#include "../GPU/NN.cuh"
+using namespace NeuralNetworkCuda;
+#endif
+
 /// Wrapper around the struct Simulation to enable the training on a simulation
 class GameBinding : public Game::Game {
 public:
