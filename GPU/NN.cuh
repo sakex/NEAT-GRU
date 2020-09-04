@@ -12,13 +12,10 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-
 /// Namespace containing the different classes relevant for the neural network
-namespace NeuralNetwork {
+namespace NeuralNetworkCuda {
 
     class Neuron;
-
-    class Topology;
 
     /// Class Neural Network with GRU gates
     class NN {
@@ -31,7 +28,7 @@ namespace NeuralNetwork {
          * Constructor with a topology as input
          * @param topology Topology from which we create the Neural Network
          */
-        explicit NN(Topology &topology);
+        explicit NN(NeuralNetwork::Topology &topology);
 
         virtual ~NN();
 
@@ -54,7 +51,7 @@ namespace NeuralNetwork {
          * Inits the Network from a topology
          * @param topology The input topology
          */
-        void init_topology(Topology &topology);
+        void init_topology(NeuralNetwork::Topology &topology);
 
         /// Resets the hidden state to 0
         __device__ void reset_state();

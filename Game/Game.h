@@ -11,9 +11,14 @@
 #include <vector>
 #include <memory>
 #include "../NeuralNetwork/Topology.h"
-#include "Player.h"
 
+#ifndef CUDA_ENABLED
+#include "../NeuralNetwork/NN.h"
 using namespace NeuralNetwork;
+#else
+#include "../GPU/NN.cuh"
+using namespace NeuralNetworkCuda;
+#endif
 
 /// Namespace for the Game abstract classes
 namespace Game {
@@ -45,7 +50,7 @@ namespace Game {
          * @param history The historic of the best topologies
          * @param size The size of the array of history
          */
-        void post_training(Topology const * history, size_t size);
+        void post_training(NeuralNetwork::Topology const * history, size_t size);
 
     private:
 
@@ -70,7 +75,7 @@ namespace Game {
          * @param history The historic of the best topologies
          * @param size The size of the array of history
          */
-        virtual void do_post_training(Topology const * history, size_t size) = 0;
+        virtual void do_post_training(NeuralNetwork::Topology const * history, size_t size) = 0;
 
     };
 }

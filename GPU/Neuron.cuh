@@ -7,7 +7,7 @@
 
 #include "Connection.cuh"
 
-namespace NeuralNetwork {
+namespace NeuralNetworkCuda {
     class Connection;
 
     class Neuron {

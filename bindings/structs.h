@@ -32,7 +32,7 @@ typedef struct Simulation {
      * @param ptr_size Size of a topology
      * @param history The best historical topologies
      */
-    void (*post_training)(void *cont, Topology const * history, unsigned ptr_size, size_t size);
+    void (*post_training)(void *cont, NeuralNetwork::Topology const * history, unsigned ptr_size, size_t size);
 
     /// Optional field, if a context has to be kept
     void *context;

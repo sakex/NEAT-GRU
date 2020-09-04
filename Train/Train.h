@@ -21,20 +21,23 @@
 #include "../Private/Species.h"
 #include "../Private/Generation.h"
 #include "../Game/Game.h"
-#include "../Game/Player.h"
 #include "../Serializer/Serializer.hpp"
 #include "../Private/Random.h"
 #include "static.h"
 
+#include "../NeuralNetwork/NN.h"
+
 #ifdef CUDA_ENABLED
 #include "../GPU/NN.cuh"
-#else
-#include "../NeuralNetwork/NN.h"
 #endif
 
 /// Namespace that solely contains the Train class
 namespace Train {
+#ifdef CUDA_ENABLED
+    using namespace NeuralNetworkCuda;
+#else
     using namespace NeuralNetwork;
+#endif
 
     /// Class to train topologies on a game
     class Train {
@@ -69,7 +72,7 @@ namespace Train {
          * @param top The pretrained topology to continue training
          */
         Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species, int _max_layers, int _max_per_layer, int inputs,
-              int outputs, Topology_ptr top);
+              int outputs, NeuralNetwork::Topology_ptr top);
 
         ~Train();
 
@@ -79,15 +82,15 @@ namespace Train {
     private:
         // Members
         Game::Game *game;
-        std::vector<Species_ptr> species;
-        Topology_ptr best_historical_topology;
+        std::vector<NeuralNetwork::Species_ptr> species;
+        NeuralNetwork::Topology_ptr best_historical_topology;
         int iterations;  // iterations < 0 -> run forever
         int inputs_count;
         int outputs_count;
         int max_individuals;
         int max_species;
         bool new_best = false;
-        std::vector<Topology_ptr> last_topologies;
+        std::vector<NeuralNetwork::Topology_ptr> last_topologies;
 
         NN *brains;
 
@@ -127,7 +130,7 @@ namespace Train {
          * Checks if topologies belong to the same species and reassigns them
          * @param topologies Vector of topologies
          */
-        void reassign_species(std::vector<Topology_ptr> &topologies);
+        void reassign_species(std::vector<NeuralNetwork::Topology_ptr> &topologies);
 
         /// Extincts species if we have more than 20
         void extinct_species();
@@ -137,13 +140,13 @@ namespace Train {
          * Returns a vector with all topologies
          * @return Vector of topologies
          */
-        std::vector<Topology_ptr> topologies_vector();
+        std::vector<NeuralNetwork::Topology_ptr> topologies_vector();
 
     private:
         /// Action to be executed after the training
         void post_training() const;
 
-        std::vector<Topology> history;
+        std::vector<NeuralNetwork::Topology> history;
     };
 }
 

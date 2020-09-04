@@ -260,11 +260,11 @@ namespace NeuralNetwork {
 
 } /* namespace NeuralNetwork */
 
-double *compute_network(NN *net, const double *inputs) {
+double *compute_network(NeuralNetwork::NN *net, const double *inputs) {
     double *outputs = net->compute(inputs);
     return outputs;
 }
 
-void reset_network_state(NN *net) {
+void reset_network_state(NeuralNetwork::NN *net) {
     net->reset_state();
 }

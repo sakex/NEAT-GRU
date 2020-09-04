@@ -7,7 +7,7 @@
 
 #include "Connection.cuh"
 
-namespace NeuralNetwork {
+namespace NeuralNetworkCuda {
     __device__ void Connection::init(double const _input_weight, double const _memory_weight, double const riw,
                                      double const rmw,
                                      double const uiw, double const umw, Neuron *_output) {
@@ -41,7 +41,7 @@ namespace NeuralNetwork {
     }
 }
 
-namespace NeuralNetwork {
+namespace NeuralNetworkCuda {
     __device__ inline double fast_sigmoid(double const value) {
         return value / (1.f + std::abs(value));
     }
@@ -139,7 +139,7 @@ namespace NeuralNetwork {
     }
 }
 
-namespace NeuralNetwork {
+namespace NeuralNetworkCuda {
 
     size_t NN::current_id = 0;
 
@@ -157,7 +157,7 @@ namespace NeuralNetwork {
         }
     }
 
-    NN::NN(Topology &topology) :
+    NN::NN(NeuralNetwork::Topology &topology) :
             stream{nullptr},
             neurons_count(0),
             layers(nullptr),
@@ -178,7 +178,6 @@ namespace NeuralNetwork {
         cudaError_t err = cudaStreamDestroy(stream);
         if (err) {
             std::cout << cudaGetErrorString(err) << std::endl;
-            throw err;
         }
     }
 
@@ -225,7 +224,7 @@ namespace NeuralNetwork {
         }
     }
 
-    void NN::init_topology(Topology &topology) {
+    void NN::init_topology(NeuralNetwork::Topology &topology) {
         layer_count = topology.get_layers();
         std::vector<int> const &sizes = topology.get_layers_size();
         layer_addresses = new int[layer_count + 1];
@@ -242,7 +241,7 @@ namespace NeuralNetwork {
             throw err;
         }
         init_kernel<<<1, neurons_count, id, stream>>>(layers);
-        Topology::relationships_map &relationships = topology.get_relationships();
+        NeuralNetwork::Topology::relationships_map &relationships = topology.get_relationships();
         std::vector<CUDAGene> gene_vec;
         std::vector<CUDAConnectionCount> connection_counts;
 
@@ -251,12 +250,12 @@ namespace NeuralNetwork {
                                          it.second.genes.size()}
             );
 
-            for (Gene *gene : it.second.genes) {
+            for (NeuralNetwork::Gene *gene : it.second.genes) {
                 if (gene->is_disabled()) {
                     continue;
                 }
-                Gene::point input = gene->get_input();
-                Gene::point output = gene->get_output();
+                NeuralNetwork::Gene::point input = gene->get_input();
+                NeuralNetwork::Gene::point output = gene->get_output();
                 gene_vec.push_back({
                                            gene->get_input_weight(),
                                            gene->get_memory_weight(),
@@ -366,30 +365,30 @@ ComputeInstance::ComputeInstance(Dim _dim) :
 }
 
 
-void ComputeInstance::set_networks(NeuralNetwork::NN *nets, unsigned long int count) {
-    networks = nets;
-    networks_count = count;
+void set_networks_gpu_instance(ComputeInstance *instance, NeuralNetworkCuda::NN *nets, unsigned long int count) {
+    instance->networks = nets;
+    instance->networks_count = count;
 }
 
-void ComputeInstance::update_dataset(double *host_data) {
-    const unsigned int size = dim.x * dim.y * dim.z;
+void update_dataset_gpu_instance(ComputeInstance * instance, double const *host_data) {
+    const unsigned int size = instance->dim.x * instance->dim.y * instance->dim.z;
     const unsigned int bytes = size * sizeof(double);
 
     cudaError_t err;
-    if (data) {
-        err = cudaFree(data);
+    if (instance->data) {
+        err = cudaFree(instance->data);
         if (err) {
             std::cout << cudaGetErrorString(err) << std::endl;
             throw err;
         }
     }
 
-    err = cudaMalloc((double **) &data, bytes);
+    err = cudaMalloc((double **) &instance->data, bytes);
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;
     }
-    err = cudaMemcpy(data, host_data, bytes, cudaMemcpyHostToDevice);
+    err = cudaMemcpy(instance->data, host_data, bytes, cudaMemcpyHostToDevice);
 
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
@@ -399,14 +398,14 @@ void ComputeInstance::update_dataset(double *host_data) {
 
 __global__ void
 compute_kernel(Dim dim,
-               NeuralNetwork::NN *networks,
+               NeuralNetworkCuda::NN *networks,
                double *data,
                const unsigned long int networks_count,
                const unsigned long int output_size,
                double *d_output) {
     unsigned int id = blockDim.x * gridDim.x;
     if (id < networks_count) {
-        NeuralNetwork::NN *net = &networks[id];
+        NeuralNetworkCuda::NN *net = &networks[id];
         // Number of datasets
         for (size_t i = 0; i < dim.z; ++i) {
             // Size of each dataset
@@ -420,28 +419,25 @@ compute_kernel(Dim dim,
     }
 }
 
-void ComputeInstance::compute(const unsigned int output_size) {
-    const unsigned int size = dim.y * dim.z * output_size * networks_count;
+void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_size) {
+    const unsigned int size = instance->dim.y * instance->dim.z * output_size * instance->networks_count;
     const unsigned int bytes = size * sizeof(double);
-    h_output = (double *) malloc(bytes);
-    cudaError_t err = cudaMalloc((double **) &d_output, bytes);
+    instance->h_output = (double *) malloc(bytes);
+    cudaError_t err = cudaMalloc((double **) &instance->d_output, bytes);
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;
     }
-    compute_kernel<<<1, networks_count>>>(dim, networks, data, networks_count, output_size, d_output);
-    err = cudaMemcpy(h_output, d_output, bytes, cudaMemcpyDeviceToHost);
+    compute_kernel<<<1, instance->networks_count>>>(instance->dim, instance->networks, instance->data,
+                                                    instance->networks_count, output_size, instance->d_output);
+    err = cudaMemcpy(instance->h_output, instance->d_output, bytes, cudaMemcpyDeviceToHost);
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;
     }
-    err = cudaFree(d_output);
+    err = cudaFree(instance->d_output);
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;
     }
-}
-
-double *ComputeInstance::get_output() const {
-    return h_output;
 }

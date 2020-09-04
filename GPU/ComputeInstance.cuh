@@ -16,26 +16,25 @@ struct Dim {
 };
 
 
-__global__ void compute_kernel(Dim dim, NeuralNetwork::NN *networks, double *data, unsigned long int networks_count, unsigned long int output_size);
+__global__ void compute_kernel(Dim dim, NeuralNetworkCuda::NN *networks, double *data, unsigned long int networks_count, unsigned long int output_size);
 
 struct ComputeInstance {
 public:
     explicit ComputeInstance(Dim dim);
-    void set_networks(NeuralNetwork::NN* nets, unsigned long int count);
-    void update_dataset(double *host_data);
-    void compute(unsigned int output_size);
-    double *get_output() const;
 
-private:
     Dim dim;
     double *data{nullptr};
     double *h_output{nullptr};
     double *d_output{nullptr};
     unsigned long int networks_count = 0;
-    NeuralNetwork::NN *networks{nullptr};
+    NeuralNetworkCuda::NN *networks{nullptr};
 };
 
 ComputeInstance * create_compute_instance(Dim dim);
+void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_size);
+void update_dataset_gpu_instance(ComputeInstance *instance, double const *host_data);
+void set_networks_gpu_instance(ComputeInstance *instance, NeuralNetworkCuda::NN* nets, unsigned long int count);
+
 }
 
 

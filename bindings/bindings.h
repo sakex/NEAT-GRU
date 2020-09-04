@@ -10,8 +10,10 @@
 #include "structs.h"
 #include <nlohmann/json.hpp>
 #include <TopologyParser.h>
+#include "NN.h"
 
 extern "C" {
+
 /**
  * Binding to allow a computation of a neural network
  *
@@ -21,7 +23,7 @@ extern "C" {
  * @param inputs The inputs of the computation
  * @return The output of the computation
  */
-double *compute_network(NN *net, const double *inputs);
+double *compute_network(NeuralNetwork::NN *net, const double *inputs);
 
 /**
  * Binding to reset the hidden state of a neural network
@@ -30,7 +32,7 @@ double *compute_network(NN *net, const double *inputs);
  *
  * @param net The network to be reset
  */
-void reset_network_state(NN *net);
+void reset_network_state(NeuralNetwork::NN *net);
 
 /**
  * Generate a neural network from a json serialized string
@@ -46,7 +48,7 @@ NN *network_from_string(char const *serialized);
  * @param topology - Pointer to a topology to convert
  * @return - Pointer to a neural network on the heap
  */
-NN *network_from_topology(Topology *topology);
+NN *network_from_topology(NeuralNetwork::Topology *topology);
 
 /**
  * Serializes a topology pointer to string
@@ -54,7 +56,7 @@ NN *network_from_topology(Topology *topology);
  * @param topology - Topology pointer to be serialized
  * @return - A c string representing the serialized topology
  */
-char * topology_to_string(Topology * topology);
+char * topology_to_string(NeuralNetwork::Topology * topology);
 
 /**
  * Binding to call Train::fit

@@ -8,7 +8,7 @@
 #include "Neuron.cuh"
 #include <stdio.h>
 
-namespace NeuralNetwork {
+namespace NeuralNetworkCuda {
     class Neuron;
 
     class Connection {

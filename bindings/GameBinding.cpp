@@ -20,6 +20,6 @@ std::vector<double> GameBinding::do_run_generation() {
     return ret;
 }
 
-void GameBinding::do_post_training(Topology const * history, size_t size) {
-    (*sim->post_training)(sim->context, history, sizeof(Topology), size);
+void GameBinding::do_post_training(NeuralNetwork::Topology const * history, size_t size) {
+    (*sim->post_training)(sim->context, history, sizeof(NeuralNetwork::Topology), size);
 }

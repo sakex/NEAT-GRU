@@ -7,17 +7,17 @@
 NN *network_from_string(char const *serialized) {
     using json = nlohmann::json;
     json j = json::parse(serialized);
-    Topology_ptr topology = std::make_unique<Topology>(TopologyParser::parse(j));
+    NeuralNetwork::Topology_ptr topology = std::make_unique<NeuralNetwork::Topology>(TopologyParser::parse(j));
     auto *net = new NN(*topology);
     return net;
 }
 
-NN *network_from_topology(Topology *topology) {
+NN *network_from_topology(NeuralNetwork::Topology *topology) {
     auto *net = new NN(*topology);
     return net;
 }
 
-char *topology_to_string(Topology *topology) {
+char *topology_to_string(NeuralNetwork::Topology *topology) {
     std::string serialized = topology->parse_to_string();
     char *out = (char *) malloc(sizeof(char) * serialized.length());
     strcpy(out, serialized.c_str());

@@ -7,7 +7,7 @@
 GpuGame::GpuGame(Dim dims) : compute_instance(dims), dim(dims) {
     size_t size = dims.x * dims.y * dims.z;
     auto *dataset = (double*)malloc(size * sizeof(double));
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         dataset[i] = utils::Random::random_number(1);
     }
     for (size_t i = 0; i < size; i += dims.x) {
@@ -15,13 +15,13 @@ GpuGame::GpuGame(Dim dims) : compute_instance(dims), dim(dims) {
         for (size_t j = i; j < i + dims.x; ++j) sum += dataset[j];
         outputs.push_back(sum > (dims.x / 2));
     }
-    compute_instance.update_dataset(dataset);
+    update_dataset_gpu_instance(&compute_instance, dataset);
     free(dataset);
 }
 
 std::vector<double> GpuGame::do_run_generation() {
-    compute_instance.compute(1);
-    double *output = compute_instance.get_output();
+    compute_gpu_instance(&compute_instance, 1);
+    double *output = compute_instance.h_output;
     std::vector<double> scores;
     for (size_t it = 0; it < player_count; ++it) {
         double sum = 0;
@@ -33,11 +33,11 @@ std::vector<double> GpuGame::do_run_generation() {
     return scores;
 }
 
-void GpuGame::do_reset_players(NN *nets, size_t count) {
-    compute_instance.set_networks(nets, count);
+void GpuGame::do_reset_players(NeuralNetworkCuda::NN *nets, size_t count) {
+    set_networks_gpu_instance(&compute_instance, nets, count);
     player_count = count;
 }
 
-void GpuGame::do_post_training(const Topology *history, size_t size) {
+void GpuGame::do_post_training(const NeuralNetwork::Topology *, size_t) {
     std::cout << "DONE" << std::endl;
 }

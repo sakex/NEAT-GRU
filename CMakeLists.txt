@@ -19,7 +19,6 @@ endif ()
 SET(NEAT_GRU_SOURCES
         Train/Train.cpp
         Game/Game.cpp
-        Game/Player.cpp
         Private/Generation.cpp
         Private/Mutation.cpp
         Private/Gene.cpp
@@ -35,7 +34,6 @@ SET(NEAT_GRU_SOURCES
         )
 
 SET(PUB_HEADERS
-        Game/Player.h
         Serializer/Serializable.h
         Serializer/Serializer.hpp
         Threading/multithreaded_methods.h
@@ -62,19 +60,18 @@ IF (CUDA_ENABLED)
     ADD_COMPILE_DEFINITIONS(CUDA_ENABLED=1)
     ADD_SUBDIRECTORY(GPU)
     TARGET_LINK_LIBRARIES(NEAT_GRU NEAT_CUDA)
-ELSE ()
-    ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
-    TARGET_SOURCES(NEAT_GRU PRIVATE
-            NeuralNetwork/NN.cpp
-            )
-    SET(PUB_HEADERS ${PUB_HEADERS}
-            NeuralNetwork/NN.h
-            NeuralNetwork/Connection.h
-            NeuralNetwork/Neuron.h
-            )
-
-    TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 ENDIF ()
+ADD_COMPILE_OPTIONS(-Wall -Wextra -pedantic -Werror)
+TARGET_SOURCES(NEAT_GRU PRIVATE
+        NeuralNetwork/NN.cpp
+        )
+SET(PUB_HEADERS ${PUB_HEADERS}
+        NeuralNetwork/NN.h
+        NeuralNetwork/Connection.h
+        NeuralNetwork/Neuron.h
+        )
+
+TARGET_SOURCES(NEAT_GRU PRIVATE ${PUB_HEADERS})
 
 
 TARGET_LINK_LIBRARIES(NEAT_GRU -lstdc++)
@@ -84,8 +81,6 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     ENABLE_TESTING()
     ADD_SUBDIRECTORY(tests)
 endif ()
-
-
 
 
 INSTALL(TARGETS NEAT_GRU

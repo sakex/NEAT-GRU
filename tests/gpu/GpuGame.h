@@ -15,7 +15,7 @@ public:
 private:
     std::vector<double> do_run_generation() override;
     void do_reset_players(NN * nets, size_t count) override;
-    void do_post_training(Topology const * history, size_t size) override;
+    void do_post_training(NeuralNetwork::Topology const * history, size_t size) override;
 
 private:
     ComputeInstance compute_instance;

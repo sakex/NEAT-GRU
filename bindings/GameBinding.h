@@ -42,7 +42,7 @@ private:
      * @param history - Historically best topologies
      * @param size - Size of the topologies
      */
-    void do_post_training(Topology const * history, size_t size) override;
+    void do_post_training(NeuralNetwork::Topology const * history, size_t size) override;
 
 private:
     /// The simulation to be run

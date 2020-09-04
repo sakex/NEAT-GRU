@@ -18,7 +18,7 @@ namespace Game {
         do_reset_players(brains, size);
     }
 
-    void Game::post_training(Topology const * topologies, size_t size) {
+    void Game::post_training(NeuralNetwork::Topology const * topologies, size_t size) {
         do_post_training(topologies, size);
     }
 }
