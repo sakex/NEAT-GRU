@@ -16,7 +16,7 @@ struct Dim {
 };
 
 
-__global__ void compute_kernel(Dim dim, NeuralNetworkCuda::NN *networks, double *data, unsigned long int networks_count, unsigned long int output_size);
+__global__ void compute_kernel(int x, int y, int z, NeuralNetworkCuda::NN *networks, double *data, int networks_count, int output_size);
 
 struct ComputeInstance {
     Dim dim;

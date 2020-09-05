@@ -340,23 +340,19 @@ namespace NeuralNetworkCuda {
         }
     }
 
-    __device__ double *NN::compute(const double *inputs_array,
-                                   size_t const from,
-                                   size_t const to,
-                                   size_t const output_size,
-                                   double *out,
-                                   size_t write_from) {
-        printf("1\n");
+    __device__ void NN::compute(const double *inputs_array,
+                                int from,
+                                int to,
+                                int output_size,
+                                double *out,
+                                int write_from) {
         set_inputs(inputs_array, from, to);
-        printf("2\n");
         for (int it = 0; it < neurons_count - output_size; ++it) {
             layers[it].feed_forward();
         }
         for (size_t it = neurons_count - output_size; it < neurons_count; ++it) {
-            out[it - neurons_count + output_size] = layers[it].get_value();
+            out[it - neurons_count + output_size + write_from] = layers[it].get_value();
         }
-        // softmax(out, output_size);
-        return out;
     }
 
     __device__ void NN::reset_state() {
@@ -365,10 +361,9 @@ namespace NeuralNetworkCuda {
         }
     }
 
-    __device__ void NN::set_inputs(const double *inputs_array, size_t const from, size_t const to) {
-        printf("From: %f -> To: %f\n", from, to);
+    __device__ void NN::set_inputs(const double *inputs_array, int const from, int const to) {
         for (int i = from; i < to; ++i) {
-            layers[i].set_input_value(inputs_array[i]);
+            layers[i - from].set_input_value(inputs_array[i]);
         }
     }
 
@@ -385,7 +380,7 @@ void set_networks_gpu_instance(ComputeInstance *instance, NeuralNetworkCuda::NN 
     instance->networks_count = count;
 }
 
-void update_dataset_gpu_instance(ComputeInstance * instance, double const *host_data) {
+void update_dataset_gpu_instance(ComputeInstance *instance, double const *host_data) {
     const unsigned int size = instance->dim.x * instance->dim.y * instance->dim.z;
     const unsigned int bytes = size * sizeof(double);
 
@@ -398,12 +393,13 @@ void update_dataset_gpu_instance(ComputeInstance * instance, double const *host_
         }
     }
 
-    err = cudaMalloc((double **) &instance->data, bytes);
+    err = cudaMalloc((double **) &(instance->data), bytes);
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;
     }
     err = cudaMemcpy(instance->data, host_data, bytes, cudaMemcpyHostToDevice);
+    cudaDeviceSynchronize();
 
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
@@ -412,22 +408,24 @@ void update_dataset_gpu_instance(ComputeInstance * instance, double const *host_
 }
 
 __global__ void
-compute_kernel(Dim dim,
+compute_kernel(const int x,
+               const int y,
+               const int z,
                NeuralNetworkCuda::NN *networks,
                double *data,
-               const unsigned long int networks_count,
-               const unsigned long int output_size,
+               const int networks_count,
+               const int output_size,
                double *d_output) {
     unsigned int id = threadIdx.x;
     if (id < networks_count) {
         NeuralNetworkCuda::NN *net = &networks[id];
         // Number of datasets
-        for (size_t i = 0; i < dim.z; ++i) {
+        for (int i = 0; i < z; ++i) {
             // Size of each dataset
-            for (size_t j = 0; j < dim.y; ++j) {
-                size_t const from = j * dim.x + i * dim.y;
-                size_t const write_from = j * output_size + i * dim.y;
-                net->compute(data, from, from + dim.x, output_size, d_output, write_from);
+            for (int j = 0; j < y; ++j) {
+                int const from = j * x + i * y;
+                int const write_from = j * output_size + i * y;
+                net->compute(data, from, from + x, output_size, d_output, write_from);
             }
         }
         net->reset_state();
@@ -443,8 +441,30 @@ void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_s
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;
     }
-    compute_kernel<<<1, instance->networks_count>>>(instance->dim, instance->networks, instance->data,
-                                                    instance->networks_count, output_size, instance->d_output);
+
+    NeuralNetworkCuda::NN * networks;
+    err = cudaMalloc((NeuralNetworkCuda::NN**)&networks, sizeof(NeuralNetworkCuda::NN) * instance->networks_count);
+    if (err) {
+        std::cout << "Malloc networks " << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+
+    err = cudaMemcpy(networks, instance->networks, sizeof(NeuralNetworkCuda::NN) * instance->networks_count, cudaMemcpyHostToDevice);
+    if (err) {
+        std::cout << "Networks memcpy " << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+
+    compute_kernel<<<1, instance->networks_count>>>(
+            static_cast<int>(instance->dim.x),
+            static_cast<int>(instance->dim.y),
+            static_cast<int>(instance->dim.z),
+            networks,
+            instance->data,
+            static_cast<int>(instance->networks_count),
+            static_cast<int>(output_size),
+            instance->d_output);
+
     cudaDeviceSynchronize();
     err = cudaGetLastError();
     if (err) {
@@ -453,10 +473,15 @@ void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_s
     }
     err = cudaMemcpy(instance->h_output, instance->d_output, bytes, cudaMemcpyDeviceToHost);
     if (err) {
-        std::cout << cudaGetErrorString(err) << std::endl;
+        std::cout << "Output memcpy" << cudaGetErrorString(err) << std::endl;
         throw err;
     }
     err = cudaFree(instance->d_output);
+    if (err) {
+        std::cout << cudaGetErrorString(err) << std::endl;
+        throw err;
+    }
+    err = cudaFree(networks);
     if (err) {
         std::cout << cudaGetErrorString(err) << std::endl;
         throw err;

@@ -38,13 +38,13 @@ namespace NeuralNetworkCuda {
          * @param inputs_vector C double array of inputs
          * @return a vector of weights
          */
-        __device__ double *compute(
+        __device__ void compute(
                 const double *inputs_vector,
-                size_t from,
-                size_t to,
-                size_t output_size,
+                int from,
+                int to,
+                int output_size,
                 double *out,
-                size_t write_from
+                int write_from
         );
 
         /**
@@ -69,7 +69,7 @@ namespace NeuralNetworkCuda {
          * Sets the inputs on the first layer
          * @param inputs_vector Array of doubles to initiate the inputs
          */
-        __device__ void set_inputs(const double *inputs_vector, size_t from, size_t to);
+        __device__ void set_inputs(const double *inputs_vector, int from, int to);
 
         /// Delete data
         void delete_layers();
