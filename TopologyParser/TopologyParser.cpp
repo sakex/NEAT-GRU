@@ -10,7 +10,7 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
     int max_layers = 0;
 
     std::vector<Gene *> new_genes;
-    for (auto &it : j["phenotypes"]) {
+    for (auto &it : j["genes"]) {
         Gene::point input = {it["input"][0], it["input"][1]};
         Gene::point output = {it["output"][0], it["output"][1]};
         if (output[0] > max_layers)
