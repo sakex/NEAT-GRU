@@ -366,6 +366,7 @@ namespace NeuralNetworkCuda {
     }
 
     __device__ void NN::set_inputs(const double *inputs_array, size_t const from, size_t const to) {
+        printf("From: %f -> To: %f\n", from, to);
         for (int i = from; i < to; ++i) {
             layers[i].set_input_value(inputs_array[i]);
         }
