@@ -350,7 +350,7 @@ namespace NeuralNetworkCuda {
         for (int it = 0; it < neurons_count - output_size; ++it) {
             layers[it].feed_forward();
         }
-        for (size_t it = neurons_count - output_size; it < neurons_count; ++it) {
+        for (int it = neurons_count - output_size; it < neurons_count; ++it) {
             out[it - neurons_count + output_size + write_from] = layers[it].get_value();
         }
     }
@@ -424,7 +424,7 @@ compute_kernel(const int x,
             // Size of each dataset
             for (int j = 0; j < y; ++j) {
                 int const from = j * x + i * y;
-                int const write_from = j * output_size + i * y;
+                int const write_from = id * y * z * output_size + j * output_size + i * y * output_size;
                 net->compute(data, from, from + x, output_size, d_output, write_from);
             }
         }
@@ -434,6 +434,8 @@ compute_kernel(const int x,
 
 void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_size) {
     const unsigned int size = instance->dim.y * instance->dim.z * output_size * instance->networks_count;
+    std::cout << "REAL SIZE: " << size << std::endl;
+    std::cout << "Dim y: " << instance->dim.y << " Dim z: " << instance->dim.z << " os: " << output_size << " count " << instance->networks_count << std::endl;
     const unsigned int bytes = size * sizeof(double);
     instance->h_output = (double *) malloc(bytes);
     cudaError_t err = cudaMalloc((double **) &instance->d_output, bytes);
@@ -472,6 +474,7 @@ void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_s
         throw err;
     }
     err = cudaMemcpy(instance->h_output, instance->d_output, bytes, cudaMemcpyDeviceToHost);
+    cudaDeviceSynchronize();
     if (err) {
         std::cout << "Output memcpy" << cudaGetErrorString(err) << std::endl;
         throw err;
