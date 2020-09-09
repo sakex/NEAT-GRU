@@ -455,7 +455,10 @@ void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_s
         throw err;
     }
 
-    compute_kernel<<<16, instance->networks_count / 16>>>(
+    int blockSize = 256;
+    int numBlocks = (instance->networks_count + blockSize - 1) / blockSize;
+
+    compute_kernel<<<numBlocks, blockSize>>>(
             static_cast<int>(instance->dim.x),
             static_cast<int>(instance->dim.y),
             static_cast<int>(instance->dim.z),
