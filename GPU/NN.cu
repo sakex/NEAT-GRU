@@ -434,8 +434,6 @@ compute_kernel(const int x,
 
 void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_size) {
     const unsigned int size = instance->dim.y * instance->dim.z * output_size * instance->networks_count;
-    std::cout << "REAL SIZE: " << size << std::endl;
-    std::cout << "Dim y: " << instance->dim.y << " Dim z: " << instance->dim.z << " os: " << output_size << " count " << instance->networks_count << std::endl;
     const unsigned int bytes = size * sizeof(double);
     instance->h_output = (double *) malloc(bytes);
     cudaError_t err = cudaMalloc((double **) &instance->d_output, bytes);

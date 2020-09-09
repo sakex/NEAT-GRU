@@ -9,7 +9,6 @@
 #include <iostream>
 #include "CudaGene.cuh"
 #include "../NeuralNetwork/Topology.h"
-#include <cuda.h>
 #include <cuda_runtime.h>
 
 /// Namespace containing the different classes relevant for the neural network
