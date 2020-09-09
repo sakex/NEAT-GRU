@@ -416,7 +416,7 @@ compute_kernel(const int x,
                const int networks_count,
                const int output_size,
                double *d_output) {
-    unsigned int id = threadIdx.x;
+    const unsigned int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id < networks_count) {
         NeuralNetworkCuda::NN *net = &networks[id];
         // Number of datasets
@@ -455,7 +455,7 @@ void compute_gpu_instance(ComputeInstance *instance, const unsigned int output_s
         throw err;
     }
 
-    compute_kernel<<<1, instance->networks_count>>>(
+    compute_kernel<<<16, instance->networks_count / 16>>>(
             static_cast<int>(instance->dim.x),
             static_cast<int>(instance->dim.y),
             static_cast<int>(instance->dim.z),
