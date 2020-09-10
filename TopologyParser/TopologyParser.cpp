@@ -21,7 +21,8 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
         double const update_input_weight = it["update_input_weight"];
         double const reset_memory_weight = it["reset_memory_weight"];
         double const update_memory_weight = it["update_memory_weight"];
-        ConnectionType const connection_type = it["connection_type"];
+        ConnectionType const connection_type = (m.find("connection_type") != m.end() ? it["connection_type"]
+                                                                                     : ConnectionType::GRU;
         bool disabled = it["disabled"];
         new_genes.push_back(
                 new Gene(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight,
