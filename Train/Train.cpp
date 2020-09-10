@@ -270,12 +270,15 @@ namespace Train {
             return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
         });
 
+        for(auto &species: species) {
+            NeuralNetwork::Topology best_copy(*species->get_best());
+            history.push_back(std::move(best_copy));
+        }
+
         if (best_historical_topology == nullptr
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
             best_historical_topology = best;
-            NeuralNetwork::Topology best_copy(*best);
-            history.push_back(std::move(best_copy));
         }
 
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "
