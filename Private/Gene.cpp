@@ -9,12 +9,12 @@
 
 namespace NeuralNetwork {
 
-    Gene::Gene(point const &_input, long const ev_number) :
-            Gene(_input, .1f, .1f, .1f, .1f, .1f, .1f, ev_number) {
+    Gene::Gene(point const &_input, ConnectionType type, long const ev_number) :
+            Gene(_input, .1f, .1f, .1f, .1f, .1f, .1f, type, ev_number) {
     }
 
     Gene::Gene(point const &_input, double const _input_weight, double const _memory_weight,
-               double const riw, double const uiw, double const rmw, double const umw,
+               double const riw, double const uiw, double const rmw, double const umw, ConnectionType type,
                long const ev_number) :
             input{_input[0], _input[1]},
             output{0, 0},
@@ -25,13 +25,14 @@ namespace NeuralNetwork {
             reset_memory_weight(rmw),
             update_memory_weight(umw),
             evolution_number(ev_number),
+            connection_type(type),
             disabled(false) {
     }
 
     Gene::Gene(point const &_input, point const &_output,
                double const _input_weight, double const _memory_weight,
                double const riw, double const uiw, double const rmw, double const umw, const bool _disabled,
-               long const ev_number) :
+               ConnectionType type, long const ev_number) :
             input{_input[0], _input[1]},
             output{_output[0], _output[1]},
             input_weight(_input_weight),
@@ -40,15 +41,16 @@ namespace NeuralNetwork {
             update_input_weight(uiw),
             reset_memory_weight(rmw),
             update_memory_weight(umw),
+            connection_type(type),
             evolution_number(ev_number),
             disabled(_disabled) {
     }
 
     Gene::Gene(point const &input, point const &output,
                double const _input_weight, double const _memory_weight,
-               double const riw, double const uiw, double const rmw, double const umw,
+               double const riw, double const uiw, double const rmw, double const umw, ConnectionType type,
                long const ev_number) :
-            Gene(input, output, _input_weight, _memory_weight, riw, uiw, rmw, umw, false, ev_number) {
+            Gene(input, output, _input_weight, _memory_weight, riw, uiw, rmw, umw, false, type, ev_number) {
     }
 
     Gene::Gene(Gene const &base) :
@@ -61,6 +63,7 @@ namespace NeuralNetwork {
         update_input_weight = base.update_input_weight;
         update_memory_weight = base.update_memory_weight;
         evolution_number = base.evolution_number;
+        connection_type = base.connection_type;
         disabled = base.disabled;
     }
 
@@ -133,6 +136,10 @@ namespace NeuralNetwork {
         return evolution_number;
     }
 
+    ConnectionType Gene::get_type() const {
+        return connection_type;
+    }
+
     void Gene::decrement_output() {
         output[0]--;
     }
@@ -161,8 +168,8 @@ namespace NeuralNetwork {
                           ",\"reset_memory_weight\":" + std::to_string(reset_memory_weight) +
                           ",\"update_input_weight\":" + std::to_string(update_input_weight) +
                           ",\"update_memory_weight\":" + std::to_string(update_memory_weight) +
-                          ",\"disabled\":"
-                          + (disabled ? "true" : "false") + "}";
+                          ",\"connection_type\":" + std::to_string(connection_type) +
+                          ",\"disabled\":" + (disabled ? "true" : "false") + "}";
         return str;
     }
 

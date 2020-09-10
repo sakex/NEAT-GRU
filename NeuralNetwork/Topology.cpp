@@ -20,7 +20,7 @@ namespace NeuralNetwork {
         for (std::pair<long, Gene *> pair : top1.ev_number_index) {
             auto search_second =
                     top2.ev_number_index.find(pair.first);
-            if (search_second != top2.ev_number_index.end()) {
+            if (search_second != top2.ev_number_index.end() && pair.second->get_type() == search_second->second->get_type()) {
                 common++;
                 W += std::abs(pair.second->get_input_weight()
                               - search_second->second->get_input_weight()) +
@@ -123,15 +123,14 @@ namespace NeuralNetwork {
     }
 
     bool Topology::operator==(NeuralNetwork::Topology const &comparison) const {
-        for (auto const &pair: ev_number_index) {
+        return std::all_of(ev_number_index.begin(), ev_number_index.end(), [&comparison](auto const &pair) {
             auto const search = comparison.ev_number_index.find(pair.first);
             bool const not_in = search == comparison.ev_number_index.end();
             Gene *phen1 = pair.second;
             Gene *phen2 = search->second;
             bool const equal = *phen1 == *phen2;
             if (not_in || !equal) return false;
-        }
-        return true;
+        });
     }
 
     void Topology::set_layers(int const _layers) {
@@ -220,7 +219,7 @@ namespace NeuralNetwork {
         return layers_size;
     }
 
-    void Topology::set_optimized() {
+    [[maybe_unused]] void Topology::set_optimized() {
         std::queue<Mutation> empty;
         std::swap(mutations, empty);
     }
@@ -250,6 +249,7 @@ namespace NeuralNetwork {
                     std::vector<Gene *>{gene}
             };
         }
+        std::sort(relationships[input].genes.begin(), relationships[input].genes.end());
         ev_number_index[gene->get_ev_number()] = gene;
     }
 
@@ -369,8 +369,10 @@ namespace NeuralNetwork {
         double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
         double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
         double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
+        ConnectionType type = Random::random_between(ConnectionType::Sigmoid, ConnectionType::GRU);
+        std::cout << type << std::endl;
         auto *gene = new Gene(input, output, input_weight, memory_weight, reset_input_weight,
-                                   update_input_weight, reset_memory_weight, update_memory_weight, ev_number);
+                                   update_input_weight, reset_memory_weight, update_memory_weight, type, ev_number);
         add_relationship(gene);
         return gene;
     }

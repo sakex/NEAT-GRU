@@ -9,7 +9,7 @@
 #define NEURALNETWORK_NN_H_
 
 #include <iostream>
-#include "Connection.h"
+#include "ConnectionGru.h"
 #include "Topology.h"
 
 

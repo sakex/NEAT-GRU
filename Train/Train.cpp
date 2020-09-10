@@ -68,20 +68,23 @@ namespace Train {
             initial_topology->set_layers(2);
             for (int i = 0; i < inputs_count; ++i) {
                 NeuralNetwork::Gene::point input = {0, i};
-                double input_weight = Random::random_between(-100, 100) / 100.0f;
-                double const memory_weight = Random::random_between(-100, 100) / 100.0f;
-                double const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
-                double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
-                double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
-                double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-
                 for (int j = 0; j < connections_per_input; ++j) {
                     int index = not_added[not_added_it];
                     ++not_added_it;
                     NeuralNetwork::Gene::point output = {1, index};
                     NeuralNetwork::Gene::coordinate coordinate = {input, output};
+
+                    double input_weight = Random::random_between(-100, 100) / 100.0f;
+                    double const memory_weight = Random::random_between(-100, 100) / 100.0f;
+                    double const reset_input_weight = Random::random_between(-100, 100) / 100.0f;
+                    double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
+                    double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
+                    double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
+                    NeuralNetwork::ConnectionType type = Random::random_between(NeuralNetwork::ConnectionType::Sigmoid,
+                                                                                NeuralNetwork::ConnectionType::GRU);
+
                     auto *gene = new NeuralNetwork::Gene(input, input_weight, memory_weight, reset_input_weight,
-                                               update_input_weight, reset_memory_weight, update_memory_weight,
+                                               update_input_weight, reset_memory_weight, update_memory_weight, type,
                                                NeuralNetwork::Generation::number(coordinate));
                     gene->set_output(1, index);
                     initial_topology->add_relationship(gene, true);

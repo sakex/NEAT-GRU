@@ -5,12 +5,13 @@
  *      Author: sakex
  */
 
-#ifndef NEURALNETWORK_PHENOTYPE_H_
-#define NEURALNETWORK_PHENOTYPE_H_
+#ifndef NEURALNETWORK_GENE_H_
+#define NEURALNETWORK_GENE_H_
 
 #include <array>
 #include <functional>
 #include "../Serializer/Serializer.hpp"
+#include "ConnectionType.h"
 
 namespace NeuralNetwork {
 
@@ -21,13 +22,13 @@ namespace NeuralNetwork {
 
     public:
         //constructors
-        explicit Gene(point const &, long);
+        explicit Gene(point const &, ConnectionType, long);
 
-        explicit Gene(point const &, double, double, double, double, double, double, long);
+        explicit Gene(point const &, double, double, double, double, double, double, ConnectionType, long);
 
-        explicit Gene(point const &, point const &, double, double, double, double, double, double, bool, long);
+        explicit Gene(point const &, point const &, double, double, double, double, double, double, bool, ConnectionType, long);
 
-        explicit Gene(point const &, point const &, double, double, double, double, double, double, long);
+        explicit Gene(point const &, point const &, double, double, double, double, double, double, ConnectionType, long);
 
         Gene(Gene const &);
 
@@ -76,6 +77,8 @@ namespace NeuralNetwork {
 
         double get_update_memory_weight() const;
 
+        ConnectionType get_type() const;
+
         bool is_disabled() const;
 
     public:
@@ -94,6 +97,7 @@ namespace NeuralNetwork {
         double update_input_weight;
         double reset_memory_weight;
         double update_memory_weight;
+        ConnectionType connection_type;
         long int evolution_number;
         bool disabled;
 
@@ -129,4 +133,4 @@ namespace std {
 
 }
 
-#endif /* NEURALNETWORK_PHENOTYPE_H_ */
+#endif /* NEURALNETWORK_GENE_H_ */

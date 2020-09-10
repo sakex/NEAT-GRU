@@ -24,6 +24,7 @@
 #include "../Serializer/Serializer.hpp"
 #include "../Private/Random.h"
 #include "../Train/static.h"
+#include "../Private/ConnectionType.h"
 
 
 /// Namespace containing the different classes relevant for the neural network
@@ -117,7 +118,7 @@ namespace NeuralNetwork {
         bool optimize();
 
         /// Sets the topology to optimized
-        void set_optimized();
+        [[maybe_unused]] void set_optimized();
 
         /**
          * Creates new indivuduals that are mutations of the original one

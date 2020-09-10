@@ -14,14 +14,14 @@ namespace NeuralNetwork {
 
     class Neuron;
 
-    class Connection {
+    class ConnectionGru {
 
     public:
-        Connection() = default;
+        ConnectionGru() = default;
 
         void init(double, double, double, double, double, double, Neuron *);
 
-        ~Connection() = default;
+        ~ConnectionGru() = default;
 
         void activate(double);
 

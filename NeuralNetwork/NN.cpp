@@ -9,6 +9,7 @@
 #include "Neuron.h"
 #include "../bindings/bindings.h"
 #include "NN.h"
+#include "ConnectionSigmoid.h"
 
 #include <cmath>
 
@@ -27,11 +28,24 @@ namespace NeuralNetwork {
         double const b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
         return a / b;
     }
+}
 
+namespace NeuralNetwork {
+    inline void ConnectionSigmoid::init(double const w, Neuron *_output) {
+        weight = w;
+        output = _output;
+    }
+
+    inline void ConnectionSigmoid::activate(double const value) {
+        output->increment_value(value * weight);
+    }
+} /* namespace NeuralNetwork */
+
+namespace NeuralNetwork {
     inline void
-    Connection::init(double const _input_weight, double const _memory_weight, double const riw, double const uiw,
-                     double const rmw, double const umw, Neuron
-                     *_output) {
+    ConnectionGru::init(double const _input_weight, double const _memory_weight, double const riw, double const uiw,
+                        double const rmw, double const umw, Neuron
+                        *_output) {
         memory = 0.f;
         prev_input = 0.f;
         input_weight = _input_weight;
@@ -43,7 +57,7 @@ namespace NeuralNetwork {
         output = _output;
     }
 
-    inline void Connection::activate(double const value) {
+    inline void ConnectionGru::activate(double const value) {
         double const prev_reset = output->get_prev_reset();
         memory = prev_input * input_weight + memory_weight * prev_reset * memory;
         prev_input = value;
@@ -55,9 +69,9 @@ namespace NeuralNetwork {
                                 value * update_input_weight + memory * update_memory_weight);
     }
 
-    inline void Connection::reset_state() {
-        memory = 0.f;
-        prev_input = 0.f;
+    inline void ConnectionGru::reset_state() {
+        memory = 0.;
+        prev_input = 0.;
     }
 
 
@@ -67,23 +81,29 @@ namespace NeuralNetwork {
 namespace NeuralNetwork {
 
     Neuron::Neuron() :
-            input(0.f),
-            memory(0.f),
-            update(0.f),
-            reset(0.f),
-            prev_reset(0.f),
-            last_added(0),
-            connections{nullptr} {
+            input(0.),
+            memory(0.),
+            update(0.),
+            reset(0.),
+            prev_reset(0.),
+            last_added_gru(0.),
+            connections_gru{nullptr} {
     }
 
     Neuron::~Neuron() {
-        delete[] connections;
+        delete[] connections_sigmoid;
+        delete[] connections_gru;
     }
 
     void
-    Neuron::add_connection(Neuron *neuron, double const input_weight, double const memory_weight, double const riw,
-                           double const uiw, double const rmw, double const umw) {
-        connections[last_added++].init(input_weight, memory_weight, riw, uiw, rmw, umw, neuron);
+    Neuron::add_connection_gru(Neuron *neuron, double const input_weight, double const memory_weight, double const riw,
+                               double const uiw, double const rmw, double const umw) {
+        connections_gru[last_added_gru++].init(input_weight, memory_weight, riw, uiw, rmw, umw, neuron);
+    }
+
+    void
+    Neuron::add_connection_sigmoid(Neuron *neuron, double const weight) {
+        connections_sigmoid[last_added_sigmoid++].init(weight, neuron);
     }
 
     inline void Neuron::increment_state(double const mem, double const inp, double const res, double const upd) {
@@ -91,6 +111,10 @@ namespace NeuralNetwork {
         input += inp;
         reset += res;
         update += upd;
+    }
+
+    inline void Neuron::increment_value(double const value) {
+        input += value;
     }
 
     inline void Neuron::set_input_value(double new_value) {
@@ -136,8 +160,11 @@ namespace NeuralNetwork {
 
         const double current_memory = fast_tanh(input + memory * reset_gate);
         const double value = update_gate * memory + (1.f - update_gate) * current_memory;
-        for (int i = 0; i < last_added; ++i) {
-            connections[i].activate(value);
+        for (int i = 0; i < last_added_gru; ++i) {
+            connections_gru[i].activate(value);
+        }
+        for (int i = 0; i < last_added_sigmoid; ++i) {
+            connections_sigmoid[i].activate(value);
         }
         prev_reset = reset_gate;
         reset_value();
@@ -147,13 +174,14 @@ namespace NeuralNetwork {
     inline void Neuron::reset_state() {
         reset_value();
         prev_reset = 0.;
-        for (int i = 0; i < last_added; ++i) {
-            connections[i].reset_state();
+        for (int i = 0; i < last_added_gru; ++i) {
+            connections_gru[i].reset_state();
         }
     }
 
-    inline void Neuron::set_connections_count(int count) {
-        connections = new Connection[count]();
+    inline void Neuron::set_connections_count(int sigmoid_count, int gru_count) {
+        connections_sigmoid = new ConnectionSigmoid[sigmoid_count]();
+        connections_gru = new ConnectionGru[gru_count]();
     }
 }
 
@@ -177,10 +205,10 @@ namespace NeuralNetwork {
     }
 
     NN::NN(Topology &topology) : neurons_count(0),
-                                           layer_count(0),
-                                           input_size(0),
-                                           output_size(0),
-                                           layers{nullptr} {
+                                 layer_count(0),
+                                 input_size(0),
+                                 output_size(0),
+                                 layers{nullptr} {
         init_topology(topology);
     }
 
@@ -209,7 +237,10 @@ namespace NeuralNetwork {
         for (auto &it : relationships) {
             Neuron *input_neuron_ptr = &layers[layer_addresses[it.first[0]] + it.first[1]];
             input_neuron_ptr->set_bias(it.second.bias);
-            input_neuron_ptr->set_connections_count(it.second.genes.size());
+
+            int type_counts[ConnectionType::GRU + 1] = {0};
+            for (Gene *gene : it.second.genes) type_counts[gene->get_type()]++;
+            input_neuron_ptr->set_connections_count(type_counts[0], type_counts[1]);
             for (Gene *gene : it.second.genes) {
                 Gene::point output = gene->get_output();
                 double const input_weight = gene->get_input_weight();
@@ -220,8 +251,16 @@ namespace NeuralNetwork {
                 double const update_memory_weight = gene->get_update_memory_weight();
 
                 Neuron *output_neuron_ptr = &layers[layer_addresses[output[0]] + output[1]];
-                input_neuron_ptr->add_connection(output_neuron_ptr, input_weight, memory_weight, reset_input_weight,
-                                                 update_input_weight, reset_memory_weight, update_memory_weight);
+                switch (gene->get_type()) {
+                    case Sigmoid:
+                        input_neuron_ptr->add_connection_sigmoid(output_neuron_ptr, input_weight);
+                        break;
+                    case GRU:
+                        input_neuron_ptr->add_connection_gru(output_neuron_ptr, input_weight, memory_weight,
+                                                             reset_input_weight, update_input_weight,
+                                                             reset_memory_weight, update_memory_weight);
+                        break;
+                }
             }
         }
         std::vector<Bias> const &output_bias_vec = topology.get_output_bias();

@@ -67,7 +67,7 @@ TARGET_SOURCES(NEAT_GRU PRIVATE
         )
 SET(PUB_HEADERS ${PUB_HEADERS}
         NeuralNetwork/NN.h
-        NeuralNetwork/Connection.h
+        NeuralNetwork/ConnectionGru.h
         NeuralNetwork/Neuron.h
         )
 
