@@ -370,7 +370,6 @@ namespace NeuralNetwork {
         double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
         double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
         ConnectionType type = (ConnectionType)Random::random_between((int)ConnectionType::Sigmoid, (int)ConnectionType::GRU);
-        std::cout << type << std::endl;
         auto *gene = new Gene(input, output, input_weight, memory_weight, reset_input_weight,
                                    update_input_weight, reset_memory_weight, update_memory_weight, type, ev_number);
         add_relationship(gene);
