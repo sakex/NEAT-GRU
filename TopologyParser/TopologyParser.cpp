@@ -21,11 +21,12 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
         double const update_input_weight = it["update_input_weight"];
         double const reset_memory_weight = it["reset_memory_weight"];
         double const update_memory_weight = it["update_memory_weight"];
+        ConnectionType const connection_type = it["connection_type"];
         bool disabled = it["disabled"];
         new_genes.push_back(
                 new Gene(input, output, input_weight, memory_weight, reset_input_weight, update_input_weight,
                          reset_memory_weight,
-                         update_memory_weight, disabled, 0));
+                         update_memory_weight, disabled, connection_type, 0));
     }
     topology.set_layers(max_layers + 1);
     for (Gene *phen_ptr : new_genes) {

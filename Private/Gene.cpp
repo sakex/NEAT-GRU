@@ -24,8 +24,8 @@ namespace NeuralNetwork {
             update_input_weight(uiw),
             reset_memory_weight(rmw),
             update_memory_weight(umw),
-            evolution_number(ev_number),
             connection_type(type),
+            evolution_number(ev_number),
             disabled(false) {
     }
 

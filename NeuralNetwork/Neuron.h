@@ -55,7 +55,7 @@ namespace NeuralNetwork {
         double memory = 0.;
         double update = 0.;
         double reset = 0.;
-        double prev_reset{} = 0f;
+        double prev_reset = 0.;
         int last_added_gru = 0;
         int last_added_sigmoid = 0;
         double bias_input = 0.;

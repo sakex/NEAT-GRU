@@ -123,13 +123,13 @@ namespace NeuralNetwork {
     }
 
     bool Topology::operator==(NeuralNetwork::Topology const &comparison) const {
-        return std::all_of(ev_number_index.begin(), ev_number_index.end(), [&comparison](auto const &pair) {
+        return std::all_of(ev_number_index.begin(), ev_number_index.end(), [&comparison](auto const &pair) -> bool {
             auto const search = comparison.ev_number_index.find(pair.first);
             bool const not_in = search == comparison.ev_number_index.end();
             Gene *phen1 = pair.second;
             Gene *phen2 = search->second;
             bool const equal = *phen1 == *phen2;
-            if (not_in || !equal) return false;
+            return !(not_in || !equal);
         });
     }
 
@@ -369,7 +369,7 @@ namespace NeuralNetwork {
         double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
         double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
         double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-        ConnectionType type = Random::random_between(ConnectionType::Sigmoid, ConnectionType::GRU);
+        ConnectionType type = (ConnectionType)Random::random_between((int)ConnectionType::Sigmoid, (int)ConnectionType::GRU);
         std::cout << type << std::endl;
         auto *gene = new Gene(input, output, input_weight, memory_weight, reset_input_weight,
                                    update_input_weight, reset_memory_weight, update_memory_weight, type, ev_number);

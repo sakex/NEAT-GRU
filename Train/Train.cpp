@@ -80,8 +80,9 @@ namespace Train {
                     double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
                     double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
                     double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-                    NeuralNetwork::ConnectionType type = Random::random_between(NeuralNetwork::ConnectionType::Sigmoid,
-                                                                                NeuralNetwork::ConnectionType::GRU);
+                    NeuralNetwork::ConnectionType type =
+                            (NeuralNetwork::ConnectionType)Random::random_between(
+                                    (int)NeuralNetwork::ConnectionType::Sigmoid, (int)NeuralNetwork::ConnectionType::GRU);
 
                     auto *gene = new NeuralNetwork::Gene(input, input_weight, memory_weight, reset_input_weight,
                                                update_input_weight, reset_memory_weight, update_memory_weight, type,

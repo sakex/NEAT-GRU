@@ -98,6 +98,7 @@ namespace NeuralNetwork {
         double reset_memory_weight;
         double update_memory_weight;
         ConnectionType connection_type;
+
         long int evolution_number;
         bool disabled;
 
