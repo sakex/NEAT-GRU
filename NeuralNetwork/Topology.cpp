@@ -12,7 +12,7 @@
 
 namespace NeuralNetwork {
 
-    double Topology::delta_compatibility(Topology &top1, Topology &top2) {
+    double Topology::delta_compatibility(Topology const &top1, Topology const &top2) {
         // see http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
         // chapter 4.1
         double disjoints = 0, common = 0;

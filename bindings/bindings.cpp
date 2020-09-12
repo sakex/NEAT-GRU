@@ -32,3 +32,7 @@ void fit(void *s, int const iterations, int const max_individuals, int const max
     Train::Train t(binding, iterations, max_individuals, max_species, max_layers, max_per_layer, inputs, outputs);
     t.start();
 }
+
+double topology_delta_compatibility(Topology const * top1, Topology const * top2) {
+    return Topology::delta_compatibility(*top1, *top2);
+}

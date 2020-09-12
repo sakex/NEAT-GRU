@@ -71,6 +71,15 @@ char * topology_to_string(NeuralNetwork::Topology * topology);
  * @param outputs Number of neurons on the output layer
  */
 void fit(void *sim, int iterations, int max_individuals, int max_species, int max_layers, int max_per_layers, int inputs, int outputs);
+
+/**
+ * Bindings call to Topology::delta_compatibility
+ *
+ * @param top1 First topology
+ * @param top2 Second topology
+ * @return delta between both topologies
+ */
+double topology_delta_compatibility(Topology const * top1, Topology const * top2);
 }
 
 #endif //NEAT_BINDINGS_H

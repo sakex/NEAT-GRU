@@ -51,7 +51,7 @@ namespace NeuralNetwork {
          * @param top2 Second topology to find distance with first one
          * @return Distance between top1 and top2
          */
-        static double delta_compatibility(Topology &top1, Topology &top2);
+        static double delta_compatibility(Topology const &top1, Topology const &top2);
 
         static std::shared_ptr<Topology> crossover(Topology &top1, Topology &top2);
 
