@@ -117,6 +117,10 @@ namespace Train {
             run_timer.stop();
             assign_results(results);
             update_best();
+            if(generations_without_beating_best == 50) {
+                std::cout << "50 generations without progress, ending" << std::endl;
+                break;
+            }
             if (new_best) {
                 no_progress = 0;
             } else {
@@ -278,6 +282,13 @@ namespace Train {
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
             best_historical_topology = best;
+            if(best->get_last_result() > best_ever_score) {
+                best_ever_score = best->get_last_result();
+                generations_without_beating_best = 0;
+            }
+            else {
+                generations_without_beating_best++;
+            }
         }
 
         std::cout << worst->get_last_result() << " " << species[0]->get_best()->get_last_result() << " "

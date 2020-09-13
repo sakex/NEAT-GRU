@@ -225,8 +225,7 @@ namespace NeuralNetwork {
         std::swap(mutations, empty);
     }
 
-    void Topology::new_generation(size_t const count,
-                                  std::vector<Topology_ptr> &topologies) {
+    void Topology::new_generation(unsigned const count, std::vector<Topology_ptr> &topologies) {
         for (unsigned it = 0; it < count; ++it) {
             topologies.push_back(evolve());
         }

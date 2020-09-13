@@ -90,6 +90,8 @@ namespace Train {
         int max_individuals;
         int max_species;
         bool new_best = false;
+        double best_ever_score = 0.0;
+        int generations_without_beating_best = 0;
         std::vector<NeuralNetwork::Topology_ptr> last_topologies;
 
         NN *brains;

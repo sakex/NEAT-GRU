@@ -125,7 +125,7 @@ namespace NeuralNetwork {
          * @param children_count The number of new topologies to create
          * @param output The vector to which we push the new topologies
          */
-        void new_generation(size_t children_count,
+        void new_generation(unsigned children_count,
                             std::vector<std::shared_ptr<Topology>> &output);
 
 
