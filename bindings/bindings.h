@@ -79,7 +79,7 @@ void fit(void *sim, int iterations, int max_individuals, int max_species, int ma
  * @param top2 Second topology
  * @return delta between both topologies
  */
-double topology_delta_compatibility(Topology const * top1, Topology const * top2);
+double topology_delta_compatibility(NeuralNetwork::Topology const * top1, NeuralNetwork::Topology const * top2);
 }
 
 #endif //NEAT_BINDINGS_H

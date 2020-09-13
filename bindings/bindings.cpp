@@ -33,6 +33,6 @@ void fit(void *s, int const iterations, int const max_individuals, int const max
     t.start();
 }
 
-double topology_delta_compatibility(Topology const * top1, Topology const * top2) {
-    return Topology::delta_compatibility(*top1, *top2);
+double topology_delta_compatibility(NeuralNetwork::Topology const * top1, NeuralNetwork::Topology const * top2) {
+    return NeuralNetwork::Topology::delta_compatibility(*top1, *top2);
 }
