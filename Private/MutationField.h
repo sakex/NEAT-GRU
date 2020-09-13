@@ -17,7 +17,7 @@ namespace NeuralNetwork {
         }
 
         char const *what() const noexcept override {
-            char buffer = new char[50];
+            char * buffer = new char[50];
             sprintf(buffer, "Invalid field: %i", _field);
             return buffer;
         }
