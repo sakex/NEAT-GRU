@@ -271,8 +271,7 @@ namespace Train {
         });
 
         for(auto &species: species) {
-            NeuralNetwork::Topology best_copy(*species->get_best());
-            history.push_back(std::move(best_copy));
+            history.emplace_back(*species->get_best());
         }
 
         if (best_historical_topology == nullptr

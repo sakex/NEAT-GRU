@@ -51,6 +51,8 @@ namespace NeuralNetwork {
 
         void set_field(int);
 
+        ConnectionType gene_type() const;
+
     private:
         Gene *gene;
         int field;

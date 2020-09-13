@@ -7,8 +7,8 @@
 
 #include "Topology.h"
 
-#define MAX_ITERATIONS 0
-#define MAX_UNFRUITFUL 0
+#define MAX_ITERATIONS 10
+#define MAX_UNFRUITFUL 10
 
 namespace NeuralNetwork {
 
@@ -20,7 +20,8 @@ namespace NeuralNetwork {
         for (std::pair<long, Gene *> pair : top1.ev_number_index) {
             auto search_second =
                     top2.ev_number_index.find(pair.first);
-            if (search_second != top2.ev_number_index.end() && pair.second->get_type() == search_second->second->get_type()) {
+            if (search_second != top2.ev_number_index.end() &&
+                pair.second->get_type() == search_second->second->get_type()) {
                 common++;
                 W += std::abs(pair.second->get_input_weight()
                               - search_second->second->get_input_weight()) +
@@ -110,7 +111,7 @@ namespace NeuralNetwork {
             };
         }
         output_bias.reserve(base.output_bias.size());
-        for(auto const & bias: base.output_bias) output_bias.emplace_back(bias);
+        for (auto const &bias: base.output_bias) output_bias.emplace_back(bias);
     }
 
     Topology::~Topology() {
@@ -190,7 +191,7 @@ namespace NeuralNetwork {
         Mutation &mutation = mutations.front();
         if (mutation.get_iterations() >= MAX_ITERATIONS || mutation.get_unfruitful() >= MAX_UNFRUITFUL) {
             mutation.set_back_to_max();
-            if (current_field != 5) {
+            if (mutation.gene_type() == ConnectionType::Sigmoid || current_field != 5) {
                 mutation.set_field(fields_order[++current_field]);
                 return true;
             }
@@ -254,7 +255,7 @@ namespace NeuralNetwork {
     }
 
     void Topology::disable_genes(Gene::point const &input,
-                                      Gene::point const &output) {
+                                 Gene::point const &output) {
         auto iterator = relationships.find(input);
         if (iterator == relationships.end())
             return;
@@ -356,10 +357,15 @@ namespace NeuralNetwork {
 
     void Topology::new_mutation(Gene *last_gene, double const wealth) {
         mutations.emplace(last_gene, wealth);
+        if (last_gene->get_type() == ConnectionType::Sigmoid) {
+            mutations.back().set_field(0);
+        } else {
+            mutations.back().set_field(fields_order[0]);
+        }
     }
 
     Gene *Topology::new_gene(Gene::point const &input,
-                                  Gene::point const &output) {
+                             Gene::point const &output) {
         using utils::Random;
         Gene::coordinate coordinate{input, output};
         long const ev_number = Generation::number(coordinate);
@@ -369,9 +375,10 @@ namespace NeuralNetwork {
         double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
         double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
         double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-        ConnectionType type = (ConnectionType)Random::random_between((int)ConnectionType::Sigmoid, (int)ConnectionType::GRU);
+        ConnectionType type = (ConnectionType) Random::random_between((int) ConnectionType::Sigmoid,
+                                                                      (int) ConnectionType::GRU);
         auto *gene = new Gene(input, output, input_weight, memory_weight, reset_input_weight,
-                                   update_input_weight, reset_memory_weight, update_memory_weight, type, ev_number);
+                              update_input_weight, reset_memory_weight, update_memory_weight, type, ev_number);
         add_relationship(gene);
         return gene;
     }

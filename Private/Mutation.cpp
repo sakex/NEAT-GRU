@@ -93,4 +93,8 @@ namespace NeuralNetwork {
         return *this;
     }
 
+    ConnectionType Mutation::gene_type() const {
+        return gene->get_type();
+    }
+
 } /* namespace NeuralNetwork */
