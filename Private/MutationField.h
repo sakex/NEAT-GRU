@@ -10,8 +10,16 @@
 
 namespace NeuralNetwork {
     struct InvalidField : std::exception {
+        const int _field;
+
+        InvalidField(int const field) : _field(field) {
+
+        }
+
         char const *what() const noexcept override {
-            return "Invalid field";
+            char buffer = new char[50];
+            sprintf(buffer, "Invalid field: %i", _field);
+            return buffer;
         }
     };
 

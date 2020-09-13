@@ -69,7 +69,7 @@ namespace NeuralNetwork {
             case 5:
                 return __MutationField<5>::get(gene);
             default:
-                throw InvalidField();
+                throw InvalidField(field);
         }
     }
 
@@ -94,7 +94,7 @@ namespace NeuralNetwork {
                 __MutationField<5>::set(gene, value);
                 break;
             default:
-                throw InvalidField();
+                throw InvalidField(field);
         }
     }
 }

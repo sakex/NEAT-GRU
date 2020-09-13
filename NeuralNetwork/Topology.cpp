@@ -80,7 +80,9 @@ namespace NeuralNetwork {
                            mutations(),
                            fields_order{0, 1, 2, 3, 4, 5},
                            current_field(0) {
-
+        static std::random_device rd;
+        static std::mt19937 g(rd());
+        std::shuffle(fields_order.begin(), fields_order.end(), g);
     }
 
     Topology::Topology(Topology const &base) : relationships(),
@@ -191,7 +193,7 @@ namespace NeuralNetwork {
         Mutation &mutation = mutations.front();
         if (mutation.get_iterations() >= MAX_ITERATIONS || mutation.get_unfruitful() >= MAX_UNFRUITFUL) {
             mutation.set_back_to_max();
-            if (mutation.gene_type() == ConnectionType::Sigmoid || current_field != 5) {
+            if (mutation.gene_type() == ConnectionType::Sigmoid && current_field != 5) {
                 mutation.set_field(fields_order[++current_field]);
                 return true;
             }
