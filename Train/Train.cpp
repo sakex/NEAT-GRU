@@ -125,8 +125,8 @@ namespace Train {
                 no_progress = 0;
             } else {
                 no_progress++;
-                if (no_progress == 50) {
-                    std::cout << "50 generations without progress, ending" << std::endl;
+                if (no_progress == 250) {
+                    std::cout << "250 generations without progress, ending" << std::endl;
                     break;
                 }
             }
