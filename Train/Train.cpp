@@ -117,16 +117,16 @@ namespace Train {
             run_timer.stop();
             assign_results(results);
             update_best();
-            if(generations_without_beating_best == 50) {
-                std::cout << "50 generations without progress, ending" << std::endl;
+            if(generations_without_beating_best == 300) {
+                std::cout << "300 generations without progress, ending" << std::endl;
                 break;
             }
             if (new_best) {
                 no_progress = 0;
             } else {
                 no_progress++;
-                if (no_progress == 250) {
-                    std::cout << "250 generations without progress, ending" << std::endl;
+                if (no_progress == 50) {
+                    std::cout << "50 generations without progress, ending" << std::endl;
                     break;
                 }
             }
