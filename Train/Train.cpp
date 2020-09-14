@@ -130,7 +130,7 @@ namespace Train {
                     break;
                 }
             }
-            reset_species();
+            if(it % 5 == 0) reset_species();
             utils::Timer selection_timer("NATURAL SELECTION");
             natural_selection();
             selection_timer.stop();

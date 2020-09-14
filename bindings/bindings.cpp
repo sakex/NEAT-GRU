@@ -21,7 +21,6 @@ char *topology_to_string(NeuralNetwork::Topology *topology) {
     std::string serialized = topology->parse_to_string();
     char *out = (char *) malloc(sizeof(char) * (serialized.length() + 1));
     strcpy(out, serialized.c_str());
-    std::cout << "OUT: " << out << std::endl;
     return out;
 }
 
