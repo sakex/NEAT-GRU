@@ -387,7 +387,7 @@ namespace NeuralNetwork {
     void Topology::set_bias(std::array<int, 2> neuron, Bias const bias) {
         if (neuron[0] != layers - 1) {
             auto iterator = relationships.find(neuron);
-            iterator->second.bias = bias;
+            if(iterator != relationships.end()) iterator->second.bias = bias;
         } else {
             if (output_bias.size() != (unsigned long) layers_size.back()) output_bias.resize(layers_size.back());
             output_bias[neuron[1]] = bias;
