@@ -59,7 +59,7 @@ namespace NeuralNetwork {
 
     inline void ConnectionGru::activate(double const value) {
         double const prev_reset = output->get_prev_reset();
-        memory = prev_input * input_weight + memory_weight * prev_reset * memory;
+        memory = fast_tanh(prev_input * input_weight + memory_weight * prev_reset * memory);
         prev_input = value;
 
         double const update_mem = memory * memory_weight;
