@@ -1,0 +1,27 @@
+[package]
+name = "neat-gru"
+version = "0.1.0"
+authors = ["sakex <alexandre@senges.ch>"]
+edition = "2018"
+
+
+[build-dependencies]
+cc = "1.0"
+
+[features]
+gpu = [] # feature has no explicit dependencies
+
+
+[profile.release]
+# Link time optimisation, possibly even with C++, equivalent to G++'s -flto
+lto = true
+
+# codegen-units of 1 gives best optimization, but disables parallel building.
+# Default: 16
+codegen-units = 1
+
+# Prevent inserting panic handlers in ASM
+panic = "abort"
+
+# Optimisation level, equivalent to G++'s -O3
+opt-level = 3
