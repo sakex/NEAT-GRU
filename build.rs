@@ -31,17 +31,22 @@ fn main() {
         .include("./Train")
         .include("./TopologyParser");
     files.iter().for_each(|file| { builder.file(file); });
+    let target = std::env::var("TARGET").unwrap();
+
     builder
         .cpp(true)
         .cpp_link_stdlib("stdc++")
-        .define("__MULTITHREADED__", "1")
         .warnings_into_errors(true);
+
+    if !target.contains("wasm32") {
+        builder.define("__MULTITHREADED__", "1")
+    }
 
     if cfg!(debug_assertions) {
         builder
             .flag("-Og")
             .flag("-g");
-    } else {
+    } else if !target.contains("wasm32") {
         builder.flag("-Ofast")
             .flag("-march=native")
             .flag("-ffast-math")
