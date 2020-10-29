@@ -25,6 +25,7 @@ fn main() {
         .include("./bindings")
         .include("./Game")
         .include("./NeuralNetwork")
+        .include("./nlohmann")
         .include("./Private")
         .include("./Serializer")
         .include("./Threading")
@@ -38,22 +39,28 @@ fn main() {
         .warnings_into_errors(true);
 
     if !target.contains("wasm32") {
-        builder.cpp_link_stdlib("stdc++")
+        builder
+            .cpp_link_stdlib("stdc++")
             .define("__MULTITHREADED__", "1");
     }
     else {
-        builder.cpp_set_stdlib("c++").cpp_link_stdlib("c++");
+        builder
+            .cpp_link_stdlib(None);
     }
 
-    if cfg!(debug_assertions) {
+    if target.contains("wasm32") {
+        builder
+            .target("wasm32-unknown-emscripten")
+            //.flag("-std=c++17")
+            .flag("-flto")
+            .flag("-nostdlib")
+            .flag("-fvisibility=hidden")
+            .flag("-Os");
+    }
+    else if cfg!(debug_assertions) {
         builder
             .flag("-Og")
             .flag("-g");
-    } else if target.contains("wasm32") {
-        builder
-            .flag("-std=c++17")
-            .flag("-flto")
-            .flag("-Ofast");
     } else {
         builder.flag("-Ofast")
             .flag("-march=native")
@@ -109,6 +116,7 @@ fn main() {
         .include("./bindings")
         .include("./Game")
         .include("./NeuralNetwork")
+        .include("./nlohmann")
         .include("./Private")
         .include("./Serializer")
         .include("./Threading")
