@@ -39,7 +39,7 @@ fn main() {
         .warnings_into_errors(true);
 
     if !target.contains("wasm32") {
-        builder.define("__MULTITHREADED__", "1")
+        builder.define("__MULTITHREADED__", "1");
     }
 
     if cfg!(debug_assertions) {
