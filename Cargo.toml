@@ -6,6 +6,8 @@ edition = "2018"
 description = "NEAT algorithm with GRU gates"
 license = "MIT"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 
 [build-dependencies]

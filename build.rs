@@ -35,18 +35,26 @@ fn main() {
 
     builder
         .cpp(true)
-        .cpp_link_stdlib("stdc++")
         .warnings_into_errors(true);
 
     if !target.contains("wasm32") {
-        builder.define("__MULTITHREADED__", "1");
+        builder.cpp_link_stdlib("stdc++")
+            .define("__MULTITHREADED__", "1");
+    }
+    else {
+        builder.cpp_set_stdlib("c++").cpp_link_stdlib("c++");
     }
 
     if cfg!(debug_assertions) {
         builder
             .flag("-Og")
             .flag("-g");
-    } else if !target.contains("wasm32") {
+    } else if target.contains("wasm32") {
+        builder
+            .flag("-std=c++17")
+            .flag("-flto")
+            .flag("-Ofast");
+    } else {
         builder.flag("-Ofast")
             .flag("-march=native")
             .flag("-ffast-math")
