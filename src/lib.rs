@@ -9,3 +9,5 @@ pub mod train;
 pub mod gpu_compute_instance;
 #[cfg(test)]
 mod tests;
+#[cfg(target_arch = "wasm32")]
+extern crate wasm_bindgen;
