@@ -41,7 +41,6 @@ fn main() {
     if !target.contains("wasm32") {
         builder
             .cpp_link_stdlib("stdc++")
-            .static_flag(true)
             .define("__MULTITHREADED__", "1");
     }
     else {
@@ -61,14 +60,13 @@ fn main() {
     else if cfg!(debug_assertions) {
         builder
             .flag("-Og")
-            .flag("-g");
+            .flag("-g")
+            .flag("-flto");
     } else {
         builder.flag("-Ofast")
             .flag("-march=native")
             .flag("-ffast-math")
-            .flag("-frename-registers")
-            .flag("-flto")
-            .flag("-fwhole-program");
+            .flag("-frename-registers");
     }
 
     builder.compile("neat");
