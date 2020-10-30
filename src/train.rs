@@ -155,9 +155,27 @@ impl<T> Train<T>
     /// # Example
     ///
     /// ```
-    /// let sim = Simulation::new(); // Has to implement trait Game
-    /// let mut runner: Train<TradingSimulation> = Train::new();
-    /// runner.simulation(sim).inputs(5).outputs(1);
+    /// use neat_gru::train::Train;
+    /// use neat_gru::game::Game;
+    /// use neat_gru::topology::Topology;
+    /// use neat_gru::neural_network::NeuralNetwork;
+    /// struct Simulation {
+    /// }
+    ///
+    /// impl Game for Simulation {
+    ///     fn run_generation(&mut self) -> Vec<f64> {
+    ///         vec![1.; 5]
+    ///     }
+    ///
+    /// fn reset_players(&mut self,nets: &[NeuralNetwork]) { }
+    ///
+    /// fn post_training(&mut self,history: &[Topology]) { }
+    ///
+    /// }
+    ///
+    /// let sim = Simulation {}; // Has to implement trait Game
+    /// let mut runner: Train<Simulation> = Train::new();
+    /// runner.simulation(sim).max_individuals(5).inputs(5).outputs(1);
     /// runner.start();
     /// ```
     pub fn start(&mut self) {

@@ -3,11 +3,11 @@ extern crate cc;
 #[cfg(not(feature = "gpu"))]
 fn main() {
     let files = [
-        "bindings/bindings.cpp",
-        "bindings/GameBinding.cpp",
+        "./bindings/bindings.cpp",
+        "./bindings/GameBinding.cpp",
         "Game/Game.cpp",
-        "NeuralNetwork/NN.cpp",
-        "NeuralNetwork/Topology.cpp",
+        "./NeuralNetwork/NN.cpp",
+        "./NeuralNetwork/Topology.cpp",
         "Private/Generation.cpp",
         "Private/Mutation.cpp",
         "Private/MutationField.cpp",
@@ -41,6 +41,7 @@ fn main() {
     if !target.contains("wasm32") {
         builder
             .cpp_link_stdlib("stdc++")
+            .static_flag(true)
             .define("__MULTITHREADED__", "1");
     }
     else {

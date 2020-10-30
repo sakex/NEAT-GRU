@@ -1,6 +1,6 @@
 [package]
 name = "neat-gru"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["sakex <alexandre@senges.ch>"]
 edition = "2018"
 description = "NEAT algorithm with GRU gates"
@@ -13,7 +13,7 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen = "0.2.68"
 
 [build-dependencies]
-cc = "1.0"
+cc = { version = "1.0", features = ["parallel"] }
 
 [features]
 gpu = [] # feature has no explicit dependencies

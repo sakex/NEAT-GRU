@@ -11,6 +11,9 @@ use wasm_bindgen::prelude::*;
 /// # Example
 ///
 /// ```
+/// use neat_gru::neural_network::NeuralNetwork;
+/// use std::fs;
+///
 /// let serialized: String = fs::read_to_string("topology_test.json")
 ///         .expect("Something went wrong reading the file");
 /// let mut net = NeuralNetwork::from_string(&serialized);
@@ -94,6 +97,8 @@ impl NeuralNetwork {
     /// # Example
     ///
     /// ```
+    /// use std::fs;
+    /// use neat_gru::neural_network::NeuralNetwork;
     /// let serialized: String = fs::read_to_string("topology_test.json").expect("Something went wrong reading the file");
     /// let mut net = NeuralNetwork::from_string(&serialized);
     ///  net.compute(&vec![0.5, 0.5], 1);
