@@ -51,7 +51,6 @@ fn main() {
     if target.contains("wasm32") {
         builder
             .target("wasm32-unknown-emscripten")
-            //.flag("-std=c++17")
             .flag("-nostdlib")
             .flag("-fvisibility=hidden")
             .flag("-Os");
