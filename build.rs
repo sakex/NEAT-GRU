@@ -60,13 +60,13 @@ fn main() {
     else if cfg!(debug_assertions) {
         builder
             .flag("-Og")
-            .flag("-g")
-            .flag("-flto");
+            .flag("-g");
     } else {
         builder.flag("-Ofast")
             .flag("-march=native")
             .flag("-ffast-math")
-            .flag("-frename-registers");
+            .flag("-frename-registers")
+            .flag("-fwhole-program");
     }
 
     builder.compile("neat");
