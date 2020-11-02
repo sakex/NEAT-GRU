@@ -10,6 +10,12 @@
 int Train::Constants::MAX_LAYERS = 0;
 int Train::Constants::MAX_PER_LAYER = 0;
 
+#if __MULTITHREADED__
+#define WITH_MUTEX  ,&mutex
+#else
+#define WITH_MUTEX
+#endif
+
 namespace Train {
     Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species,
                  int _max_layers, int _max_per_layer, int inputs, int outputs) :
@@ -26,7 +32,8 @@ namespace Train {
         random_new_species();
     }
 
-    Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species, int _max_layers, int _max_per_layer,
+    Train::Train(Game::Game *_game, int _iterations, int _max_individuals, int _max_species, int _max_layers,
+                 int _max_per_layer,
                  int inputs, int outputs, NeuralNetwork::Topology_ptr top) :
             game(_game), best_historical_topology{std::move(top)}, brains{nullptr} {
         iterations = _iterations;
@@ -80,13 +87,15 @@ namespace Train {
                     double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
                     double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
                     double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-                    NeuralNetwork::ConnectionType type =
-                            (NeuralNetwork::ConnectionType)Random::random_between(
-                                    (int)NeuralNetwork::ConnectionType::Sigmoid, (int)NeuralNetwork::ConnectionType::GRU);
+                    auto type =
+                            (NeuralNetwork::ConnectionType) Random::random_between(
+                                    (int) NeuralNetwork::ConnectionType::Sigmoid,
+                                    (int) NeuralNetwork::ConnectionType::GRU);
 
                     auto *gene = new NeuralNetwork::Gene(input, input_weight, memory_weight, reset_input_weight,
-                                               update_input_weight, reset_memory_weight, update_memory_weight, type,
-                                               NeuralNetwork::Generation::number(coordinate));
+                                                         update_input_weight, reset_memory_weight, update_memory_weight,
+                                                         type,
+                                                         NeuralNetwork::Generation::number(coordinate));
                     gene->set_output(1, index);
                     initial_topology->add_relationship(gene, true);
                 }
@@ -117,7 +126,7 @@ namespace Train {
             run_timer.stop();
             assign_results(results);
             update_best();
-            if(generations_without_beating_best == 300) {
+            if (generations_without_beating_best == 300) {
                 std::cout << "300 generations without progress, ending" << std::endl;
                 break;
             }
@@ -130,7 +139,7 @@ namespace Train {
                     break;
                 }
             }
-            if(it % 5 == 0) reset_species();
+            if (it % 5 == 0) reset_species();
             utils::Timer selection_timer("NATURAL SELECTION");
             natural_selection();
             selection_timer.stop();
@@ -155,15 +164,25 @@ namespace Train {
 
     std::vector<NeuralNetwork::Topology_ptr> Train::topologies_vector() {
         std::vector<NeuralNetwork::Topology_ptr> topologies;
+#if __MULTITHREADED__
         std::mutex mutex;
-        auto lambda = [&topologies, &mutex](NeuralNetwork::Species_ptr &spec) {
+#endif
+        auto lambda = [&topologies WITH_MUTEX](NeuralNetwork::Species_ptr &spec) {
             for (NeuralNetwork::Topology_ptr &topology : spec->get_topologies()) {
+#if __MULTITHREADED__
                 mutex.lock();
                 topologies.push_back(topology);
                 mutex.unlock();
+#else
+                topologies.push_back(topology);
+#endif
             }
         };
+#if __MULTITHREADED__
         Threading::for_each(species.begin(), species.end(), lambda);
+#else
+        std::for_each(species.begin(), species.end(), lambda);
+#endif
         return topologies;
     }
 
@@ -192,22 +211,32 @@ namespace Train {
         topologies[0] = best_historical_topology;
         species.clear();
         size_t topologies_size = topologies.size();
+#if __MULTITHREADED__
         std::mutex mutex;
+#endif
         for (size_t it = 0; it < topologies_size; ++it) {
             NeuralNetwork::Topology_ptr &topology = topologies[it];
             if (!topology->is_assigned()) {
                 NeuralNetwork::Species_ptr new_species = std::make_unique<NeuralNetwork::Species>(topology, 1);
-                auto lambda = [&topology, &new_species, &mutex](NeuralNetwork::Topology_ptr &other) {
-                    if(other->is_assigned()) return;
+                auto lambda = [&topology, &new_species WITH_MUTEX](NeuralNetwork::Topology_ptr &other) {
+                    if (other->is_assigned()) return;
                     double const delta = NeuralNetwork::Topology::delta_compatibility(*topology, *other);
                     if (delta <= 2.) {
                         other->set_assigned(true);
+#if __MULTITHREADED__
                         mutex.lock();
                         *new_species >> other;
                         mutex.unlock();
+#else
+                        *new_species >> other;
+#endif
                     }
                 };
+#if __MULTITHREADED__
                 Threading::for_each(topologies.begin() + it + 1, topologies.end(), lambda);
+#else
+                std::for_each(topologies.begin() + it + 1, topologies.end(), lambda);
+#endif
                 species.push_back(std::move(new_species));
             }
             topology->set_assigned(false);
@@ -220,9 +249,10 @@ namespace Train {
         std::cout << "SPECIES SIZE BEFORE CUT: " << species_size << std::endl;
         int const new_count = std::min(max_species, species_size);
         if (species_size > new_count) {
-            std::sort(species.begin(), species.end(), [](NeuralNetwork::Species_ptr &spec1, NeuralNetwork::Species_ptr &spec2) -> bool {
-                return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
-            });
+            std::sort(species.begin(), species.end(),
+                      [](NeuralNetwork::Species_ptr &spec1, NeuralNetwork::Species_ptr &spec2) -> bool {
+                          return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
+                      });
             int const cut_at = species_size - new_count;
             species.erase(species.begin(), species.begin() + cut_at);
         }
@@ -269,11 +299,12 @@ namespace Train {
             }
         }
 
-        std::sort(species.begin(), species.end(), [](NeuralNetwork::Species_ptr &spec1, NeuralNetwork::Species_ptr &spec2) -> bool {
-            return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
-        });
+        std::sort(species.begin(), species.end(),
+                  [](NeuralNetwork::Species_ptr &spec1, NeuralNetwork::Species_ptr &spec2) -> bool {
+                      return spec1->get_best()->get_last_result() < spec2->get_best()->get_last_result();
+                  });
 
-        for(auto &species: species) {
+        for (auto &species: species) {
             history.emplace_back(*species->get_best());
         }
 
@@ -281,11 +312,10 @@ namespace Train {
             || (max >= best_historical_topology->get_last_result() && best != best_historical_topology)) {
             new_best = true;
             best_historical_topology = best;
-            if(best->get_last_result() > best_ever_score) {
+            if (best->get_last_result() > best_ever_score) {
                 best_ever_score = best->get_last_result();
                 generations_without_beating_best = 0;
-            }
-            else {
+            } else {
                 generations_without_beating_best++;
             }
         }

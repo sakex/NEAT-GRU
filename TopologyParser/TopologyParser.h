@@ -5,7 +5,7 @@
 #ifndef TRADING_TOPOLOGYPARSER_H
 #define TRADING_TOPOLOGYPARSER_H
 
-#include <nlohmann/json.hpp>
+#include "../nlohmann/json.hpp"
 #include "../NeuralNetwork/Topology.h"
 
 /// Namespace for parsing topologies

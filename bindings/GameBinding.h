@@ -18,6 +18,13 @@ using namespace NeuralNetwork;
 using namespace NeuralNetworkCuda;
 #endif
 
+#if __EMSCRIPTEN__
+#include <emscripten.h>
+#define EMSCRIPTEN_EXPORT EMSCRIPTEN_KEEPALIVE
+#else
+#define EMSCRIPTEN_EXPORT
+#endif
+
 /// Wrapper around the struct Simulation to enable the training on a simulation
 class GameBinding : public Game::Game {
 public:
