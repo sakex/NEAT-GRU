@@ -51,7 +51,18 @@ fn main() {
     if target.contains("wasm32") {
         builder
             .target("wasm32-unknown-emscripten")
-            .flag("-nostdlib")
+            .flag("-s")
+            .flag("ENVIRONMENT='web'")
+            .flag("-s")
+            .flag("EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']")
+            .flag("-s")
+            .flag("EXPORT_ES6=1")
+            .flag("-s")
+            .flag("MODULARIZE=1")
+            .flag("-s")
+            .flag("USE_ES6_IMPORT_META=0")
+            .flag("-s")
+            .flag("EXPORTED_FUNCTIONS=\"['_compute_network', '_reset_network_state', '_network_from_string', '_network_from_topology', '_topology_to_string', '_fit', '_topology_delta_compatibility']\"")
             .flag("-fvisibility=hidden")
             .flag("-Os");
     }
@@ -63,8 +74,7 @@ fn main() {
         builder.flag("-Ofast")
             .flag("-march=native")
             .flag("-ffast-math")
-            .flag("-frename-registers")
-            .flag("-fwhole-program");
+            .flag("-frename-registers");
     }
 
     builder.compile("neat");
