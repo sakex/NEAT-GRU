@@ -63,23 +63,23 @@ namespace NeuralNetwork {
 
         point const &get_output();
 
-        long get_ev_number() const;
+        [[nodiscard]] long get_ev_number() const;
 
-        double get_input_weight() const;
+        [[nodiscard]] double get_input_weight() const;
 
-        double get_memory_weight() const;
+        [[nodiscard]] double get_memory_weight() const;
 
-        double get_reset_input_weight() const;
+        [[nodiscard]] double get_reset_input_weight() const;
 
-        double get_reset_memory_weight() const;
+        [[nodiscard]] double get_reset_memory_weight() const;
 
-        double get_update_input_weight() const;
+        [[nodiscard]] double get_update_input_weight() const;
 
-        double get_update_memory_weight() const;
+        [[nodiscard]] double get_update_memory_weight() const;
 
-        ConnectionType get_type() const;
+        [[nodiscard]] ConnectionType get_type() const;
 
-        bool is_disabled() const;
+        [[nodiscard]] bool is_disabled() const;
 
     public:
         // operators
@@ -87,6 +87,9 @@ namespace NeuralNetwork {
         bool operator<(Gene const &) const;
 
         bool operator==(Gene const &) const;
+
+        bool operator!=(Gene const &) const;
+
 
     private:
         point input;
@@ -102,7 +105,7 @@ namespace NeuralNetwork {
         long int evolution_number;
         bool disabled;
 
-        std::string parse_to_string() const override;
+        [[nodiscard]] std::string parse_to_string() const override;
     };
 
 }

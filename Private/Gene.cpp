@@ -5,6 +5,7 @@
  *      Author: sakex
  */
 
+#include <cmath>
 #include "Gene.h"
 
 namespace NeuralNetwork {
@@ -179,5 +180,23 @@ namespace NeuralNetwork {
 
     bool Gene::operator==(Gene const &that) const {
         return input == that.input && output == that.output;
+    }
+
+    inline bool approx_equal(double const a, double const b) {
+        double const diff = std::fabs(a - b);
+        return diff <= .00004;
+    }
+
+    bool Gene::operator!=(Gene const &that) const {
+        return input != that.input ||
+               output != that.output ||
+               !approx_equal(input_weight, that.input_weight) ||
+               !approx_equal(memory_weight, that.memory_weight) ||
+               !approx_equal(reset_input_weight, that.reset_input_weight) ||
+               !approx_equal(update_input_weight, that.update_input_weight) ||
+               !approx_equal(reset_memory_weight, that.reset_memory_weight) ||
+               !approx_equal(update_memory_weight, that.update_memory_weight) ||
+               connection_type != that.connection_type ||
+               disabled != that.disabled;
     }
 }
