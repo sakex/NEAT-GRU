@@ -46,7 +46,6 @@ impl TestGame {
 
 impl Game for TestGame {
     fn run_generation(&mut self) -> Vec<f64> {
-        println!("test");
         vec![0f64; self.nets.len()]
     }
 
@@ -55,7 +54,6 @@ impl Game for TestGame {
     }
 
     fn post_training(&mut self, history: &[Topology]) {
-        println!("YAAAA");
         let generated = &history[history.len() - 1];
         let as_str = generated.to_string();
         let deserialized = Topology::from_string(&*as_str);
