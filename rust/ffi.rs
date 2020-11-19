@@ -89,6 +89,8 @@ extern "C" {
     pub fn network_from_string(json: *const c_char) -> *mut c_void;
     pub fn network_from_topology(topology: *const c_void) -> *mut c_void;
     pub fn topology_to_string(topology: *const c_void) -> *const c_char;
+    pub fn topologies_equal(topology1: *const c_void, topology2: *const c_void) -> bool;
+    pub fn topology_from_string(serialized: *const c_char) -> *const c_void;
     pub fn fit(sim: *mut c_void, iterations: c_int, max_individuals: c_int, max_species: c_int,
                max_layers: c_int, max_per_layers: c_int, inputs: c_int, outputs: c_int);
     pub fn topology_delta_compatibility(topology1: *const c_void, topology2: *const c_void) -> c_double;

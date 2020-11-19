@@ -125,14 +125,29 @@ namespace NeuralNetwork {
         ev_number_index.clear();
     }
 
+    inline bool approx_equal(double const a, double const b) {
+        double const diff = std::fabs(a - b);
+        return diff <= .00004;
+    }
+
     bool Topology::operator==(NeuralNetwork::Topology const &comparison) const {
-        return std::all_of(ev_number_index.begin(), ev_number_index.end(), [&comparison](auto const &pair) -> bool {
-            auto const search = comparison.ev_number_index.find(pair.first);
-            bool const not_in = search == comparison.ev_number_index.end();
-            Gene *phen1 = pair.second;
-            Gene *phen2 = search->second;
-            bool const equal = *phen1 == *phen2;
-            return !(not_in || !equal);
+        return std::all_of(relationships.begin(), relationships.end(), [&comparison](auto const &pair) -> bool {
+            auto const search = comparison.relationships.find(pair.first);
+            bool const not_in = search == comparison.relationships.end();
+            if (not_in) return false;
+            GeneAndBias const *neuron1 = &pair.second;
+            GeneAndBias const *neuron2 = &search->second;
+            size_t const gene1_size = neuron1->genes.size();
+            if (gene1_size != neuron2->genes.size()) return false;
+            for (size_t i = 0; i < gene1_size; ++i) {
+                bool const bias_equal = (
+                        approx_equal(neuron1->bias.bias_input, neuron2->bias.bias_input) &&
+                        approx_equal(neuron1->bias.bias_update, neuron2->bias.bias_update) &&
+                        approx_equal(neuron1->bias.bias_reset, neuron2->bias.bias_reset)
+                );
+                if (!bias_equal || *neuron1->genes[i] != *neuron2->genes[i]) return false;
+            }
+            return true;
         });
     }
 
@@ -387,7 +402,7 @@ namespace NeuralNetwork {
     void Topology::set_bias(std::array<int, 2> neuron, Bias const bias) {
         if (neuron[0] != layers - 1) {
             auto iterator = relationships.find(neuron);
-            if(iterator != relationships.end()) iterator->second.bias = bias;
+            if (iterator != relationships.end()) iterator->second.bias = bias;
         } else {
             if (output_bias.size() != (unsigned long) layers_size.back()) output_bias.resize(layers_size.back());
             output_bias[neuron[1]] = bias;

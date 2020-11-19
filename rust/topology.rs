@@ -1,7 +1,8 @@
-use std::ffi::{c_void, CStr};
+use std::ffi::{c_void, CStr, CString};
 use std::fmt;
-use crate::ffi::{topology_to_string, network_from_topology, topology_delta_compatibility};
+use crate::ffi::{topology_to_string, network_from_topology, topology_delta_compatibility, topologies_equal, topology_from_string};
 use crate::neural_network::NeuralNetwork;
+use std::os::raw::c_char;
 
 /// Wrapper to the C++ class Topology
 #[derive(Clone)]
@@ -16,6 +17,15 @@ impl Topology {
         }
     }
 
+    pub fn from_string(serialized: &str) -> Topology {
+        unsafe {
+            let c_string = CString::new(serialized).unwrap();
+            let char_ptr = c_string.as_ptr() as *const c_char;
+            let topology_ptr = topology_from_string(char_ptr);
+            Topology::new(topology_ptr)
+        }
+    }
+
     pub fn to_string(&self) -> String {
         unsafe {
             let c_buf = topology_to_string(self.ptr);
@@ -27,6 +37,12 @@ impl Topology {
         unsafe {
             topology_delta_compatibility(topology1.ptr, topology2.ptr)
         }
+    }
+}
+
+impl PartialEq for Topology {
+    fn eq(&self, other: &Topology) -> bool {
+        unsafe { topologies_equal(self.ptr, other.ptr) }
     }
 }
 
