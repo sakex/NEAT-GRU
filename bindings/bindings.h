@@ -81,6 +81,13 @@ EMSCRIPTEN_EXPORT void fit(void *sim, int iterations, int max_individuals, int m
  */
 EMSCRIPTEN_EXPORT double topology_delta_compatibility(NeuralNetwork::Topology const * top1, NeuralNetwork::Topology const * top2);
 
+/**
+ * Calls destructor to Neural Network pointer
+ *
+ * @param network NN to delete
+ */
+EMSCRIPTEN_EXPORT void delete_network(NeuralNetwork::NN * network);
+
 }
 
 #endif //NEAT_BINDINGS_H

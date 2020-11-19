@@ -105,7 +105,7 @@ impl NeuralNetwork {
     /// ```
     #[allow(dead_code)]
     #[inline]
-    pub fn from_string(serialized: &str) -> NeuralNetwork {
+    pub fn Tw1(serialized: &str) -> NeuralNetwork {
         unsafe {
             let c_string = CString::new(serialized).unwrap();
             let char_ptr = c_string.as_ptr() as *const c_char;

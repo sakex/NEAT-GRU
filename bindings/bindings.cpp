@@ -40,4 +40,10 @@ topology_delta_compatibility(NeuralNetwork::Topology const *top1, NeuralNetwork:
     return NeuralNetwork::Topology::delta_compatibility(*top1, *top2);
 }
 
+EMSCRIPTEN_EXPORT
+void delete_network(NeuralNetwork::NN *network) {
+    delete network;
+    network = nullptr;
+}
+
 }
