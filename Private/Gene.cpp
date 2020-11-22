@@ -184,10 +184,23 @@ namespace NeuralNetwork {
 
     inline bool approx_equal(double const a, double const b) {
         double const diff = std::fabs(a - b);
-        return diff <= .00004;
+        return diff <= 1e-7;
     }
 
     bool Gene::operator!=(Gene const &that) const {
+        /*
+        std::cout << "INPUT " << (input == that.input) << std::endl;
+        std::cout << "OUTPUT " << (output == that.output) << " [" << output[0] << ", " << output[1] << "] [" << that.output[0] << ", " << that.output[1] << "]" << std::endl;
+        std::cout << "input_weight " << approx_equal(input_weight, that.input_weight) << " " << input_weight - that.input_weight << std::endl;
+        std::cout << "memory_weight " << approx_equal(memory_weight, that.memory_weight) << " " << memory_weight - that.memory_weight << std::endl;
+        std::cout << "reset_input_weight " << approx_equal(reset_input_weight, that.reset_input_weight) << " " << reset_input_weight - that.reset_input_weight << std::endl;
+        std::cout << "update_input_weight " << approx_equal(update_input_weight, that.update_input_weight) << " " << update_input_weight - that.update_input_weight << std::endl;
+        std::cout << "reset_memory_weight " << approx_equal(reset_memory_weight, that.reset_memory_weight) << " " << reset_memory_weight - that.reset_memory_weight << std::endl;
+        std::cout << "update_memory_weight " << approx_equal(update_memory_weight, that.update_memory_weight) << " " << update_memory_weight - that.update_memory_weight << std::endl;
+        std::cout << "connection_type " << (connection_type == that.connection_type) << std::endl;
+        std::cout << "disabled " << (disabled == that.disabled) << std::endl;
+        */
+
         return input != that.input ||
                output != that.output ||
                !approx_equal(input_weight, that.input_weight) ||

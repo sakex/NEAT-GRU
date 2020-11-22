@@ -50,6 +50,8 @@ namespace NeuralNetwork {
 
         void set_bias(Bias);
 
+        bool operator==(Neuron const &) const;
+
     private:
         double input = 0.;
         double memory = 0.;

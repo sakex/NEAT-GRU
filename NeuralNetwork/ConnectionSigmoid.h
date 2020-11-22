@@ -22,6 +22,8 @@ namespace NeuralNetwork {
 
         void activate(double);
 
+        bool operator==(ConnectionSigmoid const &) const;
+
     private:
         double weight = 0.;
         Neuron *output{nullptr};

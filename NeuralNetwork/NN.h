@@ -48,6 +48,8 @@ namespace NeuralNetwork {
         /// Resets the hidden state to 0
         void reset_state();
 
+        bool operator==(NN const &) const;
+
     private:
         int neurons_count;
         int layer_count;

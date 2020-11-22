@@ -127,25 +127,41 @@ namespace NeuralNetwork {
 
     inline bool approx_equal(double const a, double const b) {
         double const diff = std::fabs(a - b);
-        return diff <= .00004;
+        return diff <= 1e-7;
     }
 
     bool Topology::operator==(NeuralNetwork::Topology const &comparison) const {
         return std::all_of(relationships.begin(), relationships.end(), [&comparison](auto const &pair) -> bool {
             auto const search = comparison.relationships.find(pair.first);
             bool const not_in = search == comparison.relationships.end();
-            if (not_in) return false;
+            if (not_in) {
+                return false;
+            }
             GeneAndBias const *neuron1 = &pair.second;
             GeneAndBias const *neuron2 = &search->second;
             size_t const gene1_size = neuron1->genes.size();
-            if (gene1_size != neuron2->genes.size()) return false;
+            if (gene1_size == 0) return true;
             for (size_t i = 0; i < gene1_size; ++i) {
                 bool const bias_equal = (
                         approx_equal(neuron1->bias.bias_input, neuron2->bias.bias_input) &&
                         approx_equal(neuron1->bias.bias_update, neuron2->bias.bias_update) &&
                         approx_equal(neuron1->bias.bias_reset, neuron2->bias.bias_reset)
                 );
-                if (!bias_equal || *neuron1->genes[i] != *neuron2->genes[i]) return false;
+                if (!bias_equal) {
+                    return false;
+                }
+                bool found = false;
+                for (size_t j = 0; j < gene1_size; ++j) {
+                    if (neuron1->genes[i]->get_output() == neuron2->genes[j]->get_output()) {
+                        if (!(*neuron1->genes[i] != *neuron2->genes[j])) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if(!found) {
+                    return false;
+                }
             }
             return true;
         });
@@ -176,7 +192,6 @@ namespace NeuralNetwork {
     }
 
     void Topology::add_relationship(Gene *gene, const bool init) {
-        if (gene->is_disabled()) return;
         Gene::point input = gene->get_input();
         Gene::point output = gene->get_output();
         if (input[1] + 1 > layers_size[input[0]]) {
@@ -391,8 +406,8 @@ namespace NeuralNetwork {
         double const update_input_weight = Random::random_between(-100, 100) / 100.0f;
         double const reset_memory_weight = Random::random_between(-100, 100) / 100.0f;
         double const update_memory_weight = Random::random_between(-100, 100) / 100.0f;
-        ConnectionType type = (ConnectionType) Random::random_between((int) ConnectionType::Sigmoid,
-                                                                      (int) ConnectionType::GRU);
+        auto type = (ConnectionType) Random::random_between((int) ConnectionType::Sigmoid,
+                                                            (int) ConnectionType::GRU);
         auto *gene = new Gene(input, output, input_weight, memory_weight, reset_input_weight,
                               update_input_weight, reset_memory_weight, update_memory_weight, type, ev_number);
         add_relationship(gene);

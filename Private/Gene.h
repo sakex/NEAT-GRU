@@ -12,6 +12,7 @@
 #include <functional>
 #include "../Serializer/Serializer.hpp"
 #include "ConnectionType.h"
+#include <limits>
 
 namespace NeuralNetwork {
 

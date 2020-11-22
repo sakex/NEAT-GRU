@@ -43,6 +43,17 @@ EMSCRIPTEN_EXPORT void reset_network_state(NeuralNetwork::NN *net);
 EMSCRIPTEN_EXPORT NN *network_from_string(char const *serialized);
 
 /**
+ * Checks if two networks are equal
+ *
+ * @param net1 First network
+ * @param net2 Second network to check if they are equal
+ * @return true if they are equal
+ */
+EMSCRIPTEN_EXPORT
+bool networks_equal(NeuralNetwork::NN const *net1, NeuralNetwork::NN const *net2);
+
+
+/**
  * Creates a topology pointer from a serialized string
  *
  * @param serialized C string representing serialized topology

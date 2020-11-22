@@ -15,7 +15,7 @@ struct TopologyParser {
      * @param j Json to be converted to a Topology
      * @return Topology from the json
      */
-    static NeuralNetwork::Topology parse(nlohmann::json & j);
+    static NeuralNetwork::Topology * parse(nlohmann::json & j);
 };
 
 

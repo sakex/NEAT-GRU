@@ -9,7 +9,7 @@ EMSCRIPTEN_EXPORT
 NN *network_from_string(char const *serialized) {
     using json = nlohmann::json;
     json j = json::parse(serialized);
-    NeuralNetwork::Topology_ptr topology = std::make_unique<NeuralNetwork::Topology>(TopologyParser::parse(j));
+    auto * topology = TopologyParser::parse(j);
     auto *net = new NN(*topology);
     return net;
 }
@@ -18,7 +18,7 @@ EMSCRIPTEN_EXPORT
 Topology *topology_from_string(char const *serialized) {
     using json = nlohmann::json;
     json j = json::parse(serialized);
-    auto * topology = new Topology(TopologyParser::parse(j));
+    auto * topology = TopologyParser::parse(j);
     return topology;
 }
 
@@ -26,6 +26,11 @@ EMSCRIPTEN_EXPORT
 NN *network_from_topology(NeuralNetwork::Topology *topology) {
     auto *net = new NN(*topology);
     return net;
+}
+
+EMSCRIPTEN_EXPORT
+bool networks_equal(NeuralNetwork::NN const *net1, NeuralNetwork::NN const *net2) {
+    return *net1 == *net2;
 }
 
 EMSCRIPTEN_EXPORT

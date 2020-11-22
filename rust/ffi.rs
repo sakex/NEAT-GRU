@@ -88,6 +88,7 @@ extern "C" {
     pub fn compute_network(net: *mut c_void, input: *mut c_double) -> *mut c_double;
     pub fn network_from_string(json: *const c_char) -> *mut c_void;
     pub fn network_from_topology(topology: *const c_void) -> *mut c_void;
+    pub fn networks_equal(net1: *const c_void, net2: *const c_void) -> bool;
     pub fn topology_to_string(topology: *const c_void) -> *const c_char;
     pub fn topologies_equal(topology1: *const c_void, topology2: *const c_void) -> bool;
     pub fn topology_from_string(serialized: *const c_char) -> *const c_void;

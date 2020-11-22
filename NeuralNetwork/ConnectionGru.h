@@ -27,6 +27,8 @@ namespace NeuralNetwork {
 
         void reset_state();
 
+        bool operator==(ConnectionGru const &) const;
+
     private:
         double memory = 0.f;
         double prev_input = 0.f;

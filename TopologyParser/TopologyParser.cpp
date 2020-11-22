@@ -4,9 +4,9 @@
 
 #include "TopologyParser.h"
 
-NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
+NeuralNetwork::Topology * TopologyParser::parse(nlohmann::json &j) {
     using namespace NeuralNetwork;
-    Topology topology;
+    auto * topology = new Topology;
     int max_layers = 0;
 
     std::vector<Gene *> new_genes;
@@ -29,9 +29,9 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
                          reset_memory_weight,
                          update_memory_weight, disabled, (ConnectionType)connection_type, 0));
     }
-    topology.set_layers(max_layers + 1);
+    topology->set_layers(max_layers + 1);
     for (Gene *phen_ptr : new_genes) {
-        topology.add_relationship(phen_ptr, true);
+        topology->add_relationship(phen_ptr, true);
     }
     for (auto &it : j["biases"]) {
         auto &it_neuron = it["neuron"];
@@ -42,7 +42,7 @@ NeuralNetwork::Topology TopologyParser::parse(nlohmann::json &j) {
                 it_bias["bias_update"],
                 it_bias["bias_reset"]
         };
-        topology.set_bias(neuron, bias);
+        topology->set_bias(neuron, bias);
     }
     return topology;
 }

@@ -1,4 +1,4 @@
-use crate::ffi::{compute_network, reset_network_state, network_from_string};
+use crate::ffi::{compute_network, reset_network_state, network_from_string, networks_equal};
 use std::os::raw::{c_double, c_char};
 use std::ffi::{c_void, CString};
 #[cfg(target_arch = "wasm32")]
@@ -105,7 +105,7 @@ impl NeuralNetwork {
     /// ```
     #[allow(dead_code)]
     #[inline]
-    pub fn Tw1(serialized: &str) -> NeuralNetwork {
+    pub fn from_string(serialized: &str) -> NeuralNetwork {
         unsafe {
             let c_string = CString::new(serialized).unwrap();
             let char_ptr = c_string.as_ptr() as *const c_char;
@@ -118,5 +118,11 @@ impl NeuralNetwork {
     #[inline]
     pub fn get_ptr(&self) -> *mut c_void {
         self.ptr
+    }
+}
+
+impl PartialEq for NeuralNetwork {
+    fn eq(&self, other: &NeuralNetwork) -> bool {
+        unsafe { networks_equal(self.ptr, other.ptr) }
     }
 }

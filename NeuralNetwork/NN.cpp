@@ -14,6 +14,11 @@
 #include <cmath>
 
 namespace NeuralNetwork {
+    inline bool approx_equal(double const a, double const b) {
+        double const diff = std::fabs(a - b);
+        return diff <= 1e-7;
+    }
+
     inline double fast_sigmoid(double const value) {
         return value / (1.f + std::abs(value));
     }
@@ -39,6 +44,11 @@ namespace NeuralNetwork {
     inline void ConnectionSigmoid::activate(double const value) {
         output->increment_value(value * weight);
     }
+
+    bool ConnectionSigmoid::operator==(ConnectionSigmoid const &other) const {
+        return approx_equal(weight, other.weight);
+    }
+
 } /* namespace NeuralNetwork */
 
 namespace NeuralNetwork {
@@ -72,6 +82,17 @@ namespace NeuralNetwork {
     inline void ConnectionGru::reset_state() {
         memory = 0.;
         prev_input = 0.;
+    }
+
+    bool ConnectionGru::operator==(ConnectionGru const &other) const {
+        return approx_equal(memory, other.memory) &&
+               approx_equal(prev_input, other.prev_input) &&
+               approx_equal(input_weight, other.input_weight) &&
+               approx_equal(memory_weight, other.memory_weight) &&
+               approx_equal(reset_input_weight, other.reset_input_weight) &&
+               approx_equal(update_input_weight, other.update_input_weight) &&
+               approx_equal(reset_memory_weight, other.reset_memory_weight) &&
+               approx_equal(update_memory_weight, other.update_memory_weight);
     }
 
 
@@ -182,6 +203,41 @@ namespace NeuralNetwork {
     inline void Neuron::set_connections_count(int sigmoid_count, int gru_count) {
         connections_sigmoid = new ConnectionSigmoid[sigmoid_count]();
         connections_gru = new ConnectionGru[gru_count]();
+    }
+
+    bool Neuron::operator==(Neuron const &other) const {
+        bool const values_equal = approx_equal(input, other.input) &&
+                                  approx_equal(memory, other.memory) &&
+                                  approx_equal(update, other.update) &&
+                                  approx_equal(reset, other.reset) &&
+                                  approx_equal(prev_reset, other.prev_reset) &&
+                                  approx_equal(last_added_gru, other.last_added_gru) &&
+                                  approx_equal(last_added_sigmoid, other.last_added_sigmoid) &&
+                                  approx_equal(bias_input, other.bias_input) &&
+                                  approx_equal(bias_update, other.bias_update) &&
+                                  approx_equal(bias_reset, other.bias_reset);
+        if (!values_equal) return false;
+        for (int i = 0; i < last_added_gru; ++i) {
+            bool found = false;
+            for(int j = 0; j < last_added_gru; ++j) {
+                if (connections_gru[i] == other.connections_gru[j]) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) return false;
+        }
+        for (int i = 0; i < last_added_sigmoid; ++i) {
+            bool found = false;
+            for(int j = 0; j < last_added_sigmoid; ++j) {
+                if (connections_sigmoid[i] == other.connections_sigmoid[j]) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) return false;
+        }
+        return true;
     }
 }
 
@@ -296,6 +352,12 @@ namespace NeuralNetwork {
         }
     }
 
+    bool NN::operator==(NN const &other) const {
+        for (int it = 0; it < neurons_count; ++it) {
+            if (!(layers[it] == other.layers[it])) return false;
+        }
+        return true;
+    }
 
 } /* namespace NeuralNetwork */
 
