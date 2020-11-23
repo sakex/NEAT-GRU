@@ -294,10 +294,15 @@ namespace NeuralNetwork {
             Neuron *input_neuron_ptr = &layers[layer_addresses[it.first[0]] + it.first[1]];
             input_neuron_ptr->set_bias(it.second.bias);
 
-            int type_counts[ConnectionType::GRU + 1] = {0};
-            for (Gene *gene : it.second.genes) type_counts[gene->get_type()]++;
+            int type_counts[2] = {0, 0};
+            for (Gene *gene : it.second.genes) {
+                if(!gene->is_disabled()) {
+                    type_counts[gene->get_type()]++;
+                }
+            }
             input_neuron_ptr->set_connections_count(type_counts[0], type_counts[1]);
             for (Gene *gene : it.second.genes) {
+                if(gene->is_disabled()) continue;
                 Gene::point output = gene->get_output();
                 double const input_weight = gene->get_input_weight();
                 double const update_input_weight = gene->get_update_input_weight();
