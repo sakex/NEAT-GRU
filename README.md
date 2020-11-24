@@ -1,6 +1,12 @@
 # NEAT-GRU ![Tests](https://github.com/sakex/NEAT-GRU/workflows/Rust/badge.svg?branch=master)
 
-# As a C++ library
+## Languages:
+
+- [As a C++ library](#as-a-cpp-library)  
+- [As a Rust Library](#as-a-rust-library)  
+
+
+# As a Cpp library
 
 ## Generate doc with Doxygen
     doxygen doc.conf
