@@ -46,7 +46,8 @@
       train.start(); // Runs the training, will output the resulting network to "topologies.json"
       
       
- # As a Rust Library
+ # As a Rust Library 
+ [Crates.io doc](https://docs.rs/neat-gru/0.1.10/neat_gru/train/struct.Train.html)
  
  In `Cargo.toml`:
  
