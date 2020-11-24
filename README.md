@@ -67,7 +67,7 @@
      impl Player {
          pub fn new(net: NeuralNetwork) -> Player {
              Player {
-                 net = net,
+                 net: net,
                  score: 0f64
              }
          }
