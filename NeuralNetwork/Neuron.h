@@ -53,16 +53,17 @@ namespace NeuralNetwork {
         bool operator==(Neuron const &) const;
 
     private:
-        double input = 0.;
-        double memory = 0.;
-        double update = 0.;
-        double reset = 0.;
-        double prev_reset = 0.;
-        int last_added_gru = 0;
-        int last_added_sigmoid = 0;
-        double bias_input = 0.;
-        double bias_update = 0.;
-        double bias_reset = 0.;
+        double input;
+        double memory;
+        double update;
+        double reset;
+        double prev_reset;
+        int last_added_gru;
+        int last_added_sigmoid;
+        double bias_input{};
+        double bias_update{};
+        double bias_reset{};
+        bool activated;
         ConnectionGru *connections_gru{nullptr};
         ConnectionSigmoid *connections_sigmoid{nullptr};
 
