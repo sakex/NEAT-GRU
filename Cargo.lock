@@ -53,7 +53,7 @@ dependencies = [
 
 [[package]]
 name = "neat-gru"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "cc",
  "wasm-bindgen",

@@ -63,7 +63,6 @@ namespace NeuralNetwork {
         double bias_input{};
         double bias_update{};
         double bias_reset{};
-        bool activated;
         ConnectionGru *connections_gru{nullptr};
         ConnectionSigmoid *connections_sigmoid{nullptr};
 

@@ -109,7 +109,6 @@ namespace NeuralNetwork {
             prev_reset(0.),
             last_added_gru(0.),
             last_added_sigmoid(0.),
-            activated(false),
             connections_gru{nullptr} {
     }
 
@@ -130,7 +129,6 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::increment_state(double const mem, double const inp, double const res, double const upd) {
-        activated = true;
         memory += mem;
         input += inp;
         reset += res;
@@ -138,12 +136,10 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::increment_value(double const value) {
-        activated = true;
         input += value;
     }
 
     inline void Neuron::set_input_value(double new_value) {
-        activated = true;
         input = new_value;
         update = -10.f;
         reset = -10.f;
@@ -165,7 +161,6 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::reset_value() {
-        activated = false;
         input = bias_input;
         update = bias_update;
         reset = bias_reset;
@@ -182,7 +177,6 @@ namespace NeuralNetwork {
     }
 
     inline void Neuron::feed_forward() {
-        if(!activated) return;
         double const update_gate = fast_sigmoid(update);
         double const reset_gate = fast_sigmoid(reset);
 
